@@ -8,6 +8,7 @@ import {
   Link
 } from "react-router-dom";
 
+import Navbar from "./components/navbar";
 import LandingPage from "./containers/page-landing";
 import DashboardPage from "./containers/page-dashboard";
 import ProfilePage from "./containers/page-profile";
@@ -18,28 +19,7 @@ function App() {
   return (
     <Router>
       <div>
-        <nav>
-          <ul>
-            <li>
-              <Link to="/">Landing</Link>
-            </li>
-            <li>
-              <Link to="/dashboard">Dashboard</Link>
-            </li>
-            <li>
-              <Link to="/profile">Profile</Link>
-            </li>
-            <li>
-              <Link to="/positions">Positions</Link>
-            </li>
-            <li>
-              <Link to="/forums">Forums</Link>
-            </li>
-            <li>
-              <Link to="/about">About</Link>
-            </li>
-          </ul>
-        </nav>
+        <Navbar />
 
         {/* A <Switch> looks through its children <Route>s and
             renders the first one that matches the current URL. */}
