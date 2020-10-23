@@ -14,6 +14,7 @@ import DashboardPage from "./containers/page-dashboard";
 import ProfilePage from "./containers/page-profile";
 import PositionsPage from "./containers/page-positions";
 import ForumsPage from "./containers/page-forums";
+import PastApplicationsPage from "./containers/page-past-applications";
 
 function App() {
   return (
@@ -24,7 +25,9 @@ function App() {
         {/* A <Switch> looks through its children <Route>s and
             renders the first one that matches the current URL. */}
         <Switch>
-
+        <Route path="/past-applications">
+            <PastApplicationsPage />
+          </Route>
           <Route path="/dashboard">
             <DashboardPage />
           </Route>
