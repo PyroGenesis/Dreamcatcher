@@ -8,7 +8,7 @@ class DashboardPage extends Component {
   render() {
     return (
       <div className="body-content dashboard">
-        <h1>Dashboard</h1>
+        <br></br>
         <Layout/>
       </div>
 

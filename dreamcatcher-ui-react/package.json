@@ -10,9 +10,11 @@
     "@testing-library/user-event": "^7.2.1",
     "node-sass": "^4.14.1",
     "react": "^16.14.0",
+    "react-calendar-heatmap": "^1.8.1",
     "react-dom": "^16.14.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.3",
+    "react-tooltip": "^4.2.10",
     "victory": "^35.3.1"
   },
   "scripts": {
