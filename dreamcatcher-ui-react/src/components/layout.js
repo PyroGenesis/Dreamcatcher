@@ -2,107 +2,95 @@ import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Table from '../components/table';
-import Card from '@material-ui/core/Card';
-import CardActions from '@material-ui/core/CardActions';
-import CardContent from '@material-ui/core/CardContent';
 import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
-import {VictoryPie} from 'victory';
+import Calendar from '../components/calendar'
+import 'react-calendar-heatmap/dist/styles.css';
+import Paper from '@material-ui/core/Paper';
 
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
   },
-  card: {
-    width: 300,
-    height: 300,
-  },
-  bullet: {
-    display: 'inline-block',
-    margin: '0 2px',
-    transform: 'scale(0.8)',
-  },
   title: {
     fontSize: 14,
   },
-  pos: {
-    marginBottom: 12,
-  },
+  paper:{
+    padding:10, display: 'flex',
+    alignContent: 'space-between',
+    alignItems: 'center',
+    width:'80%'
+  }
 }));
 
 export default function CenteredGrid() {
   const classes = useStyles();
-  const bull = <span className={classes.bullet}>•</span>;
   return (
     <div className={classes.root}>
-      <Grid container spacing={3}>
-        <Grid item xs={4}>
-            <Card className={classes.card}>
-                <CardContent>  
-                <Typography variant="h5" component="h2">
-                Total Applications
-                </Typography>
-                <Typography variant="h1" component="h1">
-                10
-                </Typography>
-                </CardContent>
-                <CardActions>
-                    <Button size="small">Learn More</Button>
-                </CardActions>
-            </Card>
+      <Grid container spacing={5}
+      justify="center">
+        <Grid item xs={4}> 
+          <Paper className = {classes.paper}>
+            <Typography variant="h5" component="h2"  href="past-applications" style={{ flex: 1 }}>
+                  Total Applications: 10        
+              </Typography>
+              <Button href ="past-applications">View</Button>
+          </Paper>
+          
+          <br></br><br></br>
+
+          <Paper className = {classes.paper}>
+            <Typography variant="h5" component="h2" style={{ flex: 1 }}>
+                  Coding Tests Received: 2/10
+              </Typography>
+              <Button>View</Button>
+          </Paper>
+          <br></br><br></br>
+
+          <Paper className = {classes.paper}>
+            <Typography variant="h5" component="h2" style={{ flex: 1 }}>
+                  Interview Scheduled: 2/10
+              </Typography>
+              <Button>View</Button>
+          </Paper>
+          <br></br><br></br>
+
+          <Paper className = {classes.paper}>
+            <Typography variant="h5" component="h2" style={{ flex: 1 }}>
+                  Software Developer Engineer: 4
+              </Typography>
+              <Button>View</Button>
+          </Paper>
+          <br></br><br></br>
+
+          <Paper className = {classes.paper}>
+            <Typography variant="h5" component="h2" style={{ flex: 1 }}>
+                  Full Stack Developer: 4
+              </Typography>
+              <Button>View</Button>
+          </Paper>
+
+          <br></br><br></br>
+
+          <Paper className = {classes.paper}>
+            <Typography variant="h5" component="h2" style={{ flex: 1 }}>
+                  Web Developer: 4
+              </Typography>
+              <Button>View</Button>
+          </Paper>
+
         </Grid>
-        <Grid item xs={4}>
-            <Card className={classes.card}>
-                <CardContent>
-                <Typography variant="h5" component="h2">
-                Positions Applied
-                </Typography>
-                <VictoryPie
-                    colorScale={["gold", "cyan", "navy" ]}
-                    data={[
-                        { x: "Full Stack", y: 55 },
-                        { x: "SDE", y: 35 },
-                        { x: "Web Dev", y: 40 }
-                      ]}
-                />
-                </CardContent>
-                <CardActions>
-                    <Button size="small">Learn More</Button>
-                </CardActions>
-            </Card>
+        <Grid item xs={6} justify= "center" alignContent = "center"> 
+          <h1 style={{fontFamily: "Roboto"}}> 20 applications in the past 4 months</h1>
+          <Paper >
+            <Calendar/> 
+          </Paper>
+          <br></br>
+          <br></br>
+          <br></br>
+          <Table numRows = "5"/> 
         </Grid>
-        <Grid item xs={4}>
-            <Card className={classes.card}>
-                <CardContent>
-                <Typography variant="h5" component="h2">
-                Status
-                </Typography>
-                <Typography variant ="body">
-                <VictoryPie
-                    colorScale={["gold", "cyan", "navy" ]}
-                    data={[
-                        { x: "Reject", y: 55 },
-                        { x: "Applied", y: 35 },
-                        { x: "Interview", y: 40 }
-                      ]}
-                />
-                </Typography>
-                
-                </CardContent>
-                <CardActions>
-                    <Button size="small">Learn More</Button>
-                </CardActions>
-            </Card>
-        </Grid>
-        <Grid item xs={12}>
-         <Table numRows = "5"/> 
-         <Button variant="contained" color="primary" href="past-applications">
-            VIEW ALL
-          </Button>
-        </Grid>
-        
-        
-      </Grid>
+      </Grid> 
     </div>
   );
 }
