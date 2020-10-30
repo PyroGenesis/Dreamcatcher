@@ -57,7 +57,7 @@ export default function CenteredGrid() {
 
           <Paper className = {classes.paper}>
             <Typography variant="h5" component="h2" style={{ flex: 1 }}>
-                  Software Developer Engineer: 4
+                  Software Development Engineer: 4
               </Typography>
               <Button>View</Button>
           </Paper>
