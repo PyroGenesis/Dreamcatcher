@@ -46,7 +46,7 @@ class LandingPage extends Component {
 
   render() {
     return (
-        <header className="App-header">
+        <header className="" className="body-content App-header">
           <Grid container style={{margin: 0, width: '100%'}} justify="center" spacing={3} alignItems="center">
             <Grid item xs={9} align="center">
               <h1 style={{fontFamily:"Comfortaa", fontSize:80}}> Dreamcatcher</h1>

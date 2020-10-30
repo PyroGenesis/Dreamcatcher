@@ -7,7 +7,7 @@ import Layout from '../components/layout'
 class DashboardPage extends Component {
   render() {
     return (
-      <div className="dashboard">
+      <div className="body-content dashboard">
         <h1>Dashboard</h1>
         <Layout/>
       </div>

@@ -19,7 +19,7 @@ import PastApplicationsPage from "./containers/page-past-applications";
 function App() {
   return (
     <Router>
-      <div>
+      <div style={{height: '100%'}}>
         <Navbar />
 
         {/* A <Switch> looks through its children <Route>s and
