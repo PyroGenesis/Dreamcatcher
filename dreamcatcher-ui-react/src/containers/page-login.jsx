@@ -1,12 +1,15 @@
 import React from 'react';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
+import { auth } from '../components/firebase'
+import { withRouter } from 'react-router';
 
-export default class LoginForm extends React.Component {
+
+export class LoginForm extends React.Component {
 
     state = {
-        userName: '',
-        userNameError: '',
+        email: '',
+        emailError: '',
         password: '',
         passwordError: '',
     };
@@ -22,14 +25,9 @@ export default class LoginForm extends React.Component {
 
         let isError = false;
         const errors = {
-            userNameError: '',
+            emailError: '',
             passwordError: '',
         };
-
-        if(this.state.userName.length < 5) {
-            isError = true;
-            errors.userNameError = 'Username needs to be atleast 5 characters long.'
-        }
 
         if(this.state.password.length < 5) {
             isError = true;
@@ -46,14 +44,30 @@ export default class LoginForm extends React.Component {
         const err = this.validateInput();
 
         if(!err) {
+            auth.signInWithEmailAndPassword(this.state.email, this.state.password)
+            .then(res => {
+                alert('You have successfully signed in!');
+                this.props.history.push("/dashboard");
+            })
+            .catch(error => {
+                var errorCode = error.code;
+                var errorMessage = error.message;
+
+                alert(errorMessage);
+
+                console.log(errorCode);
+                console.log(errorMessage);
+                console.log(error);
+            }); 
+
             this.setState({
-                userName: '',
-                userNameError: '',
+                email: '',
+                emailError: '',
                 password: '',
                 passwordError: '',
             });
             this.props.onChange({
-                userName: '',
+                email: '',
                 password: '',
             })
         }
@@ -62,13 +76,14 @@ export default class LoginForm extends React.Component {
     render() {
 
         return (
-            <form>
+            <form  onSubmit = {e => this.onSubmit(e)}>
                 <TextField 
-                    name = 'userName' 
-                    label = 'User Name' 
-                    value = { this.state.userName } 
-                    error = { this.state.userNameError.length === 0 ? false : true }
-                    helperText = { this.state.userNameError }
+                    name = 'email' 
+                    type = 'email'
+                    label = 'Email' 
+                    value = { this.state.email } 
+                    error = { this.state.emailError.length === 0 ? false : true }
+                    helperText = { this.state.emailNameError }
                     onChange = {e => this.change(e) } 
                     required
                     />
@@ -84,8 +99,10 @@ export default class LoginForm extends React.Component {
                     required
                     />
                 <br />
-                <Button style={{marginTop: '30px', marginBottom: '20px'}} variant="contained" color="primary" onSubmit = {e => this.onSubmit(e)} type="submit" > Login </Button>
+                <Button style={{marginTop: '30px', marginBottom: '20px'}} variant="contained" color="primary" type="submit" > Login </Button>
             </form>
         );
     }
 }
+
+export default withRouter(LoginForm);

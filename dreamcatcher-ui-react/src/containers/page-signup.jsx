@@ -1,8 +1,10 @@
 import React from 'react';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
+import { withRouter } from 'react-router';
+import { auth, createUserProfileDocument } from '../components/firebase'
 
-export default class SignupForm extends React.Component {
+export class SignupForm extends React.Component {
 
     state = {
         firstName: '',
@@ -68,6 +70,52 @@ export default class SignupForm extends React.Component {
         const err = this.validateInput();
 
         if(!err) {
+            
+            const additionalData = {
+                firstName: this.state.firstName,
+                lastName: this.state.lastName,
+                userName: this.state.userName,
+                email: this.state.email,
+            }
+
+            const loginDetails = {
+                email: this.state.email,
+                password: this.state.password
+            }
+
+            auth.createUserWithEmailAndPassword(loginDetails.email, loginDetails.password)
+            .then(res => {
+                alert('You have successfully signed up!');
+
+                createUserProfileDocument(res, additionalData);
+
+                auth.signInWithEmailAndPassword(loginDetails.email, loginDetails.password)
+                .then(res => {
+                    this.props.history.push("/dashboard");
+                })
+                .catch(error => {
+                    var errorCode = error.code;
+                    var errorMessage = error.message;
+
+                    alert(errorMessage);
+
+                    console.log(errorCode);
+                    console.log(errorMessage);
+                    console.log(error);
+                }); 
+            })
+            .catch(error => {
+                var errorCode = error.code;
+                var errorMessage = error.message;
+
+                if (errorCode == 'auth/weak-password') {
+                  alert('The password is too weak.');
+                } else {
+                  alert(errorMessage);
+                }
+                console.log(error);
+            }); 
+
 
             this.setState({
                 firstName: '',
@@ -152,3 +200,5 @@ export default class SignupForm extends React.Component {
         );
     }
 }
+
+export default withRouter(SignupForm);
