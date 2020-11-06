@@ -23,7 +23,7 @@ export default function Navbar(props) {
 
   return (
     <div className={classes.root}>
-      <AppBar position="static">
+      <AppBar position="static" elevation={0}>
         <Toolbar>
           <Typography variant="h6" className={classes.title}>
             Dreamcatcher
