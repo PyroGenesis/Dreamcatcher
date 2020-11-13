@@ -43,7 +43,7 @@ export default function CenteredGrid() {
             <Typography variant="h5" component="h2" style={{ flex: 1 }}>
                   Coding Tests Received: 2/10
               </Typography>
-              <Button>View</Button>
+              <Button href="coding-tests">View</Button>
           </Paper>
           <br></br><br></br>
 
@@ -51,7 +51,7 @@ export default function CenteredGrid() {
             <Typography variant="h5" component="h2" style={{ flex: 1 }}>
                   Interview Scheduled: 2/10
               </Typography>
-              <Button>View</Button>
+              <Button href="interviews" >View</Button>
           </Paper>
           <br></br><br></br>
 
@@ -59,7 +59,7 @@ export default function CenteredGrid() {
             <Typography variant="h5" component="h2" style={{ flex: 1 }}>
                   Software Development Engineer: 4
               </Typography>
-              <Button>View</Button>
+              <Button href="software-applications">View</Button>
           </Paper>
           <br></br><br></br>
 
@@ -67,7 +67,7 @@ export default function CenteredGrid() {
             <Typography variant="h5" component="h2" style={{ flex: 1 }}>
                   Full Stack Developer: 4
               </Typography>
-              <Button>View</Button>
+              <Button href="full-stack-applications">View</Button>
           </Paper>
 
           <br></br><br></br>
@@ -76,7 +76,7 @@ export default function CenteredGrid() {
             <Typography variant="h5" component="h2" style={{ flex: 1 }}>
                   Web Developer: 4
               </Typography>
-              <Button>View</Button>
+              <Button  href="web-applications" >View</Button>
           </Paper>
 
         </Grid>
@@ -88,7 +88,7 @@ export default function CenteredGrid() {
           <br></br>
           <br></br>
           <br></br>
-          <Table numRows = "5"/> 
+          <Table numRows = "5" title = "Past Applications"/> 
         </Grid>
       </Grid> 
     </div>

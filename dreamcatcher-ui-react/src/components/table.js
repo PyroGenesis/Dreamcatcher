@@ -144,7 +144,7 @@ const useToolbarStyles = makeStyles((theme) => ({
 
 const EnhancedTableToolbar = (props) => {
   const classes = useToolbarStyles();
-  const { numSelected } = props;
+  const { numSelected } = props.numSelected;
 
   return (
     <Toolbar
@@ -158,7 +158,7 @@ const EnhancedTableToolbar = (props) => {
         </Typography>
       ) : (
         <Typography className={classes.title} variant="h6" id="tableTitle" component="div">
-          Past Applications
+          {props.tableTitle}
         </Typography>
       )}
 
@@ -207,14 +207,15 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function EnhancedTable({numRows}) {
+export default function EnhancedTable({numRows,title}) {
   const classes = useStyles();
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('');
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
-  const [dense, setDense] = React.useState(false);
+  const [dense, setDense] = React.useState(false); 
   const [rowsPerPage, setRowsPerPage] = React.useState(numRows);
+  const [tableTitle] = React.useState(title);
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -271,7 +272,7 @@ export default function EnhancedTable({numRows}) {
   return (
     <div className={classes.root}>
       <Paper className={classes.paper}>
-        <EnhancedTableToolbar numSelected={selected.length} />
+        <EnhancedTableToolbar numSelected={selected.length} tableTitle ={tableTitle}/>
         <TableContainer>
           <Table
             className={classes.table}
