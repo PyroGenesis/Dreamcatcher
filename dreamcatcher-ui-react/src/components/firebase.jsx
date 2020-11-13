@@ -45,3 +45,7 @@ export const createUserProfileDocument = async (userAuth, additionalData) => {
     return userReference; 
 }
 
+export const getPositionDoc = async (userAuth, additionalData) => {
+    if(!userAuth) return
+}
+
