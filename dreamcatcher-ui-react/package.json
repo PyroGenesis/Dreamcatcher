@@ -9,6 +9,7 @@
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",
     "firebase": "^8.0.1",
+    "material-ui-search-bar": "^1.0.0",
     "node-sass": "^4.14.1",
     "react": "^16.14.0",
     "react-calendar-heatmap": "^1.8.1",
