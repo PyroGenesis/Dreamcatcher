@@ -16,8 +16,6 @@ import Paper from '@material-ui/core/Paper';
 import Checkbox from '@material-ui/core/Checkbox';
 import IconButton from '@material-ui/core/IconButton';
 import Tooltip from '@material-ui/core/Tooltip';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Switch from '@material-ui/core/Switch';
 import DeleteIcon from '@material-ui/icons/Delete';
 import FilterListIcon from '@material-ui/icons/FilterList';
 
@@ -25,15 +23,13 @@ function createData(companyName, position, date, url, status) {
   return { companyName, position, date, url, status };
 }
 
-const rows = [
-  createData('Amazon', 'Software Development Engineer', '10/23/2020', 'https://account.amazon.jobs/en-US', 'Coding Test'),
-  createData('Google', 'Software Engineer', '10/20/2020', 'https://account.amazon.jobs/en-US', 'Coding Test'),
-  createData('Microsoft', 'Software  Engineer', '10/23/2020', 'https://account.amazon.jobs/en-US', 'Technical Screen'),
-  createData('Apple', 'Software Engineer', '10/23/2020', 'https://account.amazon.jobs/en-US', 'Reject'),
-  createData('Netflix', 'Software Engineer', '10/23/2020', 'https://account.amazon.jobs/en-US', 'Reject'),
-  createData('Qualcomm', 'Software Engineer', '10/20/2020', 'https://account.amazon.jobs/en-US', 'Reject'),
-  createData('Nvidia', 'Software Engineer', '10/23/2020', 'https://account.amazon.jobs/en-US', 'Reject'),
-]; 
+function transformData(data){
+  var rows = [];
+  for(var i = 0; i<data.length;i++){
+    rows.push(createData(data[i].company_name,data[i].position,data[i].date,data[i].link,data[i].status));
+  }
+  return rows;
+}
 
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -207,7 +203,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function EnhancedTable({numRows,title}) {
+export default function EnhancedTable({numRows,title,data}) {
   const classes = useStyles();
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('');
@@ -216,6 +212,8 @@ export default function EnhancedTable({numRows,title}) {
   const [dense, setDense] = React.useState(false); 
   const [rowsPerPage, setRowsPerPage] = React.useState(numRows);
   const [tableTitle] = React.useState(title);
+
+  const rows = transformData(data);
 
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';

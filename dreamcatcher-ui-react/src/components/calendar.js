@@ -7,11 +7,13 @@ import 'react-calendar-heatmap/dist/styles.css';
 
 const today = new Date();
 
-export default function Calendar() {
-  const randomValues = getRange(200).map(index => {
+
+export default function Calendar({countArray}) {
+  const countValues = getRange(120).map(index => {
+
     return {
       date: shiftDate(today, -index),
-      count: getRandomInt(1, 3),
+      count: countArray[index],
     };
   });
   return (
@@ -19,12 +21,25 @@ export default function Calendar() {
       <CalendarHeatmap
         startDate={shiftDate(today, -120)}
         endDate={today}
-        values={randomValues}
+        values={countValues}
         classForValue={value => {
+          console.log(value);
           if (!value) {
             return 'color-empty';
           }
-          return `color-github-${value.count}`;
+          if(value.count>=1 && value.count<=3){
+            return 'color-github-1';
+          }
+          else if(value.count>=4 && value.count<=7){
+            return 'color-github-2';
+          }
+          else if(value.count>=7 && value.count<=10){
+            return 'color-github-3';
+          }
+          else if(value.count>10){
+            return 'color-github-4';
+          }
+          return 'color-github-0';
         }}
         tooltipDataAttrs={value => {
           return {
@@ -49,8 +64,4 @@ function shiftDate(date, numDays) {
 
 function getRange(count) {
   return Array.from({ length: count }, (_, i) => i);
-}
-
-function getRandomInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
 }

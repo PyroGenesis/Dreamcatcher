@@ -7,6 +7,9 @@ import Typography from '@material-ui/core/Typography';
 import Calendar from '../components/calendar'
 import 'react-calendar-heatmap/dist/styles.css';
 import Paper from '@material-ui/core/Paper';
+import Checkbox from '@material-ui/core/Checkbox';
+import { green } from '@material-ui/core/colors';
+import { withStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -23,8 +26,42 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-export default function CenteredGrid() {
+
+function getCounts(data){
+  var countS = 0, countF = 0, countW = 0, countI = 0, countC = 0, count120 = 0;
+  var dailyCounts = new Array(120);
+  dailyCounts.fill(0);
+  const today = new Date();
+
+  for(var i = 0; i<data.length;i++){
+    var day = data[i].date.substring(3,5);
+    var month = data[i].date.substring(0,2)-1;
+    var year = data[i].date.substring(6);
+    var date = new Date(year,month,day);
+    var res = Math.abs(today - date) / 1000;
+    var days = Math.floor(res / 86400);
+    if(days<=120){
+      count120++;
+      dailyCounts[days]+=1;
+    }
+    if(data[i].status == "Interview")
+      countI++;
+    else if(data[i].status == "Coding Test")
+      countC++;
+    if(data[i].position == "Software Engineer")
+      countS++;
+    else if(data[i].position == "Full Stack Developer")
+    countF++;
+    else if(data[i].position == "Web Developer")
+    countW++;
+  }
+  return [countS, countF, countW, countI, countC, count120, dailyCounts];
+}
+export default function CenteredGrid(tableData) {
   const classes = useStyles();
+  const data = tableData.tableData;
+  const count = data.length;
+  const counts = getCounts(data);
   return (
     <div className={classes.root}>
       <Grid container spacing={5}
@@ -32,7 +69,7 @@ export default function CenteredGrid() {
         <Grid item xs={4}> 
           <Paper className = {classes.paper}>
             <Typography variant="h5" component="h2"  href="past-applications" style={{ flex: 1 }}>
-                  Total Applications: 10        
+                  Total Applications: {count}        
               </Typography>
               <Button href ="past-applications">View</Button>
           </Paper>
@@ -41,7 +78,7 @@ export default function CenteredGrid() {
 
           <Paper className = {classes.paper}>
             <Typography variant="h5" component="h2" style={{ flex: 1 }}>
-                  Coding Tests Received: 2/10
+                  Coding Tests Received: {counts[4]}/{count} 
               </Typography>
               <Button href="coding-tests">View</Button>
           </Paper>
@@ -49,7 +86,7 @@ export default function CenteredGrid() {
 
           <Paper className = {classes.paper}>
             <Typography variant="h5" component="h2" style={{ flex: 1 }}>
-                  Interview Scheduled: 2/10
+                  Interview Scheduled: {counts[3]}/{count}
               </Typography>
               <Button href="interviews" >View</Button>
           </Paper>
@@ -57,7 +94,7 @@ export default function CenteredGrid() {
 
           <Paper className = {classes.paper}>
             <Typography variant="h5" component="h2" style={{ flex: 1 }}>
-                  Software Development Engineer: 4
+                  Software Development Engineer: {counts[0]}
               </Typography>
               <Button href="software-applications">View</Button>
           </Paper>
@@ -65,7 +102,7 @@ export default function CenteredGrid() {
 
           <Paper className = {classes.paper}>
             <Typography variant="h5" component="h2" style={{ flex: 1 }}>
-                  Full Stack Developer: 4
+                  Full Stack Developer: {counts[1]}
               </Typography>
               <Button href="full-stack-applications">View</Button>
           </Paper>
@@ -74,21 +111,32 @@ export default function CenteredGrid() {
 
           <Paper className = {classes.paper}>
             <Typography variant="h5" component="h2" style={{ flex: 1 }}>
-                  Web Developer: 4
+                  Web Developer: {counts[2]}
               </Typography>
               <Button  href="web-applications" >View</Button>
           </Paper>
 
         </Grid>
         <Grid item xs={6} justify= "center" alignContent = "center"> 
-          <h1 style={{fontFamily: "Roboto"}}> 20 applications in the past 4 months</h1>
+          <h1 style={{fontFamily: "Roboto"}}> {counts[5]} applications in the past 4 months</h1>
           <Paper >
-            <Calendar/> 
+            <br></br>
+            <Paper square style ={{display: 'inline-block', width: 20, height: 20,background: '#eeeeee', marginLeft: 5}}></Paper>
+            <span>  0 applications</span>
+            <Paper square style ={{display: 'inline-block', width: 20, height: 20,background: '#d6e685', marginLeft: 5}}></Paper>
+            <span>  1-3 applications</span>
+            <Paper square style ={{display: 'inline-block', width: 20, height: 20,background: '#8cc665', marginLeft: 5}}></Paper>
+            <span>  4-7 applications</span>
+            <Paper square style ={{display: 'inline-block', width: 20, height: 20,background: '#44a340', marginLeft: 5}}></Paper>
+            <span>  7-10 applications</span>
+            <Paper square style ={{display: 'inline-block', width: 20, height: 20,background: '#1e6823', marginLeft: 5}}></Paper>
+            <span>  {">"} 10 applications</span>
+            <Calendar countArray = {counts[6]}/> 
           </Paper>
           <br></br>
           <br></br>
           <br></br>
-          <Table numRows = "5" title = "Past Applications"/> 
+          <Table numRows = "5" title = "Past Applications" data = {data}/> 
         </Grid>
       </Grid> 
     </div>
