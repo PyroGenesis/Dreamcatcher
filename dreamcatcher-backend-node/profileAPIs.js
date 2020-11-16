@@ -4,6 +4,8 @@ const router = express.Router();
 const firebase = require('./firestore-init');
 const db = firebase.firestore();
 
+// These paths start from /profile
+
 router.get('/test', async (req, res, next) => {
     const profileRef = db.collection('users').doc('burhan').collection('profile').doc('default');
     // const educationRef = profileRef.collection('education');

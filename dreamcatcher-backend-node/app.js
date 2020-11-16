@@ -1,9 +1,12 @@
 const express = require('express');
 const app = express();
+// helps express parse JSON in body
+app.use(express.json())
 
 const firebase = require('./firestore-init');
 const db = firebase.firestore();
 
+const auth = require('./auth');
 const profileRoutes = require('./profileAPIs');
 
 // MIDDLEWARE
@@ -11,6 +14,8 @@ const basicAPI = async (req, res, next) => {
     res.send('Hello');
 }
 
+// Be careful of the order here!
+app.use('/auth', auth);
 app.use('/profile', profileRoutes);
 app.use('/', basicAPI)
 
