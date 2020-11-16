@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
 
 
 function getCounts(data){
-  var countS = 0, countF = 0, countW = 0, countI = 0, countC = 0, count120 = 0;
+  var countS = 0, countF = 0, countW = 0, countI = 0, countC = 0,  countML = 0, count120 = 0;
   var dailyCounts = new Array(120);
   dailyCounts.fill(0);
   const today = new Date();
@@ -54,8 +54,10 @@ function getCounts(data){
     countF++;
     else if(data[i].position == "Web Developer")
     countW++;
+    else if(data[i].position == "Machine Learning Engineer")
+    countML++;
   }
-  return [countS, countF, countW, countI, countC, count120, dailyCounts];
+  return [countS, countF, countW, countI, countC, count120, dailyCounts, countML];
 }
 export default function CenteredGrid(tableData) {
   const classes = useStyles();
@@ -114,6 +116,15 @@ export default function CenteredGrid(tableData) {
                   Web Developer: {counts[2]}
               </Typography>
               <Button  href="web-applications" >View</Button>
+          </Paper>
+
+          <br></br><br></br>
+          
+          <Paper className = {classes.paper}>
+            <Typography variant="h5" component="h2" style={{ flex: 1 }}>
+                  Machine Learning Engineer: {counts[7]}
+              </Typography>
+              <Button  href="ml-applications" >View</Button>
           </Paper>
 
         </Grid>

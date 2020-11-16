@@ -21,6 +21,7 @@ import WebApplicationsPage from "./containers/page-web-applications";
 import InterviewPage from "./containers/page-interview";
 import CodingTestsPage from "./containers/page-coding-tests";
 import About from "./containers/page-about";
+import MLApplicationsPage from "./containers/page-ml-applications";
 
 import Login from "./containers/page-login";
 import SignUp from "./containers/page-signup";
@@ -28,6 +29,11 @@ import { AuthProvider } from './context/context';
 import AppRoute from './components/app-route';
 
 const routes = [
+  {
+    path: '/ml-applications',
+    component: MLApplicationsPage,
+    isPrivate: true
+  },
   {
     path: '/software-applications',
     component: SoftwareApplicationsPage,
