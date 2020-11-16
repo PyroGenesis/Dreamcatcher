@@ -1,7 +1,9 @@
 import React, { Component } from 'react'
 import { Link } from 'react-router-dom'
 import { AppBar, Toolbar, Button, Typography } from "@material-ui/core";
+import { logout } from '../context/actions'
 import { makeStyles } from '@material-ui/core/styles';
+import { useAuthDispatch, useAuthState } from '../context/context';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -21,6 +23,9 @@ const useStyles = makeStyles((theme) => ({
 export default function Navbar(props) {
   const classes = useStyles();
 
+  const userDetails = useAuthState()
+  const dispatch = useAuthDispatch();
+
   return (
     <div className={classes.root}>
       <AppBar position="static" elevation={0}>
@@ -34,6 +39,10 @@ export default function Navbar(props) {
           <Button color="inherit" href="/positions">Positions</Button>
           <Button color="inherit" href="/forums">Forums</Button>
           <Button color="inherit" href="/about">About</Button>
+          { userDetails.token 
+            ? <Button color="inherit" onClick={()=>logout(dispatch)}>Logout</Button>
+            : null
+          }
         </Toolbar>
       </AppBar>
     </div>

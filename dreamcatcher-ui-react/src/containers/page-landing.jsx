@@ -1,7 +1,9 @@
 import React, {Component} from 'react'
 import Card from '@material-ui/core/Card';
-import SignupForm from './page-signup';
-import LoginForm from './page-login';
+import SignupForm from './page-signup-old';
+import LoginForm from './page-login-old';
+import Login from './page-login';
+import SignUp from "./page-signup";
 import '../App.scss';
 import { CardContent, Link, Grid } from '@material-ui/core';
 
@@ -57,12 +59,11 @@ class LandingPage extends Component {
                 <CardContent>
                   {this.state.formType === 'login' ?
                     <div>
-                      <LoginForm onChange = { fields => this.onChange(fields) }/> 
+                      <Login/> 
                       <Link style={{fontSize: 18}} onClick = {this.showSignupForm}> New user? Click here to sign up </Link> 
                     </div> :
                     <div>
-                    <SignupForm 
-                        onChange = { fields => this.onChange(fields) }/>
+                    <SignUp/>
                       <Link style={{fontSize: 17}} onClick = {this.showLoginForm}> Returning user? Click here to log in </Link> 
                     </div>
                   }

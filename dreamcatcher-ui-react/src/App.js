@@ -20,56 +20,96 @@ import FullStackApplicationsPage from "./containers/page-fullstack-applications"
 import WebApplicationsPage from "./containers/page-web-applications";
 import InterviewPage from "./containers/page-interview";
 import CodingTestsPage from "./containers/page-coding-tests";
+import About from "./containers/page-about";
+
+import Login from "./containers/page-login";
+import SignUp from "./containers/page-signup";
+import { AuthProvider } from './context/context';
+import AppRoute from './components/app-route';
+
+const routes = [
+  {
+    path: '/software-applications',
+    component: SoftwareApplicationsPage,
+    isPrivate: true
+  },
+  {
+    path: '/full-stack-applications',
+    component: FullStackApplicationsPage,
+    isPrivate: true
+  },
+  {
+    path: '/web-applications',
+    component: WebApplicationsPage,
+    isPrivate: true
+  },
+  {
+    path: '/interviews',
+    component: InterviewPage,
+    isPrivate: true
+  },
+  {
+    path: '/coding-tests',
+    component: CodingTestsPage,
+    isPrivate: true
+  },
+  {
+    path: '/past-applications',
+    component: PastApplicationsPage,
+    isPrivate: true
+  },
+  {
+    path: '/dashboard',
+    component: DashboardPage,
+    isPrivate: true
+  },
+  {
+    path: '/profile',
+    component: ProfilePage,
+    isPrivate: true
+  },
+  {
+    path: '/positions',
+    component: PositionsPage,
+    isPrivate: true
+  },
+  {
+    path: '/forums',
+    component: ForumsPage,
+    isPrivate: true
+  },
+  {
+    path: '/about',
+    component: About,
+    isPrivate: true
+  },
+  {
+    path: '/',
+    component: LandingPage
+  }
+]
 
 function App() {
   return (
-    <Router>
-      <div style={{height: '100%'}}>
-        <Navbar />
-
-        {/* A <Switch> looks through its children <Route>s and
-            renders the first one that matches the current URL. */}
-        <Switch>
-        <Route path="/software-applications">
-            <SoftwareApplicationsPage/>
-          </Route>
-          <Route path="/full-stack-applications">
-            <FullStackApplicationsPage />
-          </Route>
-          <Route path="/web-applications">
-            <WebApplicationsPage />
-          </Route>
-          <Route path="/interviews">
-            <InterviewPage />
-          </Route>
-          <Route path="/coding-tests">
-            <CodingTestsPage />
-          </Route>
-          <Route path="/past-applications">
-            <PastApplicationsPage />
-          </Route>
-          <Route path="/dashboard">
-            <DashboardPage />
-          </Route>
-          <Route path="/profile">
-            <ProfilePage />
-          </Route>
-          <Route path="/positions">
-            <PositionsPage />
-          </Route>
-          <Route path="/forums">
-            <ForumsPage />
-          </Route>
-          <Route path="/about">
-            About
-          </Route>
-          <Route path="/">
-            <LandingPage />
-          </Route>
-          
-        </Switch>
-      </div>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <div style={{height: '100%'}}>
+          <Navbar />
+          {/* A <Switch> looks through its children <Route>s and
+              renders the first one that matches the current URL. */}
+          <Switch>
+              {routes.map((route) => (
+                <AppRoute
+                  key={route.path}
+                  path={route.path}
+                  component={route.component}
+                  isPrivate={route.isPrivate}
+                />
+              ))}
+          </Switch>
+        </div>
+      </Router>
+    </AuthProvider>
   );
 }
 

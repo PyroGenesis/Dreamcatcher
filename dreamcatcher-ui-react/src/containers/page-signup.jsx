@@ -1,35 +1,28 @@
-import React from 'react';
+import React, {useState} from 'react';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
-import { withRouter } from 'react-router';
-import { auth, createUserProfileDocument } from '../components/firebase'
+import { withRouter } from 'react-router-dom';
+import { signUpUser } from '../context/actions';
 
-export class SignupForm extends React.Component {
+import { useAuthDispatch, useAuthState } from '../context/context';
 
-    state = {
-        firstName: '',
-        firstNameError: '',
-        lastName: '',
-        lastNameError: '',
-        userName: '',
-        userNameError: '',
-        email: '',
-        emailError: '',
-        password: '',
-        passwordError: '',
-    };
+function SignUp(props) {
 
-    change = e => {
+    const[firstName, setFirstName] = useState('');
+    const[firstNameError, setFirstNameError] = useState('');
+    const[lastName, setLastName] = useState('');
+    const[lastNameError, setLastNameError] = useState('');
+    const[userName, setUserName] = useState('');
+    const[userNameError, setUserNameError] = useState('');
+    const[email, setEmail] = useState('');
+    const[emailError, setEmailError] = useState('');
+    const[password, setPassword] = useState('');
+    const[passwordError, setPasswordError] = useState('');
 
-        const err = this.validateInput();
+    const dispatch = useAuthDispatch();
+    const { loading, errorMessage } = useAuthState() //read the values of loading and errorMessage from context
 
-        this.props.onChange({ [e.target.name]: e.target.value });
-        this.setState({
-            [e.target.name]: e.target.value
-        });
-    };
-
-    validateInput = () => {
+    const validateInput = () => {
 
         let isError = false;
         const errors = {
@@ -40,165 +33,142 @@ export class SignupForm extends React.Component {
             passwordError: '',
         };
 
-        if(this.state.userName.length < 5) {
+        if(userName.length < 5) {
             isError = true;
             errors.userNameError = 'Username needs to be atleast 5 characters long.'
         }
 
-        if(this.state.password.length < 5) {
+        if(password.length < 5) {
             isError = true;
             errors.passwordError = 'Password needs to be atleast 5 characters long.'
         }
 
-        if(this.state.firstName.length < 5) {
+        if(firstName.length < 5) {
             isError = true;
             errors.firstNameError = 'First name needs to be atleast 5 characters long.'
         }
 
-        if(this.state.lastName.length < 5) {
+        if(lastName.length < 5) {
             isError = true;
             errors.lastNameError = 'Last name needs to be atleast 5 characters long.'
         }
         
-        this.setState(errors);
+        setFirstNameError(errors.firstName);
+        setLastNameError(errors.lastName);
+        setUserNameError(errors.userName);
+        setEmailError(errors.email);
+        setPasswordError(errors.passwordName);
+
         return isError;
     }
 
-    onSubmit = e => {
+    const onSubmit = async(e) => {
         e.preventDefault();
 
-        const err = this.validateInput();
+        // const err = this.validateInput();
 
-        if(!err) {
+        if(true) {
             
             const additionalData = {
-                firstName: this.state.firstName,
-                lastName: this.state.lastName,
-                userName: this.state.userName,
-                email: this.state.email,
+                firstName: firstName,
+                lastName: lastName,
+                userName: userName,
+                email: email,
             }
 
             const loginDetails = {
-                email: this.state.email,
-                password: this.state.password
+                email: email,
+                password: password
             }
 
-            auth.createUserWithEmailAndPassword(loginDetails.email, loginDetails.password)
-            .then(res => {
-                alert('You have successfully signed up!');
+            try {
+                let response = await signUpUser(dispatch, loginDetails, additionalData);
+                if(!response) {
+                    return;
+                }
+                props.history.push("/dashboard");
 
-                createUserProfileDocument(res, additionalData);
-
-                auth.signInWithEmailAndPassword(loginDetails.email, loginDetails.password)
-                .then(res => {
-                    this.props.history.push("/dashboard");
-                })
-                .catch(error => {
-                    var errorCode = error.code;
-                    var errorMessage = error.message;
-
-                    alert(errorMessage);
-
-                    console.log(errorCode);
-                    console.log(errorMessage);
-                    console.log(error);
-                }); 
-            })
-            .catch(error => {
+            } catch(error) {
                 var errorCode = error.code;
                 var errorMessage = error.message;
 
-                if (errorCode == 'auth/weak-password') {
-                  alert('The password is too weak.');
-                } else {
-                  alert(errorMessage);
-                }
+                alert(errorMessage);
+
+                console.log(errorCode);
+                console.log(errorMessage);
                 console.log(error);
-            }); 
+            }
 
-
-            this.setState({
-                firstName: '',
-                firstNameError: '',
-                lastName: '',
-                lastNameError: '',
-                userName: '',
-                userNameError: '',
-                email: '',
-                emailError: '',
-                password: '',
-                passwordError: '',
-            });
-            this.props.onChange({
-                firstName: '',
-                lastName: '',
-                userName: '',
-                email: '',
-                password: '',
-            })
+            setFirstName('');
+            setLastName('');
+            setUserName('');
+            setEmail('');
+            setPassword('');            
+            setFirstNameError('');
+            setLastNameError('');
+            setUserNameError('');
+            setEmailError('');
+            setPasswordError('');            
         }
     }
 
-    render() {
-
-        return (
-            <form onSubmit = {e => this.onSubmit(e)}>
-                <TextField 
-                    name="firstName" 
-                    label="First Name"
-                    value = { this.state.firstName } 
-                    onChange = {e => this.change(e) } 
-                    error = { this.state.firstNameError.length === 0 ? false : true }
-                    helperText = { this.state.firstNameError } 
-                    required 
-                    />
-                <br />
-                <TextField 
-                    name = 'lastName'
-                    label = 'Last Name' 
-                    value = { this.state.lastName } 
-                    onChange = {e => this.change(e) }
-                    error = { this.state.lastNameError.length === 0 ? false : true }
-                    helperText = { this.state.lastNameError } 
-                    required
-                    />
-                <br />
-                <TextField 
-                    name = 'userName' 
-                    label = 'User Name' 
-                    value = { this.state.userName } 
-                    error = { this.state.userNameError.length === 0 ? false : true }
-                    helperText = { this.state.userNameError }
-                    onChange = {e => this.change(e) } 
-                    required
-                    />
-                <br />
-                <TextField 
-                    name = 'email' 
-                    type = 'email'
-                    label = 'Email' 
-                    value = { this.state.email } 
-                    error = { this.state.emailError.length === 0 ? false : true }
-                    helperText = { this.state.emailError }                    
-                    onChange = {e => this.change(e) } 
-                    required
-                    />
-                <br />
-                <TextField 
-                    name = 'password' 
-                    type = 'password'
-                    label = 'Password' 
-                    value = { this.state.password } 
-                    error = { this.state.passwordError.length === 0 ? false : true }
-                    helperText = { this.state.passwordError }
-                    onChange = {e => this.change(e) } 
-                    required
-                    />
-                <br />
-                <Button style={{marginTop: '30px', marginBottom: '20px'}} variant="contained" color="primary" type="submit" > Sign up </Button>
-            </form>
-        );
-    }
+    return (
+        <form>
+            <TextField 
+                name="firstName" 
+                label="First Name"
+                value = { firstName } 
+                onChange = {e => setFirstName(e.target.value) } 
+                error = { firstNameError.length === 0 ? false : true }
+                helperText = { firstNameError } 
+                required 
+                />
+            <br />
+            <TextField 
+                name = 'lastName'
+                label = 'Last Name' 
+                value = { lastName } 
+                onChange = {e => setLastName(e.target.value) }
+                error = { lastNameError.length === 0 ? false : true }
+                helperText = { lastNameError } 
+                required
+                />
+            <br />
+            <TextField 
+                name = 'userName' 
+                label = 'User Name' 
+                value = { userName } 
+                error = { userNameError.length === 0 ? false : true }
+                helperText = { userNameError }
+                onChange = {e => setUserName(e.target.value) } 
+                required
+                />
+            <br />
+            <TextField 
+                name = 'email' 
+                type = 'email'
+                label = 'Email' 
+                value = { email } 
+                error = { emailError.length === 0 ? false : true }
+                helperText = { emailError }                    
+                onChange = {e => setEmail(e.target.value) } 
+                required
+                />
+            <br />
+            <TextField 
+                name = 'password' 
+                type = 'password'
+                label = 'Password' 
+                value = { password } 
+                error = { passwordError.length === 0 ? false : true }
+                helperText = { passwordError }
+                onChange = {e => setPassword(e.target.value) } 
+                required
+                />
+            <br />
+            <Button style={{marginTop: '30px', marginBottom: '20px'}} variant="contained" color="primary" onClick={onSubmit} > Sign up </Button>
+        </form>
+    );
 }
 
-export default withRouter(SignupForm);
+export default withRouter(SignUp)

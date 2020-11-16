@@ -59,15 +59,22 @@ class PositionsPage extends Component {
                 <CardContent>
                   {
                     this.state.position.companyName == null ? 
-                      "YAsh" : 
-                    <div>
-                      <h3> {this.state.position.positionName} </h3>
-                      <p style={{color: "grey"}}> {this.state.position.companyName} </p>
-                      <p style={{textAlign: "justify", whiteSpace: "pre-line"}}>
-                        {this.state.position.desc}
-                      </p>
-                      <a href={this.state.position.link}> Link to application </a>
-                    </div>
+                      <div>
+                        <h3> {positions[0].positionName} </h3>
+                        <p style={{color: "grey"}}> {positions[0].companyName} </p>
+                        <p style={{textAlign: "justify", whiteSpace: "pre-line"}}>
+                          {positions[0].desc}
+                        </p>
+                        <a href={positions[0].link}> Link to application </a>
+                      </div> : 
+                      <div>
+                        <h3> {this.state.position.positionName} </h3>
+                        <p style={{color: "grey"}}> {this.state.position.companyName} </p>
+                        <p style={{textAlign: "justify", whiteSpace: "pre-line"}}>
+                          {this.state.position.desc}
+                        </p>
+                        <a href={this.state.position.link}> Link to application </a>
+                      </div>
                   }
                 </CardContent>
               </Card>
