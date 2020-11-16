@@ -1,7 +1,9 @@
 const express = require('express');
 const app = express();
 
-const db = require('./firestore-init');
+const firebase = require('./firestore-init');
+const db = firebase.firestore();
+
 const profileRoutes = require('./profileAPIs');
 
 // MIDDLEWARE

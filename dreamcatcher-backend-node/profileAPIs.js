@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 
-const db = require('./firestore-init');
+const firebase = require('./firestore-init');
+const db = firebase.firestore();
 
 router.get('/test', async (req, res, next) => {
     const profileRef = db.collection('users').doc('burhan').collection('profile').doc('default');
