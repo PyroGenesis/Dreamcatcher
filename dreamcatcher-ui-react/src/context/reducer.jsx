@@ -40,6 +40,24 @@ export const AuthReducer = (initialState, action) => {
                 loading: false,
                 errorMessage: action.error,
             };
+        case "VERIFY_TOKEN":
+            return {
+                ...initialState,
+                loading: true
+            };
+        case "TOKEN_VERIFIED":
+            return {
+                ...initialState,
+                token: action.payload.auth_token,
+                loading: false
+            };
+        case "TOKEN_EXPIRED":
+                return {
+                    ...initialState,
+                    loading: false,
+                    user: "",
+                    token: ""
+                };
         default: 
             throw new Error(`Unhandled section type: ${action.type}`);
     }

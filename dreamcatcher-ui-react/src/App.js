@@ -91,8 +91,8 @@ const routes = [
   },
   {
     path: '/',
-    component: LandingPage
-  }
+    component: LandingPage,
+  },
 ]
 
 function App() {

@@ -22,7 +22,7 @@ function SignUp(props) {
     const dispatch = useAuthDispatch();
     const { loading, errorMessage } = useAuthState() //read the values of loading and errorMessage from context
 
-    const validateInput = () => {
+    const validateInput = async() => {
 
         let isError = false;
         const errors = {
@@ -53,11 +53,11 @@ function SignUp(props) {
             errors.lastNameError = 'Last name needs to be atleast 5 characters long.'
         }
         
-        setFirstNameError(errors.firstName);
-        setLastNameError(errors.lastName);
-        setUserNameError(errors.userName);
-        setEmailError(errors.email);
-        setPasswordError(errors.passwordName);
+        setFirstNameError(errors.firstNameError);
+        setLastNameError(errors.lastNameError);
+        setUserNameError(errors.userNameError);
+        setEmailError(errors.emailError);
+        setPasswordError(errors.passwordError);
 
         return isError;
     }
@@ -65,9 +65,9 @@ function SignUp(props) {
     const onSubmit = async(e) => {
         e.preventDefault();
 
-        // const err = this.validateInput();
+        const err = await validateInput();
 
-        if(true) {
+        if(!err) {
             
             const additionalData = {
                 firstName: firstName,

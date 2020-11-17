@@ -1,54 +1,45 @@
-import React, {Component} from 'react'
+import React, { useEffect, useState } from 'react'
 import Card from '@material-ui/core/Card';
-import SignupForm from './page-signup-old';
-import LoginForm from './page-login-old';
 import Login from './page-login';
 import SignUp from "./page-signup";
 import '../App.scss';
 import { CardContent, Link, Grid } from '@material-ui/core';
+import { useAuthState, useAuthDispatch } from '../context/context';
+import { checkToken } from '../context/actions';
 
-class LandingPage extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      formType: 'login',
-    };
-    this.showLoginForm = this.showLoginForm.bind(this);
-    this.showSignupForm = this.showSignupForm.bind(this);
-  }
 
-  state = {
-    fields: {}
-  };
+export default function LandingPageNew(props) {
+    const [toggle, setToggle] = useState(true);
+    const [tokenStatus, setTokenStatus] = useState('');
+    const [isLoading, setLoading] = useState(true);
 
-  onChange = updatedValue => {
-    this.setState({
-      fields: {
-        ...this.state.fields,
-        ...updatedValue
-      }
-    })
-  };
-
-  showSignupForm() {
-    if(this.state.formType === 'login') {
-      this.setState({
-        formType: 'signup'
-      })
+    const toggleChecked = () => {
+        setToggle(toggle => !toggle);
     }
-  }
+    
+    const dispatch = useAuthDispatch();
+    const userDetails = useAuthState();
 
-  showLoginForm() {
-    if(this.state.formType === 'signup') {
-      this.setState({
-        formType: 'login'
-      })
+    // useEffect(() => {
+    //   (async function() {
+    //     const tokenStatus = await checkToken(dispatch, userDetails.token);
+    //     setTokenStatus(tokenStatus);
+    //     setLoading(false);
+    //   })();
+    // }, [])
+
+    // if(isLoading) {
+    //   return <div className="App">Loading...</div>;
+    // }
+
+    // if(tokenStatus === 'success') {
+    if(userDetails.token) {
+      props.history.push('/dashboard');
+      return null;
     }
-  }
-
-  render() {
-    return (
-        <header className="" className="body-content App-header">
+    else {
+      return (
+        <header className="body-content App-header">
           <Grid container style={{margin: 0, width: '100%'}} justify="center" spacing={3} alignItems="center">
             <Grid item xs={9} align="center">
               <h1 style={{fontFamily:"Comfortaa", fontSize:80}}> Dreamcatcher</h1>
@@ -56,24 +47,20 @@ class LandingPage extends Component {
             </Grid>
             <Grid item xs align="center">
               <Card elevation={13} style={{minWidth: 300, maxWidth: 300}}>
-                <CardContent>
-                  {this.state.formType === 'login' ?
-                    <div>
+                <CardContent>        
+                  { toggle && <div>
                       <Login/> 
-                      <Link style={{fontSize: 18}} onClick = {this.showSignupForm}> New user? Click here to sign up </Link> 
-                    </div> :
-                    <div>
+                      <Link style={{fontSize: 18}} onClick = {toggleChecked}> New user? Click here to sign up </Link> 
+                    </div> }
+                  { !toggle && <div>
                     <SignUp/>
-                      <Link style={{fontSize: 17}} onClick = {this.showLoginForm}> Returning user? Click here to log in </Link> 
-                    </div>
-                  }
+                      <Link style={{fontSize: 17}} onClick = {toggleChecked}> Returning user? Click here to log in </Link> 
+                    </div> }
                 </CardContent>
               </Card>      
             </Grid>
           </Grid>    
         </header>
-    );
-  }
+      );
+    }
 }
-
-export default LandingPage

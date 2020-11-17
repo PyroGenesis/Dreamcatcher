@@ -40,9 +40,9 @@ function Login(props) {
     const onSubmit = async(e) => {
         e.preventDefault();
     
-        // const err = await validateInput();
+        const err = await validateInput();
     
-        if(true) {
+        if(!err) {
 
             let payload = { email, password }
             try {

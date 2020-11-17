@@ -1,9 +1,10 @@
-import React, { Component } from 'react'
+import React, { Component, useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { AppBar, Toolbar, Button, Typography } from "@material-ui/core";
 import { logout } from '../context/actions'
 import { makeStyles } from '@material-ui/core/styles';
 import { useAuthDispatch, useAuthState } from '../context/context';
+import {checkToken} from '../context/actions'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -23,8 +24,28 @@ const useStyles = makeStyles((theme) => ({
 export default function Navbar(props) {
   const classes = useStyles();
 
+  // const [tokenStatus, setTokenStatus] = useState('');
+  // const [isLoading, setLoading] = useState(true);
+
   const userDetails = useAuthState()
   const dispatch = useAuthDispatch();
+
+  const handleLogout = () => {
+    //setTokenStatus('');
+    logout(dispatch); 
+  }
+
+  // useEffect(() => {
+  //   (async function() {
+  //     const tokenStatus = await checkToken(dispatch, userDetails.token);
+  //     setTokenStatus(tokenStatus);
+  //     setLoading(false);
+  //   })();
+  // }, [])
+
+  // if(isLoading) {
+  //   return <div className="App">Loading...</div>;
+  // }
 
   return (
     <div className={classes.root}>
@@ -40,7 +61,7 @@ export default function Navbar(props) {
           <Button color="inherit" href="/forums">Forums</Button>
           <Button color="inherit" href="/about">About</Button>
           { userDetails.token 
-            ? <Button color="inherit" onClick={()=>logout(dispatch)}>Logout</Button>
+            ? <Button color="inherit" onClick={handleLogout}>Logout</Button>
             : null
           }
         </Toolbar>

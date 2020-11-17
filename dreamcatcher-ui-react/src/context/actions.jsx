@@ -11,6 +11,8 @@ export async function signUpUser(dispatch, signUpPayload, additionalData) {
             try {
                 let idToken = await auth.currentUser.getIdToken();
 
+                // console.log(idToken);
+
                 const data = {
                     user: signUpPayload.email,
                     auth_token: idToken
@@ -51,6 +53,8 @@ export async function loginUser(dispatch, loginPayload) {
         if(response) {
             try {
                 let idToken = await auth.currentUser.getIdToken();
+
+                console.log(idToken);
 
                 const data = {
                     user: loginPayload.email,
@@ -100,5 +104,26 @@ export async function logout(dispatch) {
     } catch (error) {
         console.log(error);
     }
+}
+
+export async function checkToken(dispatch, token) {
+    // dispatch({ type: 'VERIFY_TOKEN' });
+
+    const addr = "192.168.0.51"
+
+    try {
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token: token })
+        };
+        const response = await fetch(`/auth`, requestOptions);
+        const tokenStatus = await response.json();
+
+        return tokenStatus.status;
+    } catch(error) {
+        console.log(error);
+    }
+
 }
 

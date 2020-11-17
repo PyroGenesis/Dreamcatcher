@@ -14,8 +14,7 @@ router.post('/', (req, res) => {
         });
     }).catch((error) => {
         res.json({
-            status: 'failed',
-            uid: decodedToken.uid
+            status: 'failed'
         });
     });
 });
