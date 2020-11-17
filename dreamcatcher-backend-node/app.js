@@ -9,6 +9,8 @@ const db = firebase.firestore();
 const auth = require('./auth');
 const profileRoutes = require('./profileAPIs');
 const applications = require('./applications');
+// routes for testing purposes
+const testRoutes = require('./testing');
 
 // MIDDLEWARE
 const basicAPI = async (req, res, next) => {
@@ -16,6 +18,7 @@ const basicAPI = async (req, res, next) => {
 }
 
 // Be careful of the order here!
+app.use('/tests', testRoutes);
 app.use('/applications', applications);
 app.use('/auth', auth);
 app.use('/profiles', profileRoutes);
