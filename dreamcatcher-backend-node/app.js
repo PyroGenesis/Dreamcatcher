@@ -18,7 +18,7 @@ const basicAPI = async (req, res, next) => {
 // Be careful of the order here!
 app.use('/applications', applications);
 app.use('/auth', auth);
-app.use('/profile', profileRoutes);
+app.use('/profiles', profileRoutes);
 app.use('/', basicAPI)
 
 
