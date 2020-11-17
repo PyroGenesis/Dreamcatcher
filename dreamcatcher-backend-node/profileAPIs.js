@@ -10,17 +10,35 @@ router.get('/test', async (req, res, next) => {
     res.send('Profile Home!!!');
 });
 
-router.get('/:user', async (req, res) => {
-    const username = req.params.user;
-    const profileSnapshot = await db.collection('users').doc(username).collection('profile').doc('default').get();
+router.get('/:uid', async (req, res) => {
+    const uid = req.params.uid;
+    if (uid == null) {
+        res.statusCode = 400;
+        res.json({
+            status: res.statusCode,
+            message: 'No username provided',
+            data: null
+        });
+        return;
+    }
+    const profileSnapshot = await db.collection('users').doc(uid).collection('profile').doc('default').get();
     
     if (profileSnapshot.exists) {
+        res.statusCode = 200;
         res.json({
-            status: 'success',
-            profile: profileSnapshot.data()
+            status: res.statusCode,
+            message: 'success',
+            data: {
+                profile: profileSnapshot.data()
+            }
         });
     } else {
-        res.json({status: 'error', errorCode: 404, msg: 'This user does not exist'});
+        res.statusCode = 404;
+        res.json({
+            status: res.statusCode,
+            message: 'User not found',
+            data: null
+        });
     }
 });
 
