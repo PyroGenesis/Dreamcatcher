@@ -45,7 +45,13 @@ export const createUserProfileDocument = async (userAuth, additionalData) => {
     return userReference; 
 }
 
-export const getPositionDoc = async (userAuth, additionalData) => {
-    if(!userAuth) return
+export const checkUsernameExists = async (userName) => {
+    const usernameMapDoc =  await firestore.doc(`usernameToDetails/${userName}`);
+    const snapShot =  await usernameMapDoc.get();
+
+    if(snapShot.exists) {
+        return true;
+    }
+    return false;
 }
 

@@ -12,23 +12,25 @@ const AppRoutes = ({ component: Component, path, isPrivate, ...rest }) => {
     const userDetails = useAuthState()
     const dispatch = useAuthDispatch();
 
-    useEffect(() => {
-        (async function() {
-            dispatch({ type: 'VERIFY_TOKEN' });
-
-            const tokenStatus = await checkToken(dispatch, userDetails.token);
+    // useEffect(() => {
+    //     (async function() {
+    //         dispatch({ type: 'VERIFY_TOKEN' });
+    //         console.log("HERE")
+    //         const tokenStatus = await checkToken(dispatch, userDetails.token);
           
-            if(tokenStatus === "success") {
-                const payload = {
-                    auth_token: userDetails.token
-                }
-                dispatch({ type: 'TOKEN_VERIFIED', payload: payload})
-            }
-            else {
-                dispatch({ type: 'TOKEN_EXPIRED'})
-            }
-        })();
-    }, [])
+    //         if(tokenStatus === "success") {
+    //             const payload = {
+    //                 auth_token: userDetails.token
+    //             }
+    //             dispatch({ type: 'TOKEN_VERIFIED', payload: payload})
+    //             console.log("HERE 2")
+    //         }
+    //         else {
+    //             dispatch({ type: 'TOKEN_EXPIRED'})
+    //             console.log("HERE 3")
+    //         }
+    //     })();
+    // }, [])
 
     // if(isLoading) {
     //     return <div className="App">Loading...</div>;

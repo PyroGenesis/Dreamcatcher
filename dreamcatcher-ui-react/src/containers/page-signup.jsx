@@ -5,6 +5,7 @@ import { withRouter } from 'react-router-dom';
 import { signUpUser } from '../context/actions';
 
 import { useAuthDispatch, useAuthState } from '../context/context';
+import { checkUsernameExists } from '../components/firebase';
 
 function SignUp(props) {
 
@@ -36,6 +37,13 @@ function SignUp(props) {
         if(userName.length < 5) {
             isError = true;
             errors.userNameError = 'Username needs to be atleast 5 characters long.'
+        }
+
+        const userNameStatus = await checkUsernameExists(userName);
+
+        if(userNameStatus) {
+            isError = true;
+            errors.userNameError = 'Username already exists. Please pick a new one.'
         }
 
         if(password.length < 5) {
@@ -83,9 +91,11 @@ function SignUp(props) {
 
             try {
                 let response = await signUpUser(dispatch, loginDetails, additionalData);
+
                 if(!response) {
                     return;
                 }
+
                 props.history.push("/dashboard");
 
             } catch(error) {

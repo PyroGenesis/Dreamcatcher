@@ -23,7 +23,7 @@ export default function Calendar({countArray}) {
         endDate={today}
         values={countValues}
         classForValue={value => {
-          console.log(value);
+          // console.log(value);
           if (!value) {
             return 'color-empty';
           }

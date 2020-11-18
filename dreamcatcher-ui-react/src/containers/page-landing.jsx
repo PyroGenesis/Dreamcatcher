@@ -9,12 +9,15 @@ import { checkToken } from '../context/actions';
 
 
 export default function LandingPageNew(props) {
-    const [toggle, setToggle] = useState(true);
+    const [toggleSignUp, setToggleSignUp] = useState(false);
+    const [toggleLogin, setToggleLogin] = useState(true);
+
     const [tokenStatus, setTokenStatus] = useState('');
     const [isLoading, setLoading] = useState(true);
 
     const toggleChecked = () => {
-        setToggle(toggle => !toggle);
+      setToggleLogin(toggleLogin => !toggleLogin);
+      setToggleSignUp(toggleSignUp => !toggleSignUp);
     }
     
     const dispatch = useAuthDispatch();
@@ -34,8 +37,8 @@ export default function LandingPageNew(props) {
 
     // if(tokenStatus === 'success') {
     if(userDetails.token) {
-      props.history.push('/dashboard');
-      return null;
+       props.history.push('/dashboard');
+       return null;
     }
     else {
       return (
@@ -48,11 +51,11 @@ export default function LandingPageNew(props) {
             <Grid item xs align="center">
               <Card elevation={13} style={{minWidth: 300, maxWidth: 300}}>
                 <CardContent>        
-                  { toggle && <div>
+                  { toggleLogin && <div>
                       <Login/> 
                       <Link style={{fontSize: 18}} onClick = {toggleChecked}> New user? Click here to sign up </Link> 
                     </div> }
-                  { !toggle && <div>
+                  { toggleSignUp && <div>
                     <SignUp/>
                       <Link style={{fontSize: 17}} onClick = {toggleChecked}> Returning user? Click here to log in </Link> 
                     </div> }

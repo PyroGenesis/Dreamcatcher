@@ -28,8 +28,6 @@ function Login(props) {
             isError = true;
             errors.passwordError = 'Password needs to be atleast 5 characters long.'
         }
-        
-        // setState(errors);
 
         setEmailError(errors.emailError);
         setPasswordError(errors.passwordError);
