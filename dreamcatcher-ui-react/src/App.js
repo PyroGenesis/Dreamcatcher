@@ -27,6 +27,7 @@ import Login from "./containers/page-login";
 import SignUp from "./containers/page-signup";
 import { AuthProvider } from './context/context';
 import AppRoute from './components/app-route';
+import Post from "./containers/page-post";
 
 const routes = [
   {
@@ -87,6 +88,11 @@ const routes = [
   {
     path: '/about',
     component: About,
+    isPrivate: true
+  },
+  {
+    path: '/post',
+    component: Post,
     isPrivate: true
   },
   {

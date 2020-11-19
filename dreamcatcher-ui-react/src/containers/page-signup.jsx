@@ -119,7 +119,7 @@ function SignUp(props) {
             setUserNameError('');
             setEmailError('');
             setPasswordError('');            
-        }
+        }  
     }
 
     return (
