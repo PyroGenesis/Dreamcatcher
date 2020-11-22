@@ -66,8 +66,8 @@ router.post('/signup', async (req, res) => {
         lastName: lastName
     });
     userCreateOp.set(userDoc.collection('profile').doc('default'), {
-        education: {},
-        experience: {},
+        education: [],
+        experience: [],
         about: "This user hasn't shared anything about them yet"
     });
 
