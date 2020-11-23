@@ -68,7 +68,10 @@ router.post('/signup', async (req, res) => {
     userCreateOp.set(userDoc.collection('profile').doc('default'), {
         education: [],
         experience: [],
-        about: "This user hasn't shared anything about them yet"
+        about: "This user hasn't shared anything about them yet",
+        fullname: firstName + ' ' + lastName,
+        headline: "I am new to Dreamcatchers!",
+        location: 'Unknown'
     });
 
     userCreateOp.set(usernameMapDoc, {
