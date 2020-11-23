@@ -9,15 +9,22 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 import Avatar from '@material-ui/core/Avatar';
+import CircularProgress from '@material-ui/core/CircularProgress';
 import { Container, ThemeProvider } from '@material-ui/core';
 
 import { BurhanGlobalTheme } from "../styles/themes";
+import { firebaseDateToJSDate } from "../misc/utilities";
 import { grey } from '@material-ui/core/colors';
 
 import profilePic from '../assets/mock-profile/profile-icon.jpg'
 import company1Pic from '../assets/mock-profile/company1.png'
 import company2Pic from '../assets/mock-profile/company2.png'
 import uniPic from '../assets/mock-profile/university1.png'
+
+const PROFILE_DATE_OPTIONS = {
+  month: 'short',
+  year: 'numeric'
+}
 
 const useStyles = makeStyles((theme) => ({
   largeAvatar: {
@@ -49,8 +56,66 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function ProfilePage(props) {
+export default class ProfilePage extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isLoaded: false,
+      isError: true,
+      data: null
+    }
+  }
+
+  componentDidMount() {
+    fetch('/profiles/burhan').then((res) => {
+      return res.json();
+    }).then((profileData) => {
+      if (profileData.status === 200) {
+        this.setState({
+          isLoaded: true,
+          isError: false,
+          data: profileData.data.profile
+        });
+      } else {
+        this.setState({
+          isLoaded: true,
+          data: `Error in retrieval, status: ${profileData.status}, message: ${profileData.message}`
+        })
+      }
+      // console.log(profileData.data.profile);
+    }, (err) => {
+      this.setState({
+        isLoaded: true,
+        data: `Unknown error: ${err}`
+      })
+      console.log(err);
+    })
+  }
+
+
+  render() {
+    if (!this.state.isLoaded) {
+      return (
+        <div className="body-content" style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+          <CircularProgress size="20vw" />
+        </div>
+      )
+    } else if (this.state.isError) {
+      return <div className="body-content"><Typography variant="h1">{this.state.data}</Typography></div>
+    } else {
+      return <ProfilePageUI profileData={this.state.data} />
+      // return null
+    }
+  }
+}
+
+function ProfilePageUI({profileData}) {
   const classes = useStyles();
+  const {about, education, experience, fullname, headline, location} = profileData
+  // console.log(about, education, experience, fullname, headline, location);
+  // console.log(profileData)
+
+  // return <div></div>
 
   return (
     // <div className="body-content profile">
@@ -66,23 +131,22 @@ export default function ProfilePage(props) {
                   <Avatar alt="B" className={classes.largeAvatar} src={profilePic} />
                 </div>
                 <Typography align="center" variant="h4" style={{ paddingTop: 20 }}>
-                  Burhanuddin Lakdawala
-              </Typography>
+                  {fullname}
+                </Typography>
                 <Typography variant="h6" style={{ paddingTop: 20 }}>
-                  Software Engineer at Personable Inc. | Grad student in CS @ UCI
+                  {headline}
               </Typography>
                 <Typography align="right" variant="subtitle2" className={classes.lightGreyText}>
-                  Irvine, California, United States
+                  {location}
               </Typography>
 
                 <Divider />
                 <Typography variant="overline">
                   About
-              </Typography>
+                </Typography>
                 <Typography style={{ flexGrow: 1, overflowY: 'auto' }}>
-                Software Engineer Intern undertaking .NET application development at Personable Inc. Graduate Student in Computer Science at UCI and previously employed as a Software Engineer in Mastek's Innovation Team. Won 1st place in Mastek's prestigious Project Deep Blue. Enthusiastic about learning and working with new technologies as well as applying them to provide solutions for business problems.
-
-              </Typography>
+                {about}
+                </Typography>
 
               </CardContent>
               {/* <CardActions>
@@ -97,20 +161,26 @@ export default function ProfilePage(props) {
                 <Typography variant="overline">
                   Experience
                 </Typography>
-                <Grid container spacing={0} wrap="nowrap" className={classes.detailBox}>
-                  <Grid item style={{ width: 75 }}>
-                    <Avatar variant="square" alt="P" src={company1Pic} />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Typography variant="h6">Software Engineer Intern</Typography>
-                    <Typography variant="body2">Personable Inc. - Fulltime</Typography>
-                    <Typography variant="subtitle2" className={classes.lightGreyText}>Jun 2020 - Dec 2020</Typography>
-                    <Typography variant="subtitle2" className={classes.lightGreyText}>Irvine, California, United States</Typography>
-                    <Typography>Designed and developed 30-40% of all enhancements and improvements for Personable’s prime product, ScanWriter, which significantly improved user experience and expanded core functionality.<br />Also played an important role in transitioning the dev environment to a version-controlled CI / CD environment, which reduced merge errors by up to 50%</Typography>
-                  </Grid>
-                </Grid>
 
-                <Grid container spacing={0} wrap="nowrap" className={classes.detailBox}>
+                {experience.map(ex => (
+                  <Grid container spacing={0} wrap="nowrap" className={classes.detailBox}>
+                    <Grid item style={{ width: 75 }}>
+                      <Avatar variant="square" /*src={company1Pic}*/ >{ex.company.charAt(0)}</Avatar>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Typography variant="h6">{ex.position}</Typography>
+                      <Typography variant="body2">{ex.company} - {ex.type}</Typography>
+                      <Typography variant="subtitle2" className={classes.lightGreyText}>
+                        {firebaseDateToJSDate(ex.start, PROFILE_DATE_OPTIONS)} - {firebaseDateToJSDate(ex.end, PROFILE_DATE_OPTIONS)}
+                      </Typography>
+                      <Typography variant="subtitle2" className={classes.lightGreyText}>{ex.location}</Typography>
+                      <Typography>{ex.description}</Typography>
+                    </Grid>
+                  </Grid>
+                ))}
+                
+
+                {/* <Grid container spacing={0} wrap="nowrap" className={classes.detailBox}>
                   <Grid item style={{ width: 75 }}>
                     <Avatar variant="square" alt="M" src={company2Pic} />
                   </Grid>
@@ -123,7 +193,7 @@ export default function ProfilePage(props) {
 Adapted the solution into a Review Analytics platform for Mastek’s customers, using Angular as the front-end, Python Flask as the back-end and hosted on Azure Cloud.
 Designed the Angular UI for a document profiler application, chatbot application, and a machine-learning project.</Typography>
                   </Grid>
-                </Grid>
+                </Grid> */}
 
                 <Typography variant="overline">
                   Education
