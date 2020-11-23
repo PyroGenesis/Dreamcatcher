@@ -10,9 +10,9 @@ router.get('/test', async (req, res, next) => {
     res.send('Profile Home!!!');
 });
 
-router.get('/:uid', async (req, res) => {
-    const uid = req.params.uid;
-    if (uid == null) {
+router.get('/:username', async (req, res) => {
+    const username = req.params.username;
+    if (username == null) {
         res.statusCode = 400;
         res.json({
             status: res.statusCode,
@@ -21,6 +21,7 @@ router.get('/:uid', async (req, res) => {
         });
         return;
     }
+    const uid = await (await db.collection('usernameToDetails').doc(username).get()).get('uid')
     const profileSnapshot = await db.collection('users').doc(uid).collection('profile').doc('default').get();
     
     if (profileSnapshot.exists) {
