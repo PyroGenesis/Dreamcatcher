@@ -10,7 +10,8 @@ import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 import Avatar from '@material-ui/core/Avatar';
 import CircularProgress from '@material-ui/core/CircularProgress';
-import { Container, ThemeProvider } from '@material-ui/core';
+import { Container, IconButton, ThemeProvider } from '@material-ui/core';
+import { Add, AccessAlarm, ThreeDRotation, Edit } from '@material-ui/icons';
 
 import { BurhanGlobalTheme } from "../styles/themes";
 import { firebaseDateToJSDate } from "../misc/utilities";
@@ -96,7 +97,7 @@ export default class ProfilePage extends Component {
   render() {
     if (!this.state.isLoaded) {
       return (
-        <div className="body-content" style={{display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+        <div className="body-content" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
           <CircularProgress size="20vw" />
         </div>
       )
@@ -109,9 +110,9 @@ export default class ProfilePage extends Component {
   }
 }
 
-function ProfilePageUI({profileData}) {
+function ProfilePageUI({ profileData }) {
   const classes = useStyles();
-  const {about, education, experience, fullname, headline, location} = profileData
+  const { about, education, experience, fullname, headline, location } = profileData
   // console.log(about, education, experience, fullname, headline, location);
   // console.log(profileData)
 
@@ -135,17 +136,17 @@ function ProfilePageUI({profileData}) {
                 </Typography>
                 <Typography variant="h6" style={{ paddingTop: 20 }}>
                   {headline}
-              </Typography>
+                </Typography>
                 <Typography align="right" variant="subtitle2" className={classes.lightGreyText}>
                   {location}
-              </Typography>
+                </Typography>
 
                 <Divider />
                 <Typography variant="overline">
                   About
                 </Typography>
                 <Typography style={{ flexGrow: 1, overflowY: 'auto' }}>
-                {about}
+                  {about}
                 </Typography>
 
               </CardContent>
@@ -178,7 +179,7 @@ function ProfilePageUI({profileData}) {
                     </Grid>
                   </Grid>
                 ))}
-                
+
 
                 {/* <Grid container spacing={0} wrap="nowrap" className={classes.detailBox}>
                   <Grid item style={{ width: 75 }}>
@@ -195,10 +196,15 @@ Designed the Angular UI for a document profiler application, chatbot application
                   </Grid>
                 </Grid> */}
 
-                <Typography variant="overline">
-                  Education
-                </Typography>
-                <Grid container spacing={0} wrap="nowrap" className={classes.detailBox}>
+                <div style={{ display: 'flex' }}>
+                  <Typography variant="overline" style={{ flexGrow: 1 }}>
+                    Education
+                  </Typography>
+                  <IconButton aria-label="add" style={{alignSelf: 'start'}}>
+                    <Add />
+                  </IconButton>
+                </div>
+                {/* <Grid container spacing={0} wrap="nowrap" className={classes.detailBox}>
                   <Grid item style={{ width: 75 }}>
                     <Avatar variant="square" alt="I" src={uniPic} />
                   </Grid>
@@ -207,20 +213,28 @@ Designed the Angular UI for a document profiler application, chatbot application
                     <Typography variant="body2">Masters - Computer Science</Typography>
                     <Typography variant="subtitle2" className={classes.lightGreyText}>2019 - 2020</Typography>
                   </Grid>
-                </Grid>
-                
-                <Grid container spacing={0} wrap="nowrap" className={classes.detailBox}>
-                  <Grid item style={{ width: 75 }}>
-                    <Avatar variant="square">
-                      M
-                  </Avatar>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Typography variant="h6">University of Mumbai</Typography>
-                    <Typography variant="body2">Bachelors of Engineering - Information Technology</Typography>
-                    <Typography variant="subtitle2" className={classes.lightGreyText}>2014 - 2018</Typography>
-                  </Grid>
-                </Grid>
+                </Grid> */}
+
+                {education.map(ed => (
+                  <div style={{ display: 'flex' }}>
+                    <Grid container spacing={0} wrap="nowrap" className={classes.detailBox} style={{ flexGrow: 1 }}>
+                      <Grid item style={{ width: 75 }}>
+                        <Avatar variant="square">
+                          {ed.university.charAt(0)}
+                        </Avatar>
+                      </Grid>
+                      <Grid item xs={12}>
+                        <Typography variant="h6">{ed.university}</Typography>
+                        <Typography variant="body2">{ed.degree} - {ed.major}</Typography>
+                        <Typography variant="subtitle2" className={classes.lightGreyText}>{ed.startYear} - {ed.endYear}</Typography>
+                      </Grid>
+                    </Grid>
+                    <IconButton aria-label="edit" style={{alignSelf: 'start'}}>
+                      <Edit />
+                    </IconButton>
+                  </div>
+                ))}
+
 
 
               </CardContent>
