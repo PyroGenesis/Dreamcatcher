@@ -88,7 +88,6 @@ const routes = [
   {
     path: '/about',
     component: About,
-    isPrivate: true
   },
   {
     path: '/post',
