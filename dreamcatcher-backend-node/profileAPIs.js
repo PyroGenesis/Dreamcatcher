@@ -12,6 +12,7 @@ router.get('/test', async (req, res, next) => {
 
 router.get('/:username', async (req, res) => {
     const username = req.params.username;
+
     if (username == null) {
         res.statusCode = 400;
         res.json({
@@ -21,7 +22,18 @@ router.get('/:username', async (req, res) => {
         });
         return;
     }
-    const uid = await (await db.collection('usernameToDetails').doc(username).get()).get('uid')
+    const userRef = await db.collection('usernameToDetails').doc(username).get()
+    if (!userRef.exists) {
+        res.statusCode = 400;
+        res.json({
+            status: res.statusCode,
+            message: 'No user with this username present',
+            data: null
+        });
+        return;
+    }
+
+    const uid = userRef.get('uid');
     const profileSnapshot = await db.collection('users').doc(uid).collection('profile').doc('default').get();
     
     if (profileSnapshot.exists) {
