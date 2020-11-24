@@ -22,7 +22,8 @@ const useStyles = makeStyles((theme) => ({
         }
     },
     logo: {
-        height: theme.spacing(5),
+        // height: theme.spacing(5),
+        height: '5vh',
         marginTop: theme.spacing(0.5)
     },
 }));
