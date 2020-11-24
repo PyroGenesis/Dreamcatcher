@@ -35,7 +35,7 @@ function ForumsPage(props) {
             <Card className={classes.forumCard} onClick={()=>setForumNum(1)} >
               <CardContent>
                 <Typography variant="h4">
-                  Topic 1
+                  Interview Experiences
                 </Typography>
               </CardContent>
             </Card>
@@ -44,7 +44,7 @@ function ForumsPage(props) {
             <Card className={classes.forumCard} onClick={()=>setForumNum(2)}>
               <CardContent>
                 <Typography variant="h4">
-                  Topic 2
+                  Offer<br/>Discussion
                 </Typography>
               </CardContent>
             </Card>
@@ -53,7 +53,7 @@ function ForumsPage(props) {
             <Card className={classes.forumCard} onClick={()=>setForumNum(3)}>
               <CardContent>
                 <Typography variant="h4">
-                  Topic 3
+                  Technical<br/>Questions
                 </Typography>
               </CardContent>
             </Card>
@@ -62,7 +62,7 @@ function ForumsPage(props) {
             <Card className={classes.forumCard} onClick={()=>setForumNum(4)}>
               <CardContent>
                 <Typography variant="h4">
-                  Topic 4
+                  General<br/>Discussion
                 </Typography>
               </CardContent>
             </Card>

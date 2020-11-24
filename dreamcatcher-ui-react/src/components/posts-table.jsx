@@ -25,22 +25,34 @@ const useStyles = makeStyles((theme) => ({
 
 const posts1 = [
     {
-      title: 'Really Really long and clickbaity title',
+      title: 'Google Software Engineer 2020',
       date: '18 December, 2020',
       time: '12:00pm',
       userName: 'yukulkar'
     },
     {
-      title: 'Really Really long and clickbaity titles',
-      date: '18 December, 2020',
+      title: 'Microsoft Software Engineer 2020',
+      date: '19 December, 2020',
       time: '12:00pm',
-      userName: 'yukulkar'
+      userName: 'burhan'
     },
     {
-      title: 'Really Really long and clickbaity title',
-      date: '18 December, 2020',
+      title: 'Amazon SDE New Grad Experience',
+      date: '20 December, 2020',
       time: '12:00pm',
-      userName: 'yukulkar'
+      userName: 'anand'
+    },
+    {
+      title: 'Netflix Senior SDE',
+      date: '21 December, 2020',
+      time: '12:00pm',
+      userName: 'lorem'
+    },
+    {
+      title: 'Apple SDE Interview',
+      date: '22 December, 2020',
+      time: '12:00pm',
+      userName: 'ipsum'
     }
   ]
   

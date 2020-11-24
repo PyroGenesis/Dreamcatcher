@@ -1,14 +1,23 @@
 import React, { Component, useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { AppBar, Toolbar, Button, Typography } from "@material-ui/core";
+import { AppBar, Toolbar, Button, Typography, IconButton } from "@material-ui/core";
 import { logout } from '../context/actions'
 import { makeStyles } from '@material-ui/core/styles';
 import { useAuthDispatch, useAuthState } from '../context/context';
 import {checkToken} from '../context/actions'
+import logo from '../assets/logo.png'
+import CollapsedNavbar from './collapsed-navbar';
+
 
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
+    // position: "absolute",
+    // right: 0
+  },
+  logo: {
+    height: theme.spacing(5),
+    marginTop: theme.spacing(0.5)
   },
   menuButton: {
     marginRight: theme.spacing(2),
@@ -19,6 +28,11 @@ const useStyles = makeStyles((theme) => ({
   title: {
     flexGrow: 1,
   },
+  navBar: {
+    [theme.breakpoints.down("sm")]: {
+      display: "none"
+    }
+  }
 }));
 
 export default function Navbar(props) {
@@ -29,6 +43,7 @@ export default function Navbar(props) {
 
   const userDetails = useAuthState()
   const dispatch = useAuthDispatch();
+
 
   const handleLogout = () => {
     //setTokenStatus('');
@@ -49,21 +64,24 @@ export default function Navbar(props) {
 
   return (
     <div className={classes.root}>
-      <AppBar position="static" elevation={0}>
+      <CollapsedNavbar/>
+      <AppBar position="static" elevation={0} className={classes.navBar}>
         <Toolbar>
-          <Typography variant="h6" className={classes.title}>
-            Dreamcatcher
-          </Typography>
-          <Button color="inherit" href="/">Home</Button>
-          <Button color="inherit" href="/dashboard">Dashboard</Button>
-          <Button color="inherit" href="/profile">Profile</Button>
-          <Button color="inherit" href="/positions">Positions</Button>
-          <Button color="inherit" href="/forums">Forums</Button>
-          <Button color="inherit" href="/about">About</Button>
-          { userDetails.token 
-            ? <Button color="inherit" onClick={handleLogout}>Logout</Button>
-            : null
-          }
+            <Typography variant="h6" className={classes.title}>
+              <Button color="inherit" href="/">
+                <img src={logo} alt="Logo" className={classes.logo}/>
+              </Button>
+            </Typography>
+            <Button color="inherit" href="/">Home</Button>
+            <Button color="inherit" href="/dashboard">Dashboard</Button>
+            <Button color="inherit" href="/profile">Profile</Button>
+            <Button color="inherit" href="/positions">Positions</Button>
+            <Button color="inherit" href="/forums">Forums</Button>
+            <Button color="inherit" href="/about">About</Button>
+            { userDetails.token 
+              ? <Button color="inherit" onClick={handleLogout}>Logout</Button>
+              : null
+            }
         </Toolbar>
       </AppBar>
     </div>
