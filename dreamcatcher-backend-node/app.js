@@ -6,7 +6,7 @@ app.use(express.json())
 const firebase = require('./firestore-init');
 const db = firebase.firestore();
 
-const auth = require('./auth');
+const auth = require('./auth').router;
 const profileRoutes = require('./profileAPIs');
 const applications = require('./applications');
 // routes for testing purposes
