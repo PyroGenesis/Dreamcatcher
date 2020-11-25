@@ -18,8 +18,8 @@ const useStyles = makeStyles((theme) => ({
     },
     drawer: {
         [theme.breakpoints.up("md")]: {
-        display: "none"
-        }
+            display: "none"
+        },
     },
     logo: {
         // height: theme.spacing(5),
@@ -55,16 +55,16 @@ export default function CollapsedNavbar(props) {
                         <MenuIcon style={{color: "white"}}/>
                     </IconButton>
                     <Drawer anchor={'right'} open={openDrawer} onClose={()=>{setOpenDrawer(!openDrawer)}}>
-                    <Button color="inherit" href="/">Home</Button>
-                    <Button color="inherit" href="/dashboard">Dashboard</Button>
-                    <Button color="inherit" href="/profile">Profile</Button>
-                    <Button color="inherit" href="/positions">Positions</Button>
-                    <Button color="inherit" href="/forums">Forums</Button>
-                    <Button color="inherit" href="/about">About</Button>
-                    { userDetails.token 
-                        ? <Button color="inherit" onClick={handleLogout}>Logout</Button>
-                        : null
-                    }
+                        <Button color="inherit" href="/">Home</Button>
+                        <Button color="inherit" href="/dashboard">Dashboard</Button>
+                        <Button color="inherit" href="/profile">Profile</Button>
+                        <Button color="inherit" href="/positions">Positions</Button>
+                        <Button color="inherit" href="/forums">Forums</Button>
+                        <Button color="inherit" href="/about">About</Button>
+                        { userDetails.token 
+                            ? <Button color="inherit" onClick={handleLogout}>Logout</Button>
+                            : null
+                        }
                     </Drawer>
                 </Toolbar>
             </AppBar>

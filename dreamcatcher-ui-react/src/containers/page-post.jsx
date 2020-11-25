@@ -9,6 +9,7 @@ import ThumbUpIcon from '@material-ui/icons/ThumbUp';
 import ThumbDownIcon from '@material-ui/icons/ThumbDown';
 import CommentIcon from '@material-ui/icons/Comment';
 import { useState } from 'react';
+// import {firestore} from '../components/firebase'
 
 const useStyles = makeStyles((theme) => ({
     small: {
@@ -148,6 +149,21 @@ const thread = [
     }
 ]
 
+// async function getComments() {
+//     const forumReference = firestore.collection('forums');
+
+//     const data = await forumReference.get();
+
+//     if(data.empty) {
+//         alert("Error");
+//         return;
+//     }
+
+//     data.forEach(doc=>{
+//         console.log(doc.data());
+//     });
+// }
+
 function Post(props) {
     const classes = useStyles();
 
@@ -197,6 +213,8 @@ function Post(props) {
         }
         setDislike();
     }
+
+    // getComments();    
 
     return(
         <Grid container>

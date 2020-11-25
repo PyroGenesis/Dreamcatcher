@@ -99,7 +99,7 @@ const positions = [
     
     We are remote inclusive and our culture is unique. We live by our values. Please read more about the Netflix culture here. 
     `, link: "https://jobs.netflix.com/jobs/867008"},
-    {companyName: 'Google', positionName: ' Software Engineer, PhD University Graduate', desc: `
+    {companyName: 'Google', positionName: 'Software Engineer, PhD University Graduate', desc: `
     Minimum qualifications:
 
     • PhD degree in Computer Science or related technical field, or equivalent practical experience.
