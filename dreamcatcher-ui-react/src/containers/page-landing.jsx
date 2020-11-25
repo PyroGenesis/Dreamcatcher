@@ -1,14 +1,27 @@
 import React, { useEffect, useState } from 'react'
+import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import Login from './page-login';
 import SignUp from "./page-signup";
 import '../App.scss';
-import { CardContent, Link, Grid } from '@material-ui/core';
+import { CardContent, Link, Grid, ThemeProvider } from '@material-ui/core';
 import { useAuthState, useAuthDispatch } from '../context/context';
 import { checkToken } from '../context/actions';
+import { CardMedia } from '@material-ui/core';
+import Avatar from '@material-ui/core/Avatar';
+import logo from '../assets/logo.png'
 
+const useStyles = makeStyles((theme) => ({
+  logo: {
+    // width: theme.spacing(80),
+    width: '50vw',
+    marginBottom: theme.spacing(2)
+  }
+}));
 
 export default function LandingPageNew(props) {
+    const classes = useStyles();
+
     const [toggleSignUp, setToggleSignUp] = useState(false);
     const [toggleLogin, setToggleLogin] = useState(true);
 
@@ -45,8 +58,9 @@ export default function LandingPageNew(props) {
         <header className="body-content App-header">
           <Grid container style={{margin: 0, width: '100%'}} justify="center" spacing={3} alignItems="center">
             <Grid item xs={9} align="center">
-              <h1 style={{fontFamily:"Comfortaa", fontSize:80}}> Dreamcatcher</h1>
-              <h3 style={{fontFamily:"Montserrat", fontSize:20}}> Get help on your path to acquiring your dream job</h3>
+              {/* <h1 style={{fontFamily:"Comfortaa", fontSize:80}}> Dreamcatcher</h1> */}
+              <img src={logo} alt="Logo" className={classes.logo}/>
+              <h3 style={{fontFamily:"Montserrat", fontSize:18}}> Get help on your path to acquiring your dream job</h3>
             </Grid>
             <Grid item xs align="center">
               <Card elevation={13} style={{minWidth: 300, maxWidth: 300}}>

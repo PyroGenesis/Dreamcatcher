@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import { grey } from '@material-ui/core/colors';
 import { makeStyles } from '@material-ui/core/styles';
 import { Typography, Grid } from "@material-ui/core";
@@ -63,9 +63,70 @@ const useStyles = makeStyles((theme) => ({
 export default function Comment(props) {
     const classes = useStyles();
 
+    const [likeColor, setLikeColor] = useState('grey');
+    const [dislikeColor, setDislikeColor] = useState('grey');
+    const [liked, setLiked] = useState(false);
+    const [disliked, setDisliked] = useState(false);
+    const [likes, setLikes] = useState(props.comment.likes);
+    const [dislikes, setDislikes] = useState(props.comment.dislikes);
+
     const nestedComments = (props.comment.children || []).map(comment => {
         return <Comment comment={comment} type="child" />
     })
+
+    const setDislike = () => {     
+        if(dislikeColor === 'grey') {
+            setDislikeColor('blue');
+        }
+        else {
+            setDislikeColor('grey');
+        }
+        setDisliked(!disliked);
+        if(disliked) {
+            setDislikes(dislikes - 1)
+            props.comment.likes = dislikes - 1;
+        }
+        else {
+            setDislikes(dislikes + 1);
+            props.comment.likes = dislikes + 1;
+        }
+    }
+
+    const setLike = () => {
+        if(likeColor === 'grey') {
+            setLikeColor('blue');
+        }
+        else {
+            setLikeColor('grey');
+        }   
+        setLiked(!liked);
+        if(liked) {
+            setLikes(likes - 1)
+            props.comment.likes = likes - 1;
+        }  
+        else {
+            setLikes(likes + 1);
+            props.comment.likes = likes + 1;
+        }
+    }
+
+    const handleLike = () => {
+        
+        if (disliked) {
+            setLike();
+            setDislike();
+        }
+        setLike();
+    }
+    
+    const handleDislike = () => {
+        
+        if (liked) {
+          setDislike();
+          setLike();
+        }
+        setDislike();
+    }
     
     return (
         <Timeline>
@@ -86,22 +147,22 @@ export default function Comment(props) {
                         <Grid item xs container direction="row">
                             <Grid item>        
                                 <Typography variant="subtitle2" className={classes.iconText}>
-                                {props.comment.likes} 
+                                {likes} 
                                 </Typography>
                             </Grid>
                             <Grid item>
-                                <ThumbUpIcon fontSize="small" className={classes.postIcons}/>
+                                <ThumbUpIcon id={props.comment.id} fontSize="small" style={{color: likeColor}} className={classes.postIcons} onClick={handleLike}/>
                             </Grid>
                             <Grid item>        
                                 <Typography variant="subtitle2" className={classes.iconText}>
-                                {props.comment.dislikes} 
+                                {dislikes} 
                                 </Typography>
                             </Grid>
                             <Grid item>
-                                <ThumbDownIcon fontSize="small" className={classes.postIcons}/>
+                                <ThumbDownIcon id={props.comment.id} fontSize="small" style={{color: dislikeColor}} className={classes.postIcons} onClick={handleDislike}/>
                             </Grid>
                             <Grid item>
-                                <CommentIcon fontSize="small" className={classes.postIcons}/>
+                                <CommentIcon id={props.comment.id} fontSize="small" className={classes.postIcons}/>
                             </Grid>
                         </Grid>
                         {nestedComments}

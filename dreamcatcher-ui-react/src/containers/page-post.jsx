@@ -8,6 +8,7 @@ import CommentTree from '../components/comment-tree'
 import ThumbUpIcon from '@material-ui/icons/ThumbUp';
 import ThumbDownIcon from '@material-ui/icons/ThumbDown';
 import CommentIcon from '@material-ui/icons/Comment';
+import { useState } from 'react';
 
 const useStyles = makeStyles((theme) => ({
     small: {
@@ -150,6 +151,53 @@ const thread = [
 function Post(props) {
     const classes = useStyles();
 
+    const [likeColor, setLikeColor] = useState('grey');
+    const [dislikeColor, setDislikeColor] = useState('grey');
+    const [liked, setLiked] = useState(false);
+    const [disliked, setDisliked] = useState(false);
+    const [likes, setLikes] = useState(post[0].likes);
+    const [dislikes, setDislikes] = useState(post[0].dislikes);
+
+    const setDislike = () => {     
+        if(dislikeColor === 'grey') {
+            setDislikeColor('blue');
+        }
+        else {
+            setDislikeColor('grey');
+        }
+        setDisliked(!disliked);
+        disliked ? setDislikes(dislikes - 1) : setDislikes(dislikes + 1);
+    }
+
+    const setLike = () => {
+        if(likeColor === 'grey') {
+            setLikeColor('blue');
+        }
+        else {
+            setLikeColor('grey');
+        }   
+        setLiked(!liked);
+        liked ? setLikes(likes - 1) : setLikes(likes + 1);
+    }
+
+    const handleLike = () => {
+        
+        if (disliked) {
+            setLike();
+            setDislike();
+        }
+        setLike();
+    }
+    
+    const handleDislike = () => {
+        
+        if (liked) {
+          setDislike();
+          setLike();
+        }
+        setDislike();
+    }
+
     return(
         <Grid container>
             <Grid item xs={12}>
@@ -173,19 +221,23 @@ function Post(props) {
                                     <Grid item xs container direction="row">
                                         <Grid item>        
                                             <Typography variant="subtitle2" className={classes.small_comment}>
-                                            {post[0].likes} 
+                                            {
+                                                likes
+                                            } 
                                             </Typography>
                                         </Grid>
                                         <Grid item>
-                                            <ThumbUpIcon fontSize="small" className={classes.postIcons}/>
+                                            <ThumbUpIcon fontSize="small" className={classes.postIcons} style={{color: likeColor}} onClick={handleLike}/>
                                         </Grid>
                                         <Grid item>        
                                             <Typography variant="subtitle2" className={classes.small_comment}>
-                                            {post[0].dislikes} 
+                                            {
+                                                dislikes
+                                            } 
                                             </Typography>
                                         </Grid>
                                         <Grid item>
-                                            <ThumbDownIcon fontSize="small" className={classes.postIcons}/>
+                                            <ThumbDownIcon fontSize="small" className={classes.postIcons} style={{color: dislikeColor}} onClick={handleDislike}/>
                                         </Grid>
                                         <Grid item>
                                             <CommentIcon fontSize="small" className={classes.postIcons}/>
