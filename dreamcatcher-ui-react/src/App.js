@@ -97,7 +97,7 @@ const routes = [
     component: About,
   },
   {
-    path: '/post',
+    path: '/post/:id',
     component: Post,
     isPrivate: true
   },
