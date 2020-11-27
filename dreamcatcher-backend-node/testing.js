@@ -14,7 +14,7 @@ router.get('/', (req, res) => {
 router.get('/addUser',  async (req, res) => {
     // await db.collection('users').doc('5bVmAxHkjlc7iNHUNzgG8l9jHhg1').collection('profile').doc('default').create({about: 'abc'})
     const userRef = db.collection('users').doc('5bVmAxHkjlc7iNHUNzgG8l9jHhg1');
-    // const profileRef = userRef.collection('profile').doc('default');
+    const profileRef = userRef.collection('profile').doc('default');
 
     // profileRef.update({
     //     education: [{
@@ -52,13 +52,20 @@ router.get('/addUser',  async (req, res) => {
     //     }]
     // });
 
-    userRef.update({
-        createdAt: new Date(),
-        email: "burhan123786@gmail.com",
-        firstName: "Burhanuddin",
-        lastName: "Lakdawala",
-        username: "burhan"
+    profileRef.update({
+        about: 'Software Engineer Intern undertaking .NET application development at Personable Inc. Graduate Student in Computer Science at UCI and previously employed as a Software Engineer in Mastek\'s Innovation Team. Won 1st place in Mastek\'s prestigious Project Deep Blue. Enthusiastic about learning and working with new technologies as well as applying them to provide solutions for business problems.',
+        headline: 'Software Engineer at Personable Inc. | Grad student in CS @ UCI',
+        location: 'Irvine, California, United States',
+        fullname: 'Burhanuddin Lakdawala'
     })
+
+    // userRef.update({
+    //     createdAt: new Date(),
+    //     email: "burhan123786@gmail.com",
+    //     firstName: "Burhanuddin",
+    //     lastName: "Lakdawala",
+    //     username: "burhan"
+    // })
 
     res.end();
 });
