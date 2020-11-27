@@ -10,6 +10,12 @@ import Typography from '@material-ui/core/Typography';
 import Divider from '@material-ui/core/Divider';
 import Avatar from '@material-ui/core/Avatar';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import TextField from '@material-ui/core/TextField';
+import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
+import DialogTitle from '@material-ui/core/DialogTitle';
 import { Container, IconButton, ThemeProvider } from '@material-ui/core';
 import { Add, AccessAlarm, ThreeDRotation, Edit } from '@material-ui/icons';
 
@@ -21,6 +27,8 @@ import profilePic from '../assets/mock-profile/profile-icon.jpg'
 import company1Pic from '../assets/mock-profile/company1.png'
 import company2Pic from '../assets/mock-profile/company2.png'
 import uniPic from '../assets/mock-profile/university1.png'
+import { useParams, withRouter } from 'react-router-dom';
+import { useAuthState, AuthStateContext } from '../context/context';
 
 const PROFILE_DATE_OPTIONS = {
   month: 'short',
@@ -57,18 +65,52 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default class ProfilePage extends Component {
+class ProfilePage extends Component {
+  static contextType = AuthStateContext;
+
   constructor(props) {
     super(props);
     this.state = {
       isLoaded: false,
       isError: true,
-      data: null
+      data: null,
+
+      isUsername: false,
+      accessInfo: null
     }
+    this.isUsername = false;
+    this.accessInfo = null;
   }
 
   componentDidMount() {
-    fetch('/profiles/burhan').then((res) => {
+    const { username } = this.props.match.params;
+
+    if (username != null) {
+      // this.setState({
+      this.isUsername = true;
+      this.accessInfo = username;
+      // })
+    } else {
+      const userDetails = /*useAuthState();*/ this.context;
+      console.log('token in context', userDetails.token);
+      // this.setState({
+      this.isUsername = false;
+      this.accessInfo = userDetails.token;
+      // });
+      console.log('state inside else:', this.state.accessInfo);
+    }
+
+    // console.log('state outside else', this.state);
+    console.log('profile session', this.isUsername, this.accessInfo);
+    const profilePromise = this.isUsername ?
+      fetch(`/profiles/${this.accessInfo}`) :
+      fetch('/profiles', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: this.accessInfo })
+      });
+
+    profilePromise.then((res) => {
       return res.json();
     }).then((profileData) => {
       if (profileData.status === 200) {
@@ -104,19 +146,148 @@ export default class ProfilePage extends Component {
     } else if (this.state.isError) {
       return <div className="body-content"><Typography variant="h1">{this.state.data}</Typography></div>
     } else {
-      return <ProfilePageUI profileData={this.state.data} />
+      return <ProfilePageUI profileData={this.state.data} isUsername={this.isUsername} accessInfo={this.accessInfo} />
       // return null
     }
   }
 }
 
-function ProfilePageUI({ profileData }) {
+function EducationEdit({ data, open, closeFn, modifyFn }) {
+  // const [open, setOpen] = React.useState(ed);
+  if (data == null) {
+    data = {
+      university: '',
+      degree: '',
+      major: '',
+      startYear: '',
+      endYear: ''
+    }
+  } else {
+    data = { ...data };
+  }
+  // const {} = data;
+
+  const handleClickOpen = () => {
+    // setOpen(true);
+  };
+
+  const handleClose = () => {
+    closeFn();
+    // console.log(data);
+    // setOpen(false);
+  };
+
+  const handleSave = () => {
+    modifyFn(data);
+    handleClose();
+  }
+
+  const textFieldChanged = (e) => {
+    data[e.target.id] = e.target.value;
+    // console.log(data);
+    // console.log(e.target.id);
+  }
+
+  return (
+    <div>
+      <Dialog open={open} onClose={handleClose} aria-labelledby="education-edit-dialog">
+        <DialogTitle id="education-edit-dialog">Education</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Please provide the details of your education
+          </DialogContentText>
+          <Grid container spacing={0}>
+            <Grid item xs={12} style={{ paddingLeft: 8, paddingRight: 8 }}>
+              <TextField autoFocus required margin="dense" id="university" label="University" type="text"
+                defaultValue={data.university} onChange={textFieldChanged} fullWidth />
+            </Grid>
+            <Grid item xs={4} style={{ paddingLeft: 8, paddingRight: 8 }}>
+              <TextField required margin="dense" id="degree" label="Program" type="text"
+                defaultValue={data.degree} onChange={textFieldChanged} fullWidth />
+            </Grid>
+            <Grid item xs={8} style={{ paddingLeft: 8, paddingRight: 8 }}>
+              <TextField required margin="dense" id="major" label="Major" type="text"
+                defaultValue={data.major} onChange={textFieldChanged} fullWidth />
+            </Grid>
+            <Grid item xs={6} style={{ paddingLeft: 8, paddingRight: 8 }}>
+              <TextField required margin="dense" id="startYear" label="Start Year" type="number"
+                defaultValue={data.startYear} onChange={textFieldChanged} fullWidth />
+            </Grid>
+            <Grid item xs={6} style={{ paddingLeft: 8, paddingRight: 8 }}>
+              <TextField required margin="dense" id="endYear" label="End Year" type="number"
+                defaultValue={data.endYear} onChange={textFieldChanged} fullWidth />
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleSave} color="primary">
+            Save
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </div>
+  );
+}
+
+function ProfilePageUI({ profileData, isUsername, accessInfo }) {
   const classes = useStyles();
-  const { about, education, experience, fullname, headline, location } = profileData
+  // const { about, education, experience, fullname, headline, location } = profileData
+
+  profileData.education.sort((a, b) => b.startYear - a.startYear);
+
+  const [about, changeAbout] = React.useState(profileData.about);
+  const [education, changeEducation] = React.useState(profileData.education);
+  const [experience, changeExperience] = React.useState(profileData.experience);
+  const [fullname, changeFullname] = React.useState(profileData.fullname);
+  const [headline, changeHeadline] = React.useState(profileData.headline);
+  const [location, changeLocation] = React.useState(profileData.location);
   // console.log(about, education, experience, fullname, headline, location);
   // console.log(profileData)
 
   // return <div></div>
+  const [edEdit, toggleEdEdit] = React.useState(false);
+  const [edEditData, setEdEditData] = React.useState(null);
+  const [edSelected, setEdSelected] = React.useState(-1);
+  const showEdit = (ed, edIdx) => {
+    toggleEdEdit(true);
+    setEdEditData(ed);
+    setEdSelected(edIdx);
+    // console.log(edSelected);
+  }
+  const closeEdEdit = () => {
+    toggleEdEdit(false);
+    setEdEditData(null);
+    // console.log(edSelected);
+  }
+  const modifyEd = (newData) => {
+    console.log(newData, edSelected);
+    let edCopy = education.slice();
+    if (edSelected === -1) {
+      edCopy.push(newData);
+    } else {
+      edCopy[edSelected] = newData;
+    }
+    edCopy.sort((a, b) => b.startYear - a.startYear);
+
+    fetch('/profiles/education', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: accessInfo, education: edCopy })
+    }).then((res) => {
+      return res.json();
+    }).then(success => {
+      if (success.status == 200) {
+        changeEducation(edCopy);
+      } else {
+        console.log('API error: ', success);
+      }
+    }, error => {
+      console.log('Unknown error: ', error)
+    })
+  }
 
   return (
     // <div className="body-content profile">
@@ -124,6 +295,14 @@ function ProfilePageUI({ profileData }) {
     // </div>
     <div className="body-content">
       <ThemeProvider theme={BurhanGlobalTheme}>
+        <EducationEdit
+          open={edEdit}
+          data={edEditData}
+          closeFn={() => { closeEdEdit() }}
+          modifyFn={(newData) => { modifyEd(newData) }}
+        // edIdx={edSelected}
+        />
+
         <Grid container spacing={1} style={{ height: '100%', width: '100%', padding: 8 }}>
           <Grid item xs={12} sm={4}>
             <Card elevation={3}>
@@ -164,7 +343,7 @@ function ProfilePageUI({ profileData }) {
                 </Typography>
 
                 {experience.map(ex => (
-                  <Grid container spacing={0} wrap="nowrap" className={classes.detailBox}>
+                  <Grid container spacing={0} wrap="nowrap" key={ex.start._seconds} className={classes.detailBox}>
                     <Grid item style={{ width: 75 }}>
                       <Avatar variant="square" /*src={company1Pic}*/ >{ex.company.charAt(0)}</Avatar>
                     </Grid>
@@ -200,7 +379,7 @@ Designed the Angular UI for a document profiler application, chatbot application
                   <Typography variant="overline" style={{ flexGrow: 1 }}>
                     Education
                   </Typography>
-                  <IconButton aria-label="add" style={{alignSelf: 'start'}}>
+                  <IconButton aria-label="add" style={{ alignSelf: 'start' }} onClick={() => { showEdit(null, -1) }}>
                     <Add />
                   </IconButton>
                 </div>
@@ -215,8 +394,8 @@ Designed the Angular UI for a document profiler application, chatbot application
                   </Grid>
                 </Grid> */}
 
-                {education.map(ed => (
-                  <div style={{ display: 'flex' }}>
+                {education.map((ed, edIdx) => (
+                  <div key={ed.startYear} style={{ display: 'flex' }}>
                     <Grid container spacing={0} wrap="nowrap" className={classes.detailBox} style={{ flexGrow: 1 }}>
                       <Grid item style={{ width: 75 }}>
                         <Avatar variant="square">
@@ -229,7 +408,7 @@ Designed the Angular UI for a document profiler application, chatbot application
                         <Typography variant="subtitle2" className={classes.lightGreyText}>{ed.startYear} - {ed.endYear}</Typography>
                       </Grid>
                     </Grid>
-                    <IconButton aria-label="edit" style={{alignSelf: 'start'}}>
+                    <IconButton aria-label="edit" style={{ alignSelf: 'start' }} onClick={() => { showEdit(ed, edIdx) }}>
                       <Edit />
                     </IconButton>
                   </div>
@@ -248,3 +427,5 @@ Designed the Angular UI for a document profiler application, chatbot application
     </div>
   )
 }
+
+export default withRouter(ProfilePage);
