@@ -71,6 +71,11 @@ const routes = [
     isPrivate: true
   },
   {
+    path: '/profile/:username',
+    component: ProfilePage,
+    isPrivate: false
+  },
+  {
     path: '/profile',
     component: ProfilePage,
     isPrivate: true
