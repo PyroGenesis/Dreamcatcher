@@ -1,5 +1,5 @@
 import { Card, CardContent, Divider, Grid, Typography } from '@material-ui/core'
-import React from 'react'
+import React, {useEffect} from 'react'
 import { withRouter, useParams } from 'react-router-dom';
 import Avatar from '@material-ui/core/Avatar';
 import { makeStyles } from '@material-ui/core/styles';
@@ -9,7 +9,12 @@ import ThumbUpIcon from '@material-ui/icons/ThumbUp';
 import ThumbDownIcon from '@material-ui/icons/ThumbDown';
 import CommentIcon from '@material-ui/icons/Comment';
 import { useState } from 'react';
-// import {firestore} from '../components/firebase'
+import CircularProgress from '@material-ui/core/CircularProgress';
+import {firebaseDateToJSDate} from "../misc/utilities"
+
+import {firestore} from '../components/firebase'
+import firebase from 'firebase/app';
+import "firebase/firestore";
 
 const useStyles = makeStyles((theme) => ({
     small: {
@@ -158,17 +163,106 @@ function Post(props) {
 
     const { id } = useParams();
 
-    alert(id);
-
     const classes = useStyles();
 
     const [likeColor, setLikeColor] = useState('grey');
     const [dislikeColor, setDislikeColor] = useState('grey');
     const [liked, setLiked] = useState(false);
     const [disliked, setDisliked] = useState(false);
-    const [likes, setLikes] = useState(post[0].likes);
-    const [dislikes, setDislikes] = useState(post[0].dislikes);
+    const [likes, setLikes] = useState(0);
+    const [dislikes, setDislikes] = useState(0);
     const [showCommentBox, setShowCommentBox] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);    
+    const [posts, setPosts] = useState([])
+    const [threads, setThreads] = useState([])
+
+    const likesCounterIncrement = firebase.firestore.FieldValue.increment(1);
+    const dislikesCounterIncrement = firebase.firestore.FieldValue.increment(1);
+
+    const likesCounterDecrement = firebase.firestore.FieldValue.increment(-1);
+    const dislikesCounterDecrement = firebase.firestore.FieldValue.increment(-1);
+
+    const db = firebase.firestore();
+
+    useEffect(() => {
+        (async function() {
+
+            setIsLoading(true);
+
+            const postReference = firestore.collection('forums').where("__name__", "==", id);
+
+            const data = await postReference.get();
+
+            let postsArr = []
+
+            if(data.empty) {
+                alert("ERROR")
+                return;
+            }
+
+            data.forEach(doc => {
+
+                const dateObj = {_seconds: doc.data().date.seconds, _nanoseconds: doc.data().date.nanoseconds}
+                const options = {year: "numeric", month: "long", day: "2-digit", hour: "2-digit", minute: "2-digit"}
+      
+                const datetime = firebaseDateToJSDate(dateObj, options)
+      
+                const date = datetime.substr(0, datetime.length - 10)
+                const time = datetime.substr(datetime.length-8, datetime.length)
+
+                postsArr.push({
+                    id: doc.id,
+                    title: doc.data().title,
+                    date: date,
+                    time: time,
+                    userName: doc.data().username,
+                    body: doc.data().body
+                })
+
+                setLikes(doc.data().likes);
+                setDislikes(doc.data().dislikes);
+            })
+
+            setPosts(postsArr)
+
+            const repliesReference = firestore.collection('forums').doc(id).collection('replies');
+
+            const repliesData = await repliesReference.get();
+
+            let threadsArr = []
+
+            if(data.empty) {
+                alert("ERROR")
+                return;
+            }
+
+            repliesData.forEach(doc => {
+
+                const dateObj = {_seconds: doc.data().date.seconds, _nanoseconds: doc.data().date.nanoseconds}
+                const options = {year: "numeric", month: "long", day: "2-digit", hour: "2-digit", minute: "2-digit"}
+      
+                const datetime = firebaseDateToJSDate(dateObj, options)
+      
+                const date = datetime.substr(0, datetime.length - 10)
+                const time = datetime.substr(datetime.length-8, datetime.length)
+
+                threadsArr.push({
+                    id: doc.id,
+                    date: date,
+                    time: time,
+                    userName: doc.data().username,
+                    body: doc.data().body,
+                    likes: doc.data().likes,
+                    dislikes: doc.data().dislikes
+                })
+            })
+
+            setThreads(threadsArr)
+
+            setIsLoading(false)
+
+        })();
+    },[])
 
     const setDislike = () => {     
         if(dislikeColor === 'grey') {
@@ -177,8 +271,27 @@ function Post(props) {
         else {
             setDislikeColor('grey');
         }
+
         setDisliked(!disliked);
-        disliked ? setDislikes(dislikes - 1) : setDislikes(dislikes + 1);
+        if(disliked) {
+            // alert(props.comment.id)
+            const commentRef = db.collection('forums').doc(id)
+
+            // commentRef.update({ dislikes: dislikesCounterDecrement })
+            commentRef.set({ dislikes: dislikesCounterDecrement }, { merge: true })
+            
+            setDislikes(dislikes - 1)
+        }
+        else {
+            // alert(props.comment.id)
+
+            const commentRef = db.collection('forums').doc(id)    
+
+            //commentRef.update({ likes: likesCounterIncrement })
+            commentRef.set({ dislikes: dislikesCounterIncrement }, {merge:true})
+            
+            setDislikes(dislikes + 1);
+        }
     }
 
     const setLike = () => {
@@ -189,7 +302,25 @@ function Post(props) {
             setLikeColor('grey');
         }   
         setLiked(!liked);
-        liked ? setLikes(likes - 1) : setLikes(likes + 1);
+        if(liked) {
+            // alert(props.comment.id)
+            const commentRef = db.collection('forums').doc(id)
+
+            //commentRef.update({ likes: likesCounterDecrement })
+            commentRef.set({ likes: likesCounterDecrement },{merge:true})
+
+            setLikes(likes - 1)
+        }  
+        else {
+            // alert(props.comment.id)
+            const commentRef = db.collection('forums').doc(id)
+
+            //commentRef.update({ likes: likesCounterIncrement })
+            commentRef.set({ likes: likesCounterIncrement }, {merge:true})
+
+            setLikes(likes + 1);
+
+        }    
     }
 
     const handleLike = () => {
@@ -216,66 +347,75 @@ function Post(props) {
         setShowCommentBox(showCommentBox => !showCommentBox)
     }
 
-    return(
-        <Grid container>
-            <Grid item xs={12}>
-                <Card style={{margin: '20px'}}>
-                    <CardContent>
-                        <Grid container>
-                            <Grid item>
-                                <Avatar className={classes.small}>{post[0].userName[0]}</Avatar> 
-                            </Grid>
-                            <Grid item xs={12} sm container>
-                                <Grid item xs container direction="column">
-                                    <Typography variant="h6" className={classes.title}>
-                                        {post[0].title}
-                                    </Typography>
-                                    <Typography variant="subtitle2" className = {classes.subtitle}>
-                                        {post[0].userName} • Posted on {post[0].date} at {post[0].time}
-                                    </Typography>
-                                    <Typography variant="body1" align="justify" paragraph={true}>
-                                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean vel finibus enim, ut bibendum dolor. Phasellus arcu justo, bibendum ut mauris id, elementum consectetur nisi. Integer feugiat urna sit amet vehicula dignissim. Nam tempus nunc et diam lobortis pretium. Duis imperdiet mollis iaculis. Fusce semper metus massa, sit amet dignissim felis lacinia non. Donec tristique leo ipsum, bibendum sagittis metus luctus sit amet. Duis sed feugiat ligula. Nam malesuada nunc felis, non convallis augue gravida ut. Ut congue, augue accumsan imperdiet congue, orci mi iaculis metus, egestas mattis urna nibh eget nulla. Donec arcu urna, egestas vitae ante id, tempus tempus leo. 
-                                    </Typography>
-                                    <Grid item xs container direction="row">
-                                        <Grid item>        
-                                            <Typography variant="subtitle2" className={classes.small_comment}>
-                                            {
-                                                likes
-                                            } 
-                                            </Typography>
+    if(isLoading) {
+        return (
+            <div className="body-content" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <CircularProgress size="10vw" />
+            </div>
+        );
+    }
+    else {
+        return(
+            <Grid container>
+                <Grid item xs={12}>
+                    <Card style={{margin: '20px'}}>
+                        <CardContent>
+                            <Grid container>
+                                <Grid item>
+                                    <Avatar className={classes.small}>{post[0].userName[0]}</Avatar> 
+                                </Grid>
+                                <Grid item xs={12} sm container>
+                                    <Grid item xs container direction="column">
+                                        <Typography variant="h6" className={classes.title}>
+                                            {posts[0].title}
+                                        </Typography>
+                                        <Typography variant="subtitle2" className = {classes.subtitle}>
+                                            {posts[0].userName} • Posted on {posts[0].date} at {posts[0].time}
+                                        </Typography>
+                                        <Typography variant="body1" align="justify" paragraph={true}>
+                                            {posts[0].body}
+                                        </Typography>
+                                        <Grid item xs container direction="row">
+                                            <Grid item>        
+                                                <Typography variant="subtitle2" className={classes.small_comment}>
+                                                {
+                                                    likes
+                                                } 
+                                                </Typography>
+                                            </Grid>
+                                            <Grid item>
+                                                <ThumbUpIcon fontSize="small" className={classes.postIcons} style={{color: likeColor}} onClick={handleLike}/>
+                                            </Grid>
+                                            <Grid item>        
+                                                <Typography variant="subtitle2" className={classes.small_comment}>
+                                                {
+                                                    dislikes
+                                                } 
+                                                </Typography>
+                                            </Grid>
+                                            <Grid item>
+                                                <ThumbDownIcon fontSize="small" className={classes.postIcons} style={{color: dislikeColor}} onClick={handleDislike}/>
+                                            </Grid>
+                                            <Grid item>
+                                                <CommentIcon fontSize="small" className={classes.postIcons} onClick={addComment}/>
+                                            </Grid>
                                         </Grid>
-                                        <Grid item>
-                                            <ThumbUpIcon fontSize="small" className={classes.postIcons} style={{color: likeColor}} onClick={handleLike}/>
-                                        </Grid>
-                                        <Grid item>        
-                                            <Typography variant="subtitle2" className={classes.small_comment}>
-                                            {
-                                                dislikes
-                                            } 
-                                            </Typography>
-                                        </Grid>
-                                        <Grid item>
-                                            <ThumbDownIcon fontSize="small" className={classes.postIcons} style={{color: dislikeColor}} onClick={handleDislike}/>
-                                        </Grid>
-                                        <Grid item>
-                                            <CommentIcon fontSize="small" className={classes.postIcons} onClick={addComment}/>
-                                        </Grid>
+                                        <Divider className={classes.divider}/>
+                                        <Typography variant="h6">
+                                            Comments:
+                                        </Typography>
                                     </Grid>
-                                    <Divider className={classes.divider}/>
-                                    <Typography variant="h6">
-                                        Comments:
-                                    </Typography>
+                                </Grid>
+                                <Grid item xs={12}>
+                                    <CommentTree comments={threads} postId={id} showCommentBox = {showCommentBox}/>
                                 </Grid>
                             </Grid>
-                            <Grid item xs={12}>
-                                <CommentTree comments={thread} showCommentBox = {showCommentBox}/>
-                            </Grid>
-                        </Grid>
-                    </CardContent>
-                </Card>
+                        </CardContent>
+                    </Card>
+                </Grid>
             </Grid>
-        </Grid>
-    )
+        )
+    }
 }
 
 export default withRouter(Post);

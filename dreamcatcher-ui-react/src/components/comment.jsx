@@ -18,7 +18,8 @@ import ThumbUpIcon from '@material-ui/icons/ThumbUp';
 import ThumbDownIcon from '@material-ui/icons/ThumbDown';
 import CommentIcon from '@material-ui/icons/Comment';
 
-import Markdown from 'react-markdown'
+import firebase from 'firebase/app';
+import "firebase/firestore";
 
 import CommentBox from './comment-box';
 
@@ -80,6 +81,14 @@ export default function Comment(props) {
     //     return <Comment comment={comment} type="child" />
     // })
 
+    const likesCounterIncrement = firebase.firestore.FieldValue.increment(1);
+    const dislikesCounterIncrement = firebase.firestore.FieldValue.increment(1);
+
+    const likesCounterDecrement = firebase.firestore.FieldValue.increment(-1);
+    const dislikesCounterDecrement = firebase.firestore.FieldValue.increment(-1);
+    
+    const db = firebase.firestore();
+
     const addCommentBox = () => {
         setShowCommentBox(showCommentBox => !showCommentBox);    
     }
@@ -93,10 +102,24 @@ export default function Comment(props) {
         }
         setDisliked(!disliked);
         if(disliked) {
+            // alert(props.comment.id)
+
+            const commentRef = db.collection('forums').doc(props.postId).collection('replies').doc(props.comment.id)
+
+            // commentRef.update({ dislikes: dislikesCounterDecrement })
+            commentRef.set({ dislikes: dislikesCounterDecrement }, { merge: true })
+            
             setDislikes(dislikes - 1)
             props.comment.likes = dislikes - 1;
         }
         else {
+            // alert(props.comment.id)
+
+            const commentRef = db.collection('forums').doc(props.postId).collection('replies').doc(props.comment.id)
+
+            // commentRef.update({ dislikes: dislikesCounterIncrement })
+            commentRef.set({ dislikes: dislikesCounterIncrement }, {merge: true})
+            
             setDislikes(dislikes + 1);
             props.comment.likes = dislikes + 1;
         }
@@ -111,16 +134,29 @@ export default function Comment(props) {
         }   
         setLiked(!liked);
         if(liked) {
+            // alert(props.comment.id)
+            const commentRef = db.collection('forums').doc(props.postId).collection('replies').doc(props.comment.id)
+
+            //commentRef.update({ likes: likesCounterDecrement })
+            commentRef.set({ likes: likesCounterDecrement },{merge:true})
+
             setLikes(likes - 1)
             props.comment.likes = likes - 1;
         }  
         else {
+            // alert(props.comment.id)
+            const commentRef = db.collection('forums').doc(props.postId).collection('replies').doc(props.comment.id)
+
+            //commentRef.update({ likes: likesCounterIncrement })
+            commentRef.set({ likes: likesCounterIncrement }, {merge:true})
+
             setLikes(likes + 1);
             props.comment.likes = likes + 1;
+
         }
     }
 
-    const handleLike = () => {
+    const handleLike = async() => {
         
         if (disliked) {
             setLike();
@@ -129,7 +165,7 @@ export default function Comment(props) {
         setLike();
     }
     
-    const handleDislike = () => {
+    const handleDislike = async() => {
         
         if (liked) {
           setDislike();
@@ -138,19 +174,11 @@ export default function Comment(props) {
         setDislike();
     }
 
+    // console.log(props.comment)
+
     let quoteBody = props.comment.body.substring(1, props.comment.body.lastIndexOf('`'))
 
     let body = props.comment.body.substring(props.comment.body.lastIndexOf('`') + 1, props.comment.body.length);
-    
-    // let quoteBody = []
-
-    // let idx = props.comment.body.indexOf('`')
-
-    // while(idx != -1) {
-    //     let nextIdx = props.comment.body.indexOf('`', (idx+1))
-    //     quoteBody.push(props.comment.body.substring(idx + 1, nextIdx))
-    //     idx = nextIdx
-    // }
 
     return (
         <Timeline>
@@ -207,7 +235,7 @@ export default function Comment(props) {
                             <CommentIcon id={props.comment.id} fontSize="small" className={classes.postIcons} onClick={addCommentBox}/>
                         </Grid>
                     </Grid>
-                    { showCommentBox ? <CommentBox comment={props.comment} postComment={false} updateCommentThread={props.updateCommentThread}/> : null }
+                    { showCommentBox ? <CommentBox comment={props.comment} postId={props.postId} postComment={false} updateCommentThread={props.updateCommentThread}/> : null }
                 </TimelineContent>
             </TimelineItem>
         </Timeline>

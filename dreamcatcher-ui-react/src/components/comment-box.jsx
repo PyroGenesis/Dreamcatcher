@@ -7,6 +7,9 @@ import Timeline from "@material-ui/lab/Timeline";
 import TimelineItem from "@material-ui/lab/TimelineItem";
 import TimelineContent from "@material-ui/lab/TimelineContent";
 
+import firebase from 'firebase/app';
+import "firebase/firestore";
+
 function getCurrentDateTime() {
     let today = new Date()
 
@@ -32,9 +35,11 @@ export default function CommentBox(props) {
 
     const [date, time] = getCurrentDateTime();
 
+    const db = firebase.firestore();
+
     // console.log(time);
 
-    const addComment = () => {
+    const addComment = async() => {
 
         let quotedBody = ''
 
@@ -48,31 +53,33 @@ export default function CommentBox(props) {
             else {
                 quotedBody = '`' + props.comment.body + '`' + body;
             }
-            
-
-            // let quoteReply = props.comment.body;
-            
-            // if(quoteReply[0] === '`') {
-            //     let idx = quoteReply.lastIndexOf('`')
-                
-            //     quotedBody = quoteReply.substring(0, idx) + '`' + quoteReply.substring(idx+1, quoteReply.length) + '`' + body
-            // }
-            // else {
-            //     quotedBody = '`' + quoteReply + '`' + body;
-            // }
         }
-            
-        props.updateCommentThread(
-            {
-                id: props.comment_id+1,
-                date: date,
-                time: time,
-                userName: 'yukulkar',
+
+        const repliesRef = db.collection('forums').doc(props.postId).collection('replies').doc()
+
+        const firebaseDate = firebase.firestore.FieldValue.serverTimestamp();
+
+        repliesRef.set(
+            {  
+                username: 'yukulkar',
                 body: quotedBody,
+                date: firebaseDate,
                 likes: 0,
-                dislikes: 0
+                dislikes: 0,
             }
-        );
+        ).then(() => {
+            props.updateCommentThread(
+                {
+                    id: repliesRef.id,
+                    date: date,
+                    time: time,
+                    userName: 'yukulkar',
+                    body: quotedBody,
+                    likes: 0,
+                    dislikes: 0
+                }
+            );
+        })
     }
 
     return (
