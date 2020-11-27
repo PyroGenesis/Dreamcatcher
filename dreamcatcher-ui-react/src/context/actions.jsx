@@ -132,7 +132,9 @@ export async function logout(dispatch) {
 export async function checkToken(dispatch, token) {
     // dispatch({ type: 'VERIFY_TOKEN' });
 
-    const addr = "192.168.0.51"
+    if(token === "") {
+        return;
+    }
 
     try {
         const requestOptions = {
@@ -142,7 +144,7 @@ export async function checkToken(dispatch, token) {
         };
         const response = await fetch(`/auth`, requestOptions);
         const tokenStatus = await response.json();
-
+        
         return tokenStatus.status;
     } catch(error) {
         console.log(error);

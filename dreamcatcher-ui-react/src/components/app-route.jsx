@@ -6,35 +6,37 @@ import {checkToken} from "../context/actions"
  
 const AppRoutes = ({ component: Component, path, isPrivate, ...rest }) => {
  
-    // const [tokenStatus, setTokenStatus] = useState('');
-    // const [isLoading, setLoading] = useState(true);
-
     const userDetails = useAuthState()
     const dispatch = useAuthDispatch();
 
-    // useEffect(() => {
-    //     (async function() {
-    //         dispatch({ type: 'VERIFY_TOKEN' });
-    //         console.log("HERE")
-    //         const tokenStatus = await checkToken(dispatch, userDetails.token);
-          
-    //         if(tokenStatus === "success") {
-    //             const payload = {
-    //                 auth_token: userDetails.token
-    //             }
-    //             dispatch({ type: 'TOKEN_VERIFIED', payload: payload})
-    //             console.log("HERE 2")
-    //         }
-    //         else {
-    //             dispatch({ type: 'TOKEN_EXPIRED'})
-    //             console.log("HERE 3")
-    //         }
-    //     })();
-    // }, [])
+    const [tokenStatus, setTokenStatus] = useState('');
+    const [isLoading, setLoading] = useState(true);
 
-    // if(isLoading) {
-    //     return <div className="App">Loading...</div>;
-    // }
+    useEffect(() => {
+        (async function() {
+            // dispatch({ type: 'VERIFY_TOKEN' });
+            // console.log("HERE")
+            const tokenStatus = await checkToken(dispatch, userDetails.token);
+            console.log(tokenStatus)
+            if(tokenStatus === 200) {
+                const payload = {
+                    auth_token: userDetails.token
+                }
+                dispatch({ type: 'TOKEN_VERIFIED', payload: payload})
+                setLoading(false)
+                // console.log("HERE 2")
+            }
+            else {
+                dispatch({ type: 'TOKEN_EXPIRED'})
+                setLoading(false)
+                // console.log("HERE 3")
+            }
+        })();
+    }, [])
+
+    if(isLoading) {
+        return <div className="App">Loading...</div>;
+    }
 
     return (
         <Route
