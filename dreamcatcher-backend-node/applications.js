@@ -24,6 +24,7 @@ router.post('/', async (req, res, next) => {
         const applications = [];
         for (appl of applicationCollection.docs) {
             let application = appl.data();
+            application.id = appl.id;
             application.position = (await application.positionRef.get()).data();
             delete application.positionRef;
             applications.push(application);
