@@ -7,6 +7,8 @@ import {
   Route,
   Link
 } from "react-router-dom";
+import { MuiPickersUtilsProvider } from '@material-ui/pickers';
+import MomentUtils from '@date-io/moment';
 
 import Navbar from "./components/navbar";
 import LandingPage from "./containers/page-landing";
@@ -107,6 +109,7 @@ const routes = [
 
 function App() {
   return (
+    <MuiPickersUtilsProvider utils={MomentUtils}>
     <AuthProvider>
       <Router>
         <div style={{height: '100%'}}>
@@ -126,6 +129,7 @@ function App() {
         </div>
       </Router>
     </AuthProvider>
+    </MuiPickersUtilsProvider>
   );
 }
 
