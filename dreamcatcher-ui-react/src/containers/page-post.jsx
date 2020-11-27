@@ -1,6 +1,6 @@
 import { Card, CardContent, Divider, Grid, Typography } from '@material-ui/core'
 import React from 'react'
-import { withRouter } from 'react-router-dom';
+import { withRouter, useParams } from 'react-router-dom';
 import Avatar from '@material-ui/core/Avatar';
 import { makeStyles } from '@material-ui/core/styles';
 import { grey } from '@material-ui/core/colors';
@@ -155,6 +155,11 @@ export const thread = [
 // }
 
 function Post(props) {
+
+    const { id } = useParams();
+
+    alert(id);
+
     const classes = useStyles();
 
     const [likeColor, setLikeColor] = useState('grey');
