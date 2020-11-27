@@ -14,6 +14,39 @@ router.post('/', async (req, res) => {
     res.json(tokenResp);
 });
 
+async function getUsernameFromUID(uid) {
+    const userSnapshot = await db.collection('users').doc(uid).get();
+    
+    if (userSnapshot.exists) {
+        return {
+            status: 200,
+            message: 'success',
+            data: {
+                username: userSnapshot.data().username
+            }
+        };
+    } else {
+        return {
+            status: 404,
+            message: 'User not found',
+            data: null
+        };
+    }
+}
+
+router.post('/getUsername', async (req, res) => {
+    tokenResp = await verifyToken(req.body.token);
+    if (tokenResp.status !== 200) {
+        res.statusCode = tokenResp.status;
+        res.json(tokenResp);
+        return;
+    }
+    const uid = tokenResp.data.uid;
+    const usernameResp = await getUsernameFromUID(uid);
+    res.statusCode = usernameResp.status
+    res.json(usernameResp)
+});
+
 // router.post('/match/:username', async (req, res) => {
 //     const username = req.params.username;
 //     const token = req.body.token;

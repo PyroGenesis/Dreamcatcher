@@ -235,7 +235,7 @@ export default function Comment(props) {
                             <CommentIcon id={props.comment.id} fontSize="small" className={classes.postIcons} onClick={addCommentBox}/>
                         </Grid>
                     </Grid>
-                    { showCommentBox ? <CommentBox comment={props.comment} postId={props.postId} postComment={false} updateCommentThread={props.updateCommentThread}/> : null }
+                    { showCommentBox ? <CommentBox comment={props.comment} postId={props.postId} username={props.username} postComment={false} updateCommentThread={props.updateCommentThread}/> : null }
                 </TimelineContent>
             </TimelineItem>
         </Timeline>

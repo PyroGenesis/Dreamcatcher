@@ -9,6 +9,7 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 import {firestore} from "../components/firebase"
 import {firebaseDateToJSDate} from "../misc/utilities"
 import { withRouter } from 'react-router-dom';
+import { useAuthState, useAuthDispatch } from '../context/context';
 
 const useStyles = makeStyles((theme) => ({
     small: {
@@ -27,120 +28,17 @@ const useStyles = makeStyles((theme) => ({
     }
 }));
 
-// const posts1 = [
-//     {
-//       title: 'Google Software Engineer 2020',
-//       date: '18 December, 2020',
-//       time: '12:00pm',
-//       userName: 'yukulkar'
-//     },
-//     {
-//       title: 'Microsoft Software Engineer 2020',
-//       date: '19 December, 2020',
-//       time: '12:00pm',
-//       userName: 'burhan'
-//     },
-//     {
-//       title: 'Amazon SDE New Grad Experience',
-//       date: '20 December, 2020',
-//       time: '12:00pm',
-//       userName: 'anand'
-//     },
-//     {
-//       title: 'Netflix Senior SDE',
-//       date: '21 December, 2020',
-//       time: '12:00pm',
-//       userName: 'lorem'
-//     },
-//     {
-//       title: 'Apple SDE Interview',
-//       date: '22 December, 2020',
-//       time: '12:00pm',
-//       userName: 'ipsum'
-//     }
-//   ]
-  
-//   const posts2 = [
-//     {
-//       title: 'Really Really long and clickbaity title',
-//       date: '17 December, 2020',
-//       time: '12:00pm',
-//       userName: 'yukulkar'
-//     },
-//     {
-//       title: 'Really Really long and clickbaity titles',
-//       date: '17 December, 2020',
-//       time: '12:00pm',
-//       userName: 'yukulkar'
-//     },
-//     {
-//       title: 'Really Really long and clickbaity title',
-//       date: '17 December, 2020',
-//       time: '12:00pm',
-//       userName: 'yukulkar'
-//     }
-//   ]
-  
-//   const posts3 = [
-//     {
-//       title: 'Really Really long and clickbaity title',
-//       date: '16 December, 2020',
-//       time: '12:00pm',
-//       userName: 'yukulkar'
-//     },
-//     {
-//       title: 'Really Really long and clickbaity titles',
-//       date: '16 December, 2020',
-//       time: '12:00pm',
-//       userName: 'yukulkar'
-//     },
-//     {
-//       title: 'Really Really long and clickbaity title',
-//       date: '16 December, 2020',
-//       time: '12:00pm',
-//       userName: 'yukulkar'
-//     }
-//   ]
-  
-//   const posts4 = [
-//     {
-//       title: 'Really Really long and clickbaity title',
-//       date: '15 December, 2020',
-//       time: '12:00pm',
-//       userName: 'yukulkar'
-//     },
-//     {
-//       title: 'Really Really long and clickbaity titles',
-//       date: '15 December, 2020',
-//       time: '12:00pm',
-//       userName: 'yukulkar'
-//     },
-//     {
-//       title: 'Really Really long and clickbaity title',
-//       date: '15 December, 2020',
-//       time: '12:00pm',
-//       userName: 'yukulkar'
-//     }
-//   ]
-
 function PostsTable(props) {
     const classes = useStyles();
 
     const [isLoading, setIsLoading] = useState(true);
     const [posts, setPosts] = useState([])
+    const [username, setUsername] = useState('')
 
     let categories = ["Interview Experiences", "Offer Discussion", "Technical Questions", "General Discussion"]
 
-    // switch(props.forumNum) {
-    //     case 1: posts = posts1;
-    //             break;
-    //     case 2: posts = posts2;
-    //             break;
-    //     case 3: posts = posts3;
-    //             break;
-    //     case 4: posts = posts4;
-    //             break;
-    // }
+    const dispatch = useAuthDispatch();
+    const userDetails = useAuthState();
 
     useEffect(() => {
       (async function() {
@@ -156,6 +54,7 @@ function PostsTable(props) {
 
         if(data.empty) {
           alert("ERROR")
+          return;
         }
         
         let postsArr = []
@@ -181,7 +80,18 @@ function PostsTable(props) {
         })
 
         setPosts(postsArr)
-        // setIsLoading(isLoading => !isLoading)
+
+        const requestOptions = {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token: userDetails.token })
+        }
+
+        const response = await fetch('/auth/getUsername', requestOptions)
+        const usernameObj = await response.json()
+        
+        setUsername(usernameObj.data.username)
+        // console.log(username.data.username)
 
         setIsLoading(false)
 
@@ -201,25 +111,25 @@ function PostsTable(props) {
               <Table>
                   <TableBody>
                       {posts.map((post) => (        
-                      <TableRow key={post.id}>
-                          <TableCell onClick={()=>props.history.push(`/post/${post.id}`)}>
-                          <Grid container>
-                            <Grid item>
-                              <Avatar className={classes.small}>{post.userName[0]}</Avatar> 
+                        <TableRow key={post.id}>
+                            <TableCell onClick={()=>props.history.push({pathname: `/post/${post.id}`, state: {username: username}})}>
+                            <Grid container>
+                              <Grid item>
+                                <Avatar className={classes.small}>{post.userName[0]}</Avatar> 
+                              </Grid>
+                              <Grid item xs={12} sm container>
+                                <Grid item xs container direction="column">
+                                  <Typography variant="h6" className={classes.title}>
+                                    {post.title}
+                                  </Typography>
+                                  <Typography variant="subtitle2" className = {classes.subtitle}>
+                                    Posted on {post.date} at {post.time}
+                                  </Typography>
+                                </Grid>    
+                              </Grid>
                             </Grid>
-                            <Grid item xs={12} sm container>
-                              <Grid item xs container direction="column">
-                                <Typography variant="h6" className={classes.title}>
-                                  {post.title}
-                                </Typography>
-                                <Typography variant="subtitle2" className = {classes.subtitle}>
-                                  Posted on {post.date} at {post.time}
-                                </Typography>
-                              </Grid>    
-                            </Grid>
-                          </Grid>
-                          </TableCell>
-                      </TableRow>
+                            </TableCell>
+                        </TableRow>
                       ))}
                   </TableBody>
               </Table>

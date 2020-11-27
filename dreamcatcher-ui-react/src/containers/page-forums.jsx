@@ -5,6 +5,8 @@ import { withRouter } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import { grey } from '@material-ui/core/colors';
 import PostsTable from '../components/posts-table';
+import Fab from '@material-ui/core/Fab';
+import AddIcon from '@material-ui/icons/Add';
 
 const useStyles = makeStyles((theme) => ({
   small: {
@@ -30,6 +32,9 @@ function ForumsPage(props) {
 
     return (
       <div className="body-content forums">
+        {/* <Fab color="primary" aria-label="add">
+          <AddIcon />
+        </Fab> */}
         <Grid container align="center">
           <Grid item xs={3}>
             <Card className={classes.forumCard} onClick={()=>setForumNum(1)} >

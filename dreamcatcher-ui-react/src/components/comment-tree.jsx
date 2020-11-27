@@ -33,11 +33,11 @@ export default function CommentTree(props) {
     else {
         return (
             <div>
-                { props.showCommentBox ? <CommentBox comment={comments[comments.length-1]} postId={props.postId} postComment={true} updateCommentThread={updateCommentThread}/> : null }
+                { props.showCommentBox ? <CommentBox comment={comments[comments.length-1]} username={props.username} postId={props.postId} postComment={true} updateCommentThread={updateCommentThread}/> : null }
                 {
                     comments.map((comment) => {
                         return (
-                            <Comment key={comment.id} comment={comment} postId={props.postId} updateCommentThread={updateCommentThread}/> 
+                            <Comment key={comment.id} comment={comment} postId={props.postId} username={props.username} updateCommentThread={updateCommentThread}/> 
                         )
                     })   
                 }

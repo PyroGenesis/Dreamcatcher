@@ -61,7 +61,7 @@ export default function CommentBox(props) {
 
         repliesRef.set(
             {  
-                username: 'yukulkar',
+                username: props.username,
                 body: quotedBody,
                 date: firebaseDate,
                 likes: 0,
@@ -73,7 +73,7 @@ export default function CommentBox(props) {
                     id: repliesRef.id,
                     date: date,
                     time: time,
-                    userName: 'yukulkar',
+                    userName: props.username,
                     body: quotedBody,
                     likes: 0,
                     dislikes: 0
