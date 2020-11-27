@@ -4,7 +4,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import { Typography, Grid } from "@material-ui/core";
 
 import Avatar from '@material-ui/core/Avatar';
-
+import Button from '@material-ui/core/Button';
 import Timeline from '@material-ui/lab/Timeline';
 import TimelineItem from '@material-ui/lab/TimelineItem';
 import TimelineSeparator from '@material-ui/lab/TimelineSeparator';
@@ -12,10 +12,15 @@ import TimelineConnector from '@material-ui/lab/TimelineConnector';
 import TimelineContent from '@material-ui/lab/TimelineContent';
 import TimelineDot from '@material-ui/lab/TimelineDot';
 import TimelineOppositeContent from '@material-ui/lab/TimelineOppositeContent';
+import TextField from '@material-ui/core/TextField';
 
 import ThumbUpIcon from '@material-ui/icons/ThumbUp';
 import ThumbDownIcon from '@material-ui/icons/ThumbDown';
 import CommentIcon from '@material-ui/icons/Comment';
+
+import Markdown from 'react-markdown'
+
+import CommentBox from './comment-box';
 
 const useStyles = makeStyles((theme) => ({
     small: {
@@ -69,10 +74,15 @@ export default function Comment(props) {
     const [disliked, setDisliked] = useState(false);
     const [likes, setLikes] = useState(props.comment.likes);
     const [dislikes, setDislikes] = useState(props.comment.dislikes);
+    const [showCommentBox, setShowCommentBox] = useState(false);
 
-    const nestedComments = (props.comment.children || []).map(comment => {
-        return <Comment comment={comment} type="child" />
-    })
+    // const nestedComments = (props.comment.children || []).map(comment => {
+    //     return <Comment comment={comment} type="child" />
+    // })
+
+    const addCommentBox = () => {
+        setShowCommentBox(showCommentBox => !showCommentBox);    
+    }
 
     const setDislike = () => {     
         if(dislikeColor === 'grey') {
@@ -127,7 +137,21 @@ export default function Comment(props) {
         }
         setDislike();
     }
+
+    let quoteBody = props.comment.body.substring(1, props.comment.body.lastIndexOf('`'))
+
+    let body = props.comment.body.substring(props.comment.body.lastIndexOf('`') + 1, props.comment.body.length);
     
+    // let quoteBody = []
+
+    // let idx = props.comment.body.indexOf('`')
+
+    // while(idx != -1) {
+    //     let nextIdx = props.comment.body.indexOf('`', (idx+1))
+    //     quoteBody.push(props.comment.body.substring(idx + 1, nextIdx))
+    //     idx = nextIdx
+    // }
+
     return (
         <Timeline>
             <TimelineItem>
@@ -142,31 +166,48 @@ export default function Comment(props) {
                     <Typography variant="subtitle2" className={classes.comment_details}>
                         {props.comment.userName} • Posted on {props.comment.date} at {props.comment.time}
                     </Typography>
-                    <Typography variant="body1" align="justify" paragraph="true">
-                        {props.comment.body}
-                        <Grid item xs container direction="row">
-                            <Grid item>        
-                                <Typography variant="subtitle2" className={classes.iconText}>
-                                {likes} 
-                                </Typography>
-                            </Grid>
-                            <Grid item>
-                                <ThumbUpIcon id={props.comment.id} fontSize="small" style={{color: likeColor}} className={classes.postIcons} onClick={handleLike}/>
-                            </Grid>
-                            <Grid item>        
-                                <Typography variant="subtitle2" className={classes.iconText}>
-                                {dislikes} 
-                                </Typography>
-                            </Grid>
-                            <Grid item>
-                                <ThumbDownIcon id={props.comment.id} fontSize="small" style={{color: dislikeColor}} className={classes.postIcons} onClick={handleDislike}/>
-                            </Grid>
-                            <Grid item>
-                                <CommentIcon id={props.comment.id} fontSize="small" className={classes.postIcons}/>
-                            </Grid>
-                        </Grid>
-                        {nestedComments}
+                    {
+                        quoteBody.length > 1 ? <div> 
+                            <Timeline>
+                                <TimelineItem>
+                                    <TimelineOppositeContent className={classes.oppositeContent}/>
+                                        <TimelineSeparator>
+                                            <TimelineConnector /> 
+                                        </TimelineSeparator>
+                                        <TimelineContent>
+                                            <Typography variant="subtitle2" style={{color: grey[500]}} align="justify">
+                                                {quoteBody}
+                                            </Typography>
+                                        </TimelineContent>
+                                </TimelineItem>
+                            </Timeline> 
+                        </div> : null
+                    }
+                    <Typography variant="body1" align="justify" paragraph={true}>
+                        {body}
                     </Typography>
+                    <Grid item xs container direction="row">
+                        <Grid item>        
+                            <Typography variant="subtitle2" className={classes.iconText}>
+                            {likes} 
+                            </Typography>
+                        </Grid>
+                        <Grid item>
+                            <ThumbUpIcon id={props.comment.id} fontSize="small" style={{color: likeColor}} className={classes.postIcons} onClick={handleLike}/>
+                        </Grid>
+                        <Grid item>        
+                            <Typography variant="subtitle2" className={classes.iconText}>
+                            {dislikes} 
+                            </Typography>
+                        </Grid>
+                        <Grid item>
+                            <ThumbDownIcon id={props.comment.id} fontSize="small" style={{color: dislikeColor}} className={classes.postIcons} onClick={handleDislike}/>
+                        </Grid>
+                        <Grid item>
+                            <CommentIcon id={props.comment.id} fontSize="small" className={classes.postIcons} onClick={addCommentBox}/>
+                        </Grid>
+                    </Grid>
+                    { showCommentBox ? <CommentBox comment={props.comment} postComment={false} updateCommentThread={props.updateCommentThread}/> : null }
                 </TimelineContent>
             </TimelineItem>
         </Timeline>
