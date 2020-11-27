@@ -4,7 +4,7 @@ const router = express.Router();
 const firebase = require('./firestore-init');
 const db = firebase.firestore();
 
-const verifyToken = require('./auth').verifyToken
+const verifyToken = require('./common_resources').verifyToken;
 
 // These paths start from /applications
 
@@ -13,11 +13,8 @@ router.post('/', async (req, res, next) => {
 
     tokenResp = await verifyToken(token);
     if (tokenResp.status !== 200) {
-        res.json({
-            status: 200,
-            message: 'Invalid token',
-            data: false
-        });
+        res.statusCode = tokenResp.status;
+        res.json(tokenResp);
         return;
     }
     const uid = /*'5bVmAxHkjlc7iNHUNzgG8l9jHhg1'*/ tokenResp.data.uid;

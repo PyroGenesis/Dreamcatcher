@@ -4,98 +4,66 @@ const router = express.Router();
 const firebase = require('./firestore-init');
 const db = firebase.firestore();
 
-// These paths start from /auth
+const verifyToken = require('./common_resources').verifyToken;
 
-async function verifyToken(token) {
-    let res = null;
-    if (token == null) {
-        res = {
-            status: 400,
-            message: 'No token provided',
-            data: null
-        };
-        return res;
-    }
-    
-    try {
-        const decodedToken = await firebase.auth().verifyIdToken(token);
-        res = {
-            status: 200,
-            message: 'success',
-            data: {
-                uid: decodedToken.uid
-            }
-        };
-    } catch (error) {
-        res = {
-            status: 400,
-            message: 'Invalid Token',
-            data: null
-        };
-    }
-    return res;
-}
+// These paths start from /auth
 
 router.post('/', async (req, res) => {
     tokenResp = await verifyToken(req.body.token);
     res.statusCode = tokenResp.status;
-    res.json({
-        status: tokenResp.status,
-        message: tokenResp.message,
-        data: tokenResp.data
-    })
+    res.json(tokenResp);
 });
 
-router.post('/match/:username', async (req, res) => {
-    const username = req.params.username;
-    const token = req.body.token;
+// router.post('/match/:username', async (req, res) => {
+//     const username = req.params.username;
+//     const token = req.body.token;
 
-    tokenResp = await verifyToken(token);
-    if (tokenResp.status !== 200) {
-        res.json({
-            status: 200,
-            message: 'Invalid token',
-            data: false
-        });
-        return;
-    }
-    const tokenUID = tokenResp.data.uid;
+//     tokenResp = await verifyToken(token);
+//     if (tokenResp.status !== 200) {
+//         res.json({
+//             status: 200,
+//             message: 'Invalid token',
+//             data: false
+//         });
+//         return;
+//     }
+//     const tokenUID = tokenResp.data.uid;
 
-    if (username == null) {
-        res.statusCode = 400;
-        res.json({
-            status: res.statusCode,
-            message: 'No username provided',
-            data: false
-        });
-        return;
-    }
-    const userRef = await db.collection('usernameToDetails').doc(username).get()
-    if (!userRef.exists) {
-        res.statusCode = 400;
-        res.json({
-            status: res.statusCode,
-            message: 'No user with this username present',
-            data: false
-        });
-        return;
-    }
+//     if (username == null) {
+//         res.statusCode = 400;
+//         res.json({
+//             status: res.statusCode,
+//             message: 'No username provided',
+//             data: false
+//         });
+//         return;
+//     }
+//     const userRef = await db.collection('usernameToDetails').doc(username).get()
+//     if (!userRef.exists) {
+//         res.statusCode = 400;
+//         res.json({
+//             status: res.statusCode,
+//             message: 'No user with this username present',
+//             data: false
+//         });
+//         return;
+//     }
 
-    const usernameUID  = await userRef.get('uid');
-    if (tokenUID === usernameUID) {
-        res.json({
-            status: 200,
-            message: 'Same user profile',
-            data: true
-        })
-    } else {
-        res.json({
-            status: 200,
-            message: 'Different user profile',
-            data: false
-        })
-    }
-})
+//     const usernameUID  = await userRef.get('uid');
+//     if (tokenUID === usernameUID) {
+//         res.json({
+//             status: 200,
+//             message: 'Same user profile',
+//             data: true
+//         })
+//     } else {
+//         res.json({
+//             status: 200,
+//             message: 'Different user profile',
+//             data: false
+//         })
+//     }
+// })
 
 
 router.post('/signup', async (req, res) => {
@@ -124,7 +92,8 @@ router.post('/signup', async (req, res) => {
         createdAt: new Date(),
         email: email,
         firstName: firstName,
-        lastName: lastName
+        lastName: lastName,
+        username: userName
     });
     userCreateOp.set(userDoc.collection('profile').doc('default'), {
         education: [],
@@ -149,4 +118,4 @@ router.post('/signup', async (req, res) => {
     });
 });
 
-module.exports = {router, verifyToken};
+module.exports = router

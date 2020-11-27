@@ -6,7 +6,7 @@ app.use(express.json())
 const firebase = require('./firestore-init');
 const db = firebase.firestore();
 
-const auth = require('./auth').router;
+const auth = require('./auth');
 const profileRoutes = require('./profileAPIs');
 const applications = require('./applications');
 // routes for testing purposes
@@ -14,7 +14,7 @@ const testRoutes = require('./testing');
 
 // MIDDLEWARE
 const basicAPI = async (req, res, next) => {
-    res.send('Hello');
+    res.send('API was not setup / called correctly. Caught by fallback.');
 }
 
 // Be careful of the order here!
