@@ -8,10 +8,65 @@ const verifyToken = require('./common_resources').verifyToken;
 
 // These paths start from /applications
 
-router.post('/', async (req, res, next) => {
-    token = req.body.token;
+router.post('/update', async (req, res, next) => {
+    const token = req.body.token;
+    const application_id = req.body.id;
+    const new_status = req.body.status;
 
-    tokenResp = await verifyToken(token);
+    if (token == null || application_id == null || new_status == null) {
+        res.statusCode = 400;
+        res.json({
+            status: res.statusCode,
+            message: 'Missing data',
+            data: null
+        });
+        return;
+    }
+
+    const tokenResp = await verifyToken(token);
+    if (tokenResp.status !== 200) {
+        res.statusCode = tokenResp.status;
+        res.json(tokenResp);
+        return;
+    }
+    const uid = tokenResp.data.uid;
+
+    const applicationRef = db.collection('users').doc(uid).collection('applications').doc(application_id)
+    // const application = await applicationRef.get();
+    // if (!application.exists) {
+    //     res.statusCode = 400;
+    //     res.json({
+    //         status: res.statusCode,
+    //         message: 'Invalid application ID',
+    //         data: null
+    //     });
+    //     return;
+    // }
+
+    try {
+        await applicationRef.update({
+            status: new_status
+        });
+        res.statusCode = 200;
+        res.json({
+            status: res.statusCode,
+            message: 'success',
+            data: null
+        });
+    } catch (error) {
+        res.statusCode = 400;
+        res.json({
+            status: res.statusCode,
+            message: 'Invalid application ID or unknown error',
+            data: null
+        });
+    }
+});
+
+router.post('/', async (req, res, next) => {
+    const token = req.body.token;
+
+    const tokenResp = await verifyToken(token);
     if (tokenResp.status !== 200) {
         res.statusCode = tokenResp.status;
         res.json(tokenResp);
