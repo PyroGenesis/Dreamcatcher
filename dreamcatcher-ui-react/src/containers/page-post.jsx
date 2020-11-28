@@ -198,10 +198,10 @@ function Post(props) {
 
             let postsArr = []
 
-            if(data.empty) {
-                alert("ERROR")
-                return;
-            }
+            // if(data.empty) {
+            //     alert("ERROR")
+            //     return;
+            // }
 
             data.forEach(doc => {
 
