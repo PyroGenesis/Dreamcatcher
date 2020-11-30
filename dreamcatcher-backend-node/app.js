@@ -7,7 +7,7 @@ const firebase = require('./firestore-init');
 const db = firebase.firestore();
 
 const auth = require('./auth');
-const profileRoutes = require('./profileAPIs');
+const profileRoutes = require('./profiles');
 const applications = require('./applications');
 // routes for testing purposes
 const testRoutes = require('./testing');
