@@ -42,7 +42,7 @@ class AboutPage extends Component {
                                 Burhanuddin Lakdawala
                             </Typography>
                             <Typography variant="h5">
-                                Full Stack Engineer
+                                Backend Engineer & DBA
                             </Typography>
                         </CardContent>
                         </Card>
@@ -55,7 +55,7 @@ class AboutPage extends Component {
                                 Yash Uday Kulkarni
                             </Typography>
                             <Typography variant="h5">
-                                Full Stack Engineer
+                                Front End and Infrastructure Developer
                             </Typography>
                         </CardContent>
                         </Card>
