@@ -70,8 +70,6 @@ router.get('/', async (req, res, next) => {
     token = req.query.token;
     status = req.query.status;
     position = req.query.position;
-    console.log(status);
-    console.log(position);
     const tokenResp = await verifyToken(token);
     if (tokenResp.status !== 200) {
         res.statusCode = tokenResp.status;
@@ -79,7 +77,6 @@ router.get('/', async (req, res, next) => {
         return;
     }
     const uid = /*'5bVmAxHkjlc7iNHUNzgG8l9jHhg1'*/ tokenResp.data.uid;
-    console.log(uid);
 
     const applicationCollection = await db.collection('users').doc(uid).collection('applications').get();
     if (applicationCollection.size > 0) {
@@ -88,8 +85,19 @@ router.get('/', async (req, res, next) => {
             let application = appl.data();
             application.id = appl.id;
             application.position = (await application.positionRef.get()).data();
+            if (position == null || position == undefined) {
+                if (status == application.status)
+                   applications.push(application);
+                else if (status == null || status == undefined){
+                    applications.push(application);
+                }
+    
+            }
+            else {
+                if (position == application.position.position_name)
+                applications.push(application);
+            }
             delete application.positionRef;
-            applications.push(application);
         }
         res.statusCode = 200;
         res.json({
@@ -100,10 +108,10 @@ router.get('/', async (req, res, next) => {
             }
         });
     } else {
-        res.statusCode = 201;
+        res.statusCode = 404;
         res.json({
             status: res.statusCode,
-            message: 'No applications present',
+            message: 'No applications found',
             data: null
         });
     }
