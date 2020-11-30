@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, useEffect } from 'react'
 import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
@@ -16,8 +16,11 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import MenuItem from '@material-ui/core/MenuItem';
 import { Container, IconButton, ThemeProvider } from '@material-ui/core';
-import { Add, AccessAlarm, ThreeDRotation, Edit } from '@material-ui/icons';
+import { Add, AccessAlarm, ThreeDRotation, Edit, Delete } from '@material-ui/icons';
+import { DatePicker } from "@material-ui/pickers";
+import moment from 'moment';
 
 import { BurhanGlobalTheme } from "../styles/themes";
 import { firebaseDateToJSDate } from "../misc/utilities";
@@ -86,21 +89,15 @@ class ProfilePage extends Component {
     const { username } = this.props.match.params;
 
     if (username != null) {
-      // this.setState({
       this.isUsername = true;
       this.accessInfo = username;
       // })
     } else {
       const userDetails = /*useAuthState();*/ this.context;
-      console.log('token in context', userDetails.token);
-      // this.setState({
       this.isUsername = false;
       this.accessInfo = userDetails.token;
-      // });
-      console.log('state inside else:', this.state.accessInfo);
     }
 
-    // console.log('state outside else', this.state);
     console.log('profile session', this.isUsername, this.accessInfo);
     const profilePromise = this.isUsername ?
       fetch(`/profiles/${this.accessInfo}`) :
@@ -152,24 +149,122 @@ class ProfilePage extends Component {
   }
 }
 
-function EducationEdit({ data, open, closeFn, modifyFn }) {
+function ExperienceEdit({ data, open/*, closeFn, modifyFn */ }) {
   // const [open, setOpen] = React.useState(ed);
   if (data == null) {
     data = {
-      university: '',
-      degree: '',
-      major: '',
-      startYear: '',
-      endYear: ''
+      company: '',
+      position: '',
+      type: '',
+      start: new Date(),
+      end: new Date(),
+      location: '',
+      description: ''
     }
   } else {
     data = { ...data };
   }
-  // const {} = data;
 
-  const handleClickOpen = () => {
-    // setOpen(true);
+  const handleClose = () => {
+    // closeFn();
   };
+
+  const handleSave = () => {
+    // modifyFn(data);
+    // handleClose();
+  }
+
+  const textFieldChanged = (e) => {
+    // data[e.target.id] = e.target.value;
+  }
+
+  const jobTypes = ['Full time', 'Part time', 'Contract'];
+
+  return (
+    <div>
+      <Dialog open={open} onClose={handleClose} aria-labelledby="experience-edit-dialog">
+        <DialogTitle id="experience-edit-dialog">Experience</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Please provide the details of your professional experience
+          </DialogContentText>
+          <Grid container spacing={0}>
+            <Grid item xs={12} style={{ paddingLeft: 8, paddingRight: 8 }}>
+              <TextField autoFocus required margin="dense" id="company" label="Company" type="text"
+                defaultValue={data.company} onChange={textFieldChanged} fullWidth />
+            </Grid>
+            <Grid item xs={8} style={{ paddingLeft: 8, paddingRight: 8 }}>
+              <TextField required margin="dense" id="position" label="Position" type="text"
+                defaultValue={data.position} onChange={textFieldChanged} fullWidth />
+            </Grid>
+            <Grid item xs={4} style={{ paddingLeft: 8, paddingRight: 8 }}>
+              <TextField required margin="dense" id="type" label="Type" select
+                defaultValue={data.type} onChange={textFieldChanged} fullWidth >
+                {jobTypes.map((type) => (
+                  <MenuItem key={type} value={type}>
+                    {type}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+            <Grid item xs={3} style={{ paddingLeft: 8, paddingRight: 8 }}>
+              <DatePicker required margin="dense" id="start" label="Start Date" disableFuture format="MMM DD, yyyy"
+                defaultValue={data.start} onChange={textFieldChanged} fullWidth />
+            </Grid>
+            <Grid item xs={3} style={{ paddingLeft: 8, paddingRight: 8 }}>
+              <DatePicker required margin="dense" id="end" label="End Date" disablePast format="MMM DD, yyyy"
+                defaultValue={data.end} onChange={textFieldChanged} fullWidth />
+            </Grid>
+            <Grid item xs={6} style={{ paddingLeft: 8, paddingRight: 8 }}>
+              <TextField required margin="dense" id="location" label="Location" type="text"
+                defaultValue={data.location} onChange={textFieldChanged} fullWidth />
+            </Grid>
+            <Grid item xs={12} style={{ paddingLeft: 8, paddingRight: 8 }}>
+              <TextField required margin="dense" id="description" label="Description" type="text" multiline
+                defaultValue={data.description} onChange={textFieldChanged} fullWidth />
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleSave} color="primary">
+            Save
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </div>
+  );
+}
+
+function EducationEdit({ data, open, closeFn, modifyFn, saveFn }) {
+  // const [open, setOpen] = React.useState(ed);
+  // const [data, changeData] = React.useState({
+  //   university: inputData ? inputData.university : '',
+  //   degree: inputData ? inputData.degree : '',
+  //   major: inputData ? inputData.major : '',
+  //   startYear: inputData ? inputData.startYear : '',
+  //   endYear: inputData ? inputData.endYear : ''
+  // });
+
+  // console.log('input', inputData?true:false, inputData);
+
+  // useEffect(() => {
+  //   inputData
+  // })
+
+  // if (data == null) {
+  //   data = {
+  //     university: '',
+  //     degree: '',
+  //     major: '',
+  //     startYear: '',
+  //     endYear: ''
+  //   }
+  // } else {
+  //   data = { ...data };
+  // }
 
   const handleClose = () => {
     closeFn();
@@ -178,15 +273,51 @@ function EducationEdit({ data, open, closeFn, modifyFn }) {
   };
 
   const handleSave = () => {
-    modifyFn(data);
+    saveFn(data);
     handleClose();
   }
 
   const textFieldChanged = (e) => {
+    if (data == null) {
+      data = {
+        university: '',
+        degree: '',
+        major: '',
+        startYear: null,
+        endYear: null
+      };
+    }
     data[e.target.id] = e.target.value;
-    // console.log(data);
-    // console.log(e.target.id);
+    // changeData({
+    //   ...data,
+    //   [e.target.id]: e.target.value
+    // });
   }
+
+  // const argTest = (...args) => { console.log('args',args) };
+
+  const dateFieldChanged = (id) => (date) => {
+    if (data == null) {
+      data = {
+        university: '',
+        degree: '',
+        major: '',
+        startYear: null,
+        endYear: null
+      };
+    }
+    modifyFn({
+      ...data,
+      [id]: date.year()
+    })
+    // data[id] = date.year();
+    // changeData({
+    //   ...data,
+    //   [id]: date.year()
+    // });
+  };
+
+  console.log(data);
 
   return (
     <div>
@@ -199,23 +330,23 @@ function EducationEdit({ data, open, closeFn, modifyFn }) {
           <Grid container spacing={0}>
             <Grid item xs={12} style={{ paddingLeft: 8, paddingRight: 8 }}>
               <TextField autoFocus required margin="dense" id="university" label="University" type="text"
-                defaultValue={data.university} onChange={textFieldChanged} fullWidth />
+                defaultValue={data ? data.university : ''} onChange={textFieldChanged} fullWidth />
             </Grid>
             <Grid item xs={4} style={{ paddingLeft: 8, paddingRight: 8 }}>
               <TextField required margin="dense" id="degree" label="Program" type="text"
-                defaultValue={data.degree} onChange={textFieldChanged} fullWidth />
+                defaultValue={data ? data.degree : ''} onChange={textFieldChanged} fullWidth />
             </Grid>
             <Grid item xs={8} style={{ paddingLeft: 8, paddingRight: 8 }}>
               <TextField required margin="dense" id="major" label="Major" type="text"
-                defaultValue={data.major} onChange={textFieldChanged} fullWidth />
+                defaultValue={data ? data.major : ''} onChange={textFieldChanged} fullWidth />
             </Grid>
             <Grid item xs={6} style={{ paddingLeft: 8, paddingRight: 8 }}>
-              <TextField required margin="dense" id="startYear" label="Start Year" type="number"
-                defaultValue={data.startYear} onChange={textFieldChanged} fullWidth />
+              <DatePicker required margin="dense" id="startYear" label="Start Year" views={["year"]} disableFuture
+                value={data && data.startYear ? moment([data.startYear]) : null} onChange={dateFieldChanged('startYear')} fullWidth />
             </Grid>
             <Grid item xs={6} style={{ paddingLeft: 8, paddingRight: 8 }}>
-              <TextField required margin="dense" id="endYear" label="End Year" type="number"
-                defaultValue={data.endYear} onChange={textFieldChanged} fullWidth />
+              <DatePicker required margin="dense" id="endYear" label="End Year" views={["year"]}
+                value={data && data.endYear ? moment([data.endYear]) : null} onChange={dateFieldChanged('endYear')} fullWidth />
             </Grid>
           </Grid>
         </DialogContent>
@@ -252,18 +383,23 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
   const [edEditData, setEdEditData] = React.useState(null);
   const [edSelected, setEdSelected] = React.useState(-1);
   const showEdit = (ed, edIdx) => {
-    toggleEdEdit(true);
     setEdEditData(ed);
     setEdSelected(edIdx);
+    console.log('from parent',edEditData,ed);
+    toggleEdEdit(true);
     // console.log(edSelected);
   }
   const closeEdEdit = () => {
-    toggleEdEdit(false);
     setEdEditData(null);
+    toggleEdEdit(false);
     // console.log(edSelected);
   }
   const modifyEd = (newData) => {
-    console.log(newData, edSelected);
+    setEdEditData({ ...edEditData, ...newData });
+  }
+  const saveEd = (newData) => {
+    // console.log(newData);
+    // return;
     let edCopy = education.slice();
     if (edSelected === -1) {
       edCopy.push(newData);
@@ -271,6 +407,7 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
       edCopy[edSelected] = newData;
     }
     edCopy.sort((a, b) => b.startYear - a.startYear);
+    console.log(edCopy, edSelected);
 
     fetch('/profiles/education', {
       method: 'POST',
@@ -286,7 +423,28 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
       }
     }, error => {
       console.log('Unknown error: ', error)
-    })
+    });
+  }
+  const deleteEd = (edIdx) => {
+    // deletes and copies
+    let edCopy = education.slice();
+    edCopy.splice(edIdx, 1);
+
+    fetch('/profiles/education', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: accessInfo, education: edCopy })
+    }).then((res) => {
+      return res.json();
+    }).then(success => {
+      if (success.status == 200) {
+        changeEducation(edCopy);
+      } else {
+        console.log('API error: ', success);
+      }
+    }, error => {
+      console.log('Unknown error: ', error)
+    });
   }
 
   return (
@@ -300,7 +458,10 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
           data={edEditData}
           closeFn={() => { closeEdEdit() }}
           modifyFn={(newData) => { modifyEd(newData) }}
-        // edIdx={edSelected}
+          saveFn={(newData) => { saveEd(newData) }}
+        />
+
+        <ExperienceEdit open={false}
         />
 
         <Grid container spacing={1} style={{ height: '100%', width: '100%', padding: 8 }}>
@@ -408,8 +569,11 @@ Designed the Angular UI for a document profiler application, chatbot application
                         <Typography variant="subtitle2" className={classes.lightGreyText}>{ed.startYear} - {ed.endYear}</Typography>
                       </Grid>
                     </Grid>
-                    <IconButton aria-label="edit" style={{ alignSelf: 'start' }} onClick={() => { showEdit(ed, edIdx) }}>
+                    <IconButton aria-label="edit" edge="end" style={{ alignSelf: 'start' }} onClick={() => { showEdit(ed, edIdx) }}>
                       <Edit />
+                    </IconButton>
+                    <IconButton aria-label="delete" edge="end" style={{ alignSelf: 'start' }} onClick={() => { deleteEd(edIdx) }}>
+                      <Delete />
                     </IconButton>
                   </div>
                 ))}
