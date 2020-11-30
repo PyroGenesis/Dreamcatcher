@@ -12,12 +12,10 @@ router.get('/test', async (req, res, next) => {
     res.send('Profile Home!!!');
 });
 
-router.post('/education', async (req, res) => {
-    tokenResp = await verifyToken(req.body.token);
+async function updateProfileField(field, token, data) {
+    tokenResp = await verifyToken(token);
     if (tokenResp.status !== 200) {
-        res.statusCode = tokenResp.status;
-        res.json(tokenResp);
-        return;
+        return tokenResp;
     }
 
     const uid = tokenResp.data.uid;
@@ -25,24 +23,36 @@ router.post('/education', async (req, res) => {
 
     try {
         await profileRef.update({
-            education: req.body.education
+            [field]: data
         });
-        res.statusCode = 200;
-        res.json({
-            status: res.statusCode,
+        return {
+            status: 200,
             message: 'success',
             data: null
-        });
+        };
     } catch (error) {
-        res.statusCode = 500;
-        res.json({
-            status: res.statusCode,
+        return {
+            status: 500,
             message: 'unknown error',
             data: error
-        });
+        };
     }
-    // console.log(req.body.education);
+}
 
+router.post('/experience', async (req, res) => {
+    const updateResp = await updateProfileField('experience', req.body.token, req.body.experience);
+    if (updateResp.status !== 200) {
+        res.statusCode = updateResp.status;
+    }
+    res.json(updateResp);
+});
+
+router.post('/education', async (req, res) => {
+    const updateResp = await updateProfileField('education', req.body.token, req.body.education);
+    if (updateResp.status !== 200) {
+        res.statusCode = updateResp.status;
+    }
+    res.json(updateResp);
 });
 
 async function getProfileFromUID(uid) {

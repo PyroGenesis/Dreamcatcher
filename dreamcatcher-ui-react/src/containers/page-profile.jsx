@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component, useEffect } from 'react'
 import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
@@ -16,11 +16,14 @@ import DialogActions from '@material-ui/core/DialogActions';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import MenuItem from '@material-ui/core/MenuItem';
 import { Container, IconButton, ThemeProvider } from '@material-ui/core';
-import { Add, AccessAlarm, ThreeDRotation, Edit } from '@material-ui/icons';
+import { Add, AccessAlarm, ThreeDRotation, Edit, Delete } from '@material-ui/icons';
+import { DatePicker } from "@material-ui/pickers";
+import moment from 'moment';
 
 import { BurhanGlobalTheme } from "../styles/themes";
-import { firebaseDateToJSDate } from "../misc/utilities";
+import { firebaseDateToJSDate, firebaseDateToJSDateObj } from "../misc/utilities";
 import { grey } from '@material-ui/core/colors';
 
 import profilePic from '../assets/mock-profile/profile-icon.jpg'
@@ -33,7 +36,8 @@ import { useAuthState, AuthStateContext } from '../context/context';
 const PROFILE_DATE_OPTIONS = {
   month: 'short',
   year: 'numeric'
-}
+};
+const MOMENT_DATE_OPTIONS = "MMM YYYY";
 
 const useStyles = makeStyles((theme) => ({
   largeAvatar: {
@@ -86,21 +90,15 @@ class ProfilePage extends Component {
     const { username } = this.props.match.params;
 
     if (username != null) {
-      // this.setState({
       this.isUsername = true;
       this.accessInfo = username;
       // })
     } else {
       const userDetails = /*useAuthState();*/ this.context;
-      console.log('token in context', userDetails.token);
-      // this.setState({
       this.isUsername = false;
       this.accessInfo = userDetails.token;
-      // });
-      console.log('state inside else:', this.state.accessInfo);
     }
 
-    // console.log('state outside else', this.state);
     console.log('profile session', this.isUsername, this.accessInfo);
     const profilePromise = this.isUsername ?
       fetch(`/profiles/${this.accessInfo}`) :
@@ -152,24 +150,136 @@ class ProfilePage extends Component {
   }
 }
 
-function EducationEdit({ data, open, closeFn, modifyFn }) {
-  // const [open, setOpen] = React.useState(ed);
-  if (data == null) {
-    data = {
-      university: '',
-      degree: '',
-      major: '',
-      startYear: '',
-      endYear: ''
-    }
-  } else {
-    data = { ...data };
-  }
-  // const {} = data;
-
-  const handleClickOpen = () => {
-    // setOpen(true);
+function ExperienceEdit({ data, open, closeFn, modifyFn, saveFn }) {
+  const handleClose = () => {
+    closeFn();
   };
+
+  const handleSave = () => {
+    saveFn(data);
+    handleClose();
+  }
+
+  const basicCheck = () => {
+    if (data == null) {
+      data = {
+        company: '',
+        position: '',
+        type: '',
+        start: null,
+        end: null,
+        location: '',
+        description: ''
+      };
+    }
+  }
+
+  const textFieldChanged = (e) => {
+    basicCheck();
+    data[e.target.id] = e.target.value;
+  }
+
+  const selectFieldChanged = (e) => {
+    console.log(e.target);
+    basicCheck();
+    data[e.target.name] = e.target.value;
+  }
+
+  const dateFieldChanged = (id) => (dateObj) => {
+    basicCheck();
+    modifyFn({
+      ...data,
+      [id]: dateObj
+    })
+  };
+
+  const jobTypes = ['Full time', 'Part time', 'Contract'];
+
+  return (
+    <div>
+      <Dialog open={open} onClose={handleClose} aria-labelledby="experience-edit-dialog">
+        <DialogTitle id="experience-edit-dialog">Experience</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Please provide the details of your professional experience
+          </DialogContentText>
+          <Grid container spacing={0}>
+            <Grid item xs={12} style={{ paddingLeft: 8, paddingRight: 8 }}>
+              <TextField autoFocus required margin="dense" id="company" label="Company" type="text"
+                defaultValue={data ? data.company : ''} onChange={textFieldChanged} fullWidth />
+            </Grid>
+            <Grid item xs={8} style={{ paddingLeft: 8, paddingRight: 8 }}>
+              <TextField required margin="dense" id="position" label="Position" type="text"
+                defaultValue={data ? data.position : ''} onChange={textFieldChanged} fullWidth />
+            </Grid>
+            <Grid item xs={4} style={{ paddingLeft: 8, paddingRight: 8 }}>
+              <TextField required margin="dense" id="type" name="type" label="Type" select
+                defaultValue={data ? data.type : ''} onChange={selectFieldChanged} fullWidth >
+                {jobTypes.map((type) => (
+                  <MenuItem key={type} value={type}>
+                    {type}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+            <Grid item xs={3} style={{ paddingLeft: 8, paddingRight: 8 }}>
+              <DatePicker required margin="dense" id="start" label="Start Date" disableFuture format="MMM DD, yyyy"
+                value={data ? data.start : null} onChange={dateFieldChanged('start')} fullWidth />
+            </Grid>
+            <Grid item xs={3} style={{ paddingLeft: 8, paddingRight: 8 }}>
+              <DatePicker required margin="dense" id="end" label="End Date" format="MMM DD, yyyy"
+                value={data ? data.end : null} onChange={dateFieldChanged('end')} fullWidth />
+            </Grid>
+            <Grid item xs={6} style={{ paddingLeft: 8, paddingRight: 8 }}>
+              <TextField required margin="dense" id="location" label="Location" type="text"
+                defaultValue={data ? data.location : ''} onChange={textFieldChanged} fullWidth />
+            </Grid>
+            <Grid item xs={12} style={{ paddingLeft: 8, paddingRight: 8 }}>
+              <TextField required margin="dense" id="description" label="Description" type="text" multiline
+                defaultValue={data ? data.description : ''} onChange={textFieldChanged} fullWidth />
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleSave} color="primary">
+            Save
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </div>
+  );
+}
+
+function EducationEdit({ data, open, closeFn, modifyFn, saveFn }) {
+  // const [open, setOpen] = React.useState(ed);
+  // const [data, changeData] = React.useState({
+  //   university: inputData ? inputData.university : '',
+  //   degree: inputData ? inputData.degree : '',
+  //   major: inputData ? inputData.major : '',
+  //   startYear: inputData ? inputData.startYear : '',
+  //   endYear: inputData ? inputData.endYear : ''
+  // });
+
+  // console.log('input', inputData?true:false, inputData);
+
+  // useEffect(() => {
+  //   inputData
+  // })
+
+  // if (data == null) {
+  //   data = {
+  //     university: '',
+  //     degree: '',
+  //     major: '',
+  //     startYear: '',
+  //     endYear: ''
+  //   }
+  // } else {
+  //   data = { ...data };
+  // }
 
   const handleClose = () => {
     closeFn();
@@ -178,15 +288,49 @@ function EducationEdit({ data, open, closeFn, modifyFn }) {
   };
 
   const handleSave = () => {
-    modifyFn(data);
+    saveFn(data);
     handleClose();
   }
 
   const textFieldChanged = (e) => {
+    if (data == null) {
+      data = {
+        university: '',
+        degree: '',
+        major: '',
+        startYear: null,
+        endYear: null
+      };
+    }
     data[e.target.id] = e.target.value;
-    // console.log(data);
-    // console.log(e.target.id);
+    // changeData({
+    //   ...data,
+    //   [e.target.id]: e.target.value
+    // });
   }
+
+  // const argTest = (...args) => { console.log('args',args) };
+
+  const dateFieldChanged = (id) => (date) => {
+    if (data == null) {
+      data = {
+        university: '',
+        degree: '',
+        major: '',
+        startYear: null,
+        endYear: null
+      };
+    }
+    modifyFn({
+      ...data,
+      [id]: date.year()
+    })
+    // data[id] = date.year();
+    // changeData({
+    //   ...data,
+    //   [id]: date.year()
+    // });
+  };
 
   return (
     <div>
@@ -199,23 +343,23 @@ function EducationEdit({ data, open, closeFn, modifyFn }) {
           <Grid container spacing={0}>
             <Grid item xs={12} style={{ paddingLeft: 8, paddingRight: 8 }}>
               <TextField autoFocus required margin="dense" id="university" label="University" type="text"
-                defaultValue={data.university} onChange={textFieldChanged} fullWidth />
+                defaultValue={data ? data.university : ''} onChange={textFieldChanged} fullWidth />
             </Grid>
             <Grid item xs={4} style={{ paddingLeft: 8, paddingRight: 8 }}>
               <TextField required margin="dense" id="degree" label="Program" type="text"
-                defaultValue={data.degree} onChange={textFieldChanged} fullWidth />
+                defaultValue={data ? data.degree : ''} onChange={textFieldChanged} fullWidth />
             </Grid>
             <Grid item xs={8} style={{ paddingLeft: 8, paddingRight: 8 }}>
               <TextField required margin="dense" id="major" label="Major" type="text"
-                defaultValue={data.major} onChange={textFieldChanged} fullWidth />
+                defaultValue={data ? data.major : ''} onChange={textFieldChanged} fullWidth />
             </Grid>
             <Grid item xs={6} style={{ paddingLeft: 8, paddingRight: 8 }}>
-              <TextField required margin="dense" id="startYear" label="Start Year" type="number"
-                defaultValue={data.startYear} onChange={textFieldChanged} fullWidth />
+              <DatePicker required margin="dense" id="startYear" label="Start Year" views={["year"]} disableFuture
+                value={data && data.startYear ? moment([data.startYear]) : null} onChange={dateFieldChanged('startYear')} fullWidth />
             </Grid>
             <Grid item xs={6} style={{ paddingLeft: 8, paddingRight: 8 }}>
-              <TextField required margin="dense" id="endYear" label="End Year" type="number"
-                defaultValue={data.endYear} onChange={textFieldChanged} fullWidth />
+              <DatePicker required margin="dense" id="endYear" label="End Year" views={["year"]}
+                value={data && data.endYear ? moment([data.endYear]) : null} onChange={dateFieldChanged('endYear')} fullWidth />
             </Grid>
           </Grid>
         </DialogContent>
@@ -237,6 +381,24 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
   // const { about, education, experience, fullname, headline, location } = profileData
 
   profileData.education.sort((a, b) => b.startYear - a.startYear);
+  // if (profileData.experience.length > 0 && profileData.experience[0].start._seconds != null) {
+  //   profileData.experience.map((ex) => {
+  //     console.log('map', firebaseDateToJSDateObj(ex.start));
+  //     ex.start = moment(firebaseDateToJSDateObj(ex.start))
+  //     ex.end = moment(firebaseDateToJSDateObj(ex.end))
+  //   });
+  // }
+  profileData.experience.map((ex) => {
+    ex.start = moment(ex.start);
+    ex.end = moment(ex.end);
+  });
+
+  // useEffect(() => {
+  //   profileData.experience.map((ex) => {
+  //     ex.start = moment(firebaseDateToJSDateObj(ex.start))
+  //     ex.end = moment(firebaseDateToJSDateObj(ex.end))
+  //   });
+  // })
 
   const [about, changeAbout] = React.useState(profileData.about);
   const [education, changeEducation] = React.useState(profileData.education);
@@ -247,23 +409,28 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
   // console.log(about, education, experience, fullname, headline, location);
   // console.log(profileData)
 
-  // return <div></div>
+  // For education edit
   const [edEdit, toggleEdEdit] = React.useState(false);
   const [edEditData, setEdEditData] = React.useState(null);
   const [edSelected, setEdSelected] = React.useState(-1);
   const showEdit = (ed, edIdx) => {
-    toggleEdEdit(true);
     setEdEditData(ed);
     setEdSelected(edIdx);
+    console.log('from parent', edEditData, ed);
+    toggleEdEdit(true);
     // console.log(edSelected);
   }
   const closeEdEdit = () => {
-    toggleEdEdit(false);
     setEdEditData(null);
+    toggleEdEdit(false);
     // console.log(edSelected);
   }
   const modifyEd = (newData) => {
-    console.log(newData, edSelected);
+    setEdEditData({ ...edEditData, ...newData });
+  }
+  const saveEd = (newData) => {
+    // console.log(newData);
+    // return;
     let edCopy = education.slice();
     if (edSelected === -1) {
       edCopy.push(newData);
@@ -271,6 +438,7 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
       edCopy[edSelected] = newData;
     }
     edCopy.sort((a, b) => b.startYear - a.startYear);
+    console.log(edCopy, edSelected);
 
     fetch('/profiles/education', {
       method: 'POST',
@@ -286,9 +454,101 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
       }
     }, error => {
       console.log('Unknown error: ', error)
-    })
+    });
+  }
+  const deleteEd = (edIdx) => {
+    // deletes and copies
+    let edCopy = education.slice();
+    edCopy.splice(edIdx, 1);
+
+    fetch('/profiles/education', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: accessInfo, education: edCopy })
+    }).then((res) => {
+      return res.json();
+    }).then(success => {
+      if (success.status == 200) {
+        changeEducation(edCopy);
+      } else {
+        console.log('API error: ', success);
+      }
+    }, error => {
+      console.log('Unknown error: ', error)
+    });
   }
 
+
+  // for experience
+  const [exEdit, toggleExEdit] = React.useState(false);
+  const [exEditData, setExEditData] = React.useState(null);
+  const [exSelected, setExSelected] = React.useState(-1);
+  const showExEdit = (ex, exIdx) => {
+    setExEditData(ex);
+    setExSelected(exIdx);
+    toggleExEdit(true);
+  }
+  const closeExEdit = () => {
+    toggleExEdit(false);
+    // setExEditData(null);
+  }
+  const modifyEx = (newData) => {
+    setExEditData({ ...exEditData, ...newData });
+  }
+  const saveEx = (newData) => {
+    // console.log(newData);
+    // return;
+    // newData.start = newData.start.toDate();
+    // newData.end = newData.end.toDate();
+
+    let exCopy = experience.slice();
+    if (exSelected === -1) {
+      exCopy.push(newData);
+    } else {
+      exCopy[exSelected] = newData;
+    }
+    exCopy.sort((a, b) => b.start - a.start);
+    console.log(exCopy, exSelected);
+
+    fetch('/profiles/experience', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: accessInfo, experience: exCopy })
+    }).then((res) => {
+      return res.json();
+    }).then(success => {
+      if (success.status == 200) {
+        changeExperience(exCopy);
+      } else {
+        console.log('API error: ', success);
+      }
+    }, error => {
+      console.log('Unknown error: ', error)
+    });
+  }
+  const deleteEx = (exIdx) => {
+    // deletes and copies
+    let exCopy = experience.slice();
+    exCopy.splice(exIdx, 1);
+
+    fetch('/profiles/experience', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: accessInfo, experience: exCopy })
+    }).then((res) => {
+      return res.json();
+    }).then(success => {
+      if (success.status == 200) {
+        changeExperience(exCopy);
+      } else {
+        console.log('API error: ', success);
+      }
+    }, error => {
+      console.log('Unknown error: ', error)
+    });
+  }
+
+  console.log(experience);
   return (
     // <div className="body-content profile">
     //   <h1>Profile!</h1>
@@ -300,7 +560,15 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
           data={edEditData}
           closeFn={() => { closeEdEdit() }}
           modifyFn={(newData) => { modifyEd(newData) }}
-        // edIdx={edSelected}
+          saveFn={(newData) => { saveEd(newData) }}
+        />
+
+        <ExperienceEdit
+          open={exEdit}
+          data={exEditData}
+          closeFn={() => { closeExEdit() }}
+          modifyFn={(newData) => { modifyEx(newData) }}
+          saveFn={(newData) => { saveEx(newData) }}
         />
 
         <Grid container spacing={1} style={{ height: '100%', width: '100%', padding: 8 }}>
@@ -338,42 +606,39 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
             <Card elevation={3}>
               <CardContent style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
 
-                <Typography variant="overline">
-                  Experience
-                </Typography>
+                <div style={{ display: 'flex' }}>
+                  <Typography variant="overline" style={{ flexGrow: 1 }}>
+                    Experience
+                  </Typography>
+                  <IconButton aria-label="add" style={{ alignSelf: 'start' }} onClick={() => { showExEdit(null, -1) }}>
+                    <Add />
+                  </IconButton>
+                </div>
 
-                {experience.map(ex => (
-                  <Grid container spacing={0} wrap="nowrap" key={ex.start._seconds} className={classes.detailBox}>
-                    <Grid item style={{ width: 75 }}>
-                      <Avatar variant="square" /*src={company1Pic}*/ >{ex.company.charAt(0)}</Avatar>
+                {experience.map((ex, exIdx) => (
+                  <div key={ex.start.unix()} style={{ display: 'flex' }}>
+                    <Grid container spacing={0} wrap="nowrap" key={ex.start._seconds} className={classes.detailBox}>
+                      <Grid item style={{ width: 75 }}>
+                        <Avatar variant="square" /*src={company1Pic}*/ >{ex.company.charAt(0)}</Avatar>
+                      </Grid>
+                      <Grid item xs={12}>
+                        <Typography variant="h6">{ex.position}</Typography>
+                        <Typography variant="body2">{ex.company} - {ex.type}</Typography>
+                        <Typography variant="subtitle2" className={classes.lightGreyText}>
+                          {ex.start.format(MOMENT_DATE_OPTIONS) + " - " + ex.end.format(MOMENT_DATE_OPTIONS)}
+                        </Typography>
+                        <Typography variant="subtitle2" className={classes.lightGreyText}>{ex.location}</Typography>
+                        <Typography>{ex.description}</Typography>
+                      </Grid>
                     </Grid>
-                    <Grid item xs={12}>
-                      <Typography variant="h6">{ex.position}</Typography>
-                      <Typography variant="body2">{ex.company} - {ex.type}</Typography>
-                      <Typography variant="subtitle2" className={classes.lightGreyText}>
-                        {firebaseDateToJSDate(ex.start, PROFILE_DATE_OPTIONS)} - {firebaseDateToJSDate(ex.end, PROFILE_DATE_OPTIONS)}
-                      </Typography>
-                      <Typography variant="subtitle2" className={classes.lightGreyText}>{ex.location}</Typography>
-                      <Typography>{ex.description}</Typography>
-                    </Grid>
-                  </Grid>
+                    <IconButton aria-label="edit" edge="end" style={{ alignSelf: 'start' }} onClick={() => { showExEdit(ex, exIdx) }}>
+                      <Edit />
+                    </IconButton>
+                    <IconButton aria-label="delete" edge="end" style={{ alignSelf: 'start' }} onClick={() => { deleteEx(exIdx) }}>
+                      <Delete />
+                    </IconButton>
+                  </div>
                 ))}
-
-
-                {/* <Grid container spacing={0} wrap="nowrap" className={classes.detailBox}>
-                  <Grid item style={{ width: 75 }}>
-                    <Avatar variant="square" alt="M" src={company2Pic} />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Typography variant="h6">Software Engineer</Typography>
-                    <Typography variant="body2">Mastek Ltd. - Fulltime</Typography>
-                    <Typography variant="subtitle2" className={classes.lightGreyText}>Jun 2018 - Aug 2019</Typography>
-                    <Typography variant="subtitle2" className={classes.lightGreyText}>Mumbai, Maharashtra, India</Typography>
-                    <Typography>Developed an NLP solution consisting of Text Summarization, Sentiment Analysis, and Document Clustering.
-Adapted the solution into a Review Analytics platform for Mastek’s customers, using Angular as the front-end, Python Flask as the back-end and hosted on Azure Cloud.
-Designed the Angular UI for a document profiler application, chatbot application, and a machine-learning project.</Typography>
-                  </Grid>
-                </Grid> */}
 
                 <div style={{ display: 'flex' }}>
                   <Typography variant="overline" style={{ flexGrow: 1 }}>
@@ -383,16 +648,6 @@ Designed the Angular UI for a document profiler application, chatbot application
                     <Add />
                   </IconButton>
                 </div>
-                {/* <Grid container spacing={0} wrap="nowrap" className={classes.detailBox}>
-                  <Grid item style={{ width: 75 }}>
-                    <Avatar variant="square" alt="I" src={uniPic} />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Typography variant="h6">University of California, Irvine</Typography>
-                    <Typography variant="body2">Masters - Computer Science</Typography>
-                    <Typography variant="subtitle2" className={classes.lightGreyText}>2019 - 2020</Typography>
-                  </Grid>
-                </Grid> */}
 
                 {education.map((ed, edIdx) => (
                   <div key={ed.startYear} style={{ display: 'flex' }}>
@@ -408,8 +663,11 @@ Designed the Angular UI for a document profiler application, chatbot application
                         <Typography variant="subtitle2" className={classes.lightGreyText}>{ed.startYear} - {ed.endYear}</Typography>
                       </Grid>
                     </Grid>
-                    <IconButton aria-label="edit" style={{ alignSelf: 'start' }} onClick={() => { showEdit(ed, edIdx) }}>
+                    <IconButton aria-label="edit" edge="end" style={{ alignSelf: 'start' }} onClick={() => { showEdit(ed, edIdx) }}>
                       <Edit />
+                    </IconButton>
+                    <IconButton aria-label="delete" edge="end" style={{ alignSelf: 'start' }} onClick={() => { deleteEd(edIdx) }}>
+                      <Delete />
                     </IconButton>
                   </div>
                 ))}
