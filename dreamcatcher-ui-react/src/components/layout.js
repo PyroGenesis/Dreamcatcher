@@ -10,6 +10,7 @@ import Paper from '@material-ui/core/Paper';
 import Checkbox from '@material-ui/core/Checkbox';
 import { green } from '@material-ui/core/colors';
 import { withStyles } from '@material-ui/core/styles';
+import { firebaseDateToJSDate } from "../misc/utilities";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -32,11 +33,16 @@ function getCounts(data){
   var dailyCounts = new Array(120);
   dailyCounts.fill(0);
   const today = new Date();
-
-  for(var i = 0; i<data.length;i++){
-    var day = data[i].date.substring(3,5);
-    var month = data[i].date.substring(0,2)-1;
-    var year = data[i].date.substring(6);
+  if(data==null)
+    return [countS, countF, countW, countI, countC, count120, dailyCounts, countML];
+  for(var i = 0; i<data.applications.length;i++){
+    const dateObj = {_seconds: data.applications[i].date._seconds, _nanoseconds:data.applications[i].date._nanoseconds};
+    const options = {year: "numeric", month: "numeric", day: "2-digit"};
+    const datetime = firebaseDateToJSDate(dateObj, options);
+    console.log(datetime);
+    var day = datetime.substring(3,5);
+    var month = datetime.substring(0,2)-1;
+    var year = datetime.substring(6);
     var date = new Date(year,month,day);
     var res = Math.abs(today - date) / 1000;
     var days = Math.floor(res / 86400);
@@ -44,25 +50,25 @@ function getCounts(data){
       count120++;
       dailyCounts[days]+=1;
     }
-    if(data[i].status == "Interview")
+    if(data.applications[i].status == "Interview")
       countI++;
-    else if(data[i].status == "Coding Test")
+    else if(data.applications[i].status == "Coding Test")
       countC++;
-    if(data[i].position == "Software Engineer")
+    if(data.applications[i].position.position_name == "Software Development Engineer")
       countS++;
-    else if(data[i].position == "Full Stack Developer")
+    else if(data.applications[i].position.position_name == "Full Stack Developer")
     countF++;
-    else if(data[i].position == "Web Developer")
+    else if(data.applications[i].position.position_name == "Web Developer")
     countW++;
-    else if(data[i].position == "Machine Learning Engineer")
+    else if(data.applications[i].position.position_name == "Machine Learning Engineer")
     countML++;
   }
   return [countS, countF, countW, countI, countC, count120, dailyCounts, countML];
 }
 export default function CenteredGrid(tableData) {
   const classes = useStyles();
-  const data = tableData.tableData;
-  const count = data.length;
+  const data = tableData.tableData.data;
+  const count = data == null?0:data.applications.length;
   const counts = getCounts(data);
   return (
     <div className={classes.root}>

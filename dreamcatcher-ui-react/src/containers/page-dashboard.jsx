@@ -1,10 +1,9 @@
 import React, {Component} from 'react';
-import Table from '../components/table'
-
-import Card from '../components/cards'
 import Layout from '../components/layout'
+import { AuthStateContext } from '../context/context';
 
 class DashboardPage extends Component {
+  static contextType = AuthStateContext;
   state = {
     data: [],
   };
@@ -16,8 +15,9 @@ class DashboardPage extends Component {
   }
   
   callApi = async () => {
-    const response = await fetch('http://localhost:5000/applications');
+    const response = await fetch('http://localhost:5000/applications?token='+this.context.token);
     const body = await response.json();
+    console.log(body);
     if (response.status !== 200) throw Error(body.message);
     return body;
   };

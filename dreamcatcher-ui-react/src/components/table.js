@@ -16,6 +16,7 @@ import Paper from '@material-ui/core/Paper';
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
+import { firebaseDateToJSDate } from "../misc/utilities";
 
 function createData(companyName, position, date, url, status) {
   return { companyName, position, date, url, status };
@@ -23,9 +24,17 @@ function createData(companyName, position, date, url, status) {
 
 function transformData(data){
   var rows = [];
-  for(var i = 0; i<data.length;i++){
-    rows.push(createData(data[i].company_name,data[i].position,data[i].date,data[i].link,data[i].status));
+  console.log(data);
+  if(data==null || data == [])
+    return rows;
+  for(var i = 0; i<data.applications.length;i++){
+    const dateObj = {_seconds: data.applications[i].date._seconds, _nanoseconds:data.applications[i].date._nanoseconds};
+    const options = {year: "numeric", month: "long", day: "2-digit", hour: "2-digit", minute: "2-digit"};
+    const datetime = firebaseDateToJSDate(dateObj, options);
+    console.log(typeof(datetime));
+    rows.push(createData(data.applications[i].position.company_name,data.applications[i].position.position_name,datetime,data.applications[i].position.link,data.applications[i].status));
   }
+  console.log(rows);
   return rows;
 }
 
@@ -182,7 +191,7 @@ export default function EnhancedTable({numRows,title,data}) {
   const [rowsPerPage, setRowsPerPage] = React.useState(numRows);
   const [tableTitle] = React.useState(title);
   const[status,setStatus] = React.useState([]);
-
+  console.log(data);
   var rows = transformData(data);
 
   const handleRequestSort = (event, property) => {

@@ -1,7 +1,9 @@
 import React, {Component} from 'react';
-import Table from '../components/table'
+import Table from '../components/table';
+import { AuthStateContext } from '../context/context';
 
 class CodingTestsPage extends Component {
+  static contextType = AuthStateContext;
   state = {
     data: [],
   };
@@ -13,7 +15,7 @@ class CodingTestsPage extends Component {
   }
   
   callApi = async () => {
-    const response = await fetch('http://localhost:5000/applications?status=Coding Test');
+    const response = await fetch('http://localhost:5000/applications?token='+this.context.token+'&status=Coding Test');
     const body = await response.json();
     if (response.status !== 200) throw Error(body.message);
     return body;
@@ -22,7 +24,7 @@ class CodingTestsPage extends Component {
       return (
           <div className="applications" align ="center">
             <br></br>
-            <Table numRows = "10" title = "Coding Tests" data ={this.state.data}/>
+            <Table numRows = "10" title = "Coding Tests" data ={this.state.data.data}/>
             <br></br>
           </div>
   
