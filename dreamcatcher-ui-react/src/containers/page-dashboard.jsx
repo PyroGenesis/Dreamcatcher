@@ -15,9 +15,8 @@ class DashboardPage extends Component {
   }
   
   callApi = async () => {
-    const response = await fetch('http://localhost:5000/applications?token='+this.context.token);
+    const response = await fetch('/applications?token='+this.context.token);
     const body = await response.json();
-    console.log(body);
     if (response.status !== 200) throw Error(body.message);
     return body;
   };
