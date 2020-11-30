@@ -8,6 +8,51 @@ const verifyToken = require('./common_resources').verifyToken;
 
 // These paths start from /applications
 
+router.post('/add', async (req, res) => {
+    const token = req.body.token;
+    const position_id = req.body.id;
+    const status = req.body.status;
+    if (token == null || position_id == null) {
+        res.statusCode = 400;
+        res.json({
+            status: res.statusCode,
+            message: 'Missing data',
+            data: null
+        });
+        return;
+    }
+
+    const tokenResp = await verifyToken(token);
+    if (tokenResp.status !== 200) {
+        res.statusCode = tokenResp.status;
+        res.json(tokenResp);
+        return;
+    }
+    const uid = tokenResp.data.uid;
+    const docRef = db.collection('users').doc(uid).collection('applications').doc();
+
+    try {
+        await docRef.set({
+            date: firebase.firestore.Timestamp.fromDate(new Date()),
+            positionRef: db.collection('positions').doc(position_id),
+            status: status
+            });
+        res.statusCode = 200;
+        res.json({
+            status: res.statusCode,
+            message: 'success',
+            data: null
+        });
+    } catch (error) {
+        res.statusCode = 400;
+        res.json({
+            status: res.statusCode,
+            message: 'Invalid application ID or unknown error',
+            data: null
+        });
+    }
+});
+
 router.post('/update', async (req, res) => {
     const token = req.body.token;
     const application_id = req.body.id;

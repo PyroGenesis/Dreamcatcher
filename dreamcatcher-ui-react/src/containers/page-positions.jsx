@@ -12,13 +12,15 @@ import positions from "./page-positions-data";
 import {firestore} from "../components/firebase"
 import CircularProgress from '@material-ui/core/CircularProgress';
 import Typography from '@material-ui/core/Typography';
+import Button from '@material-ui/core/Button';
+import { AuthStateContext } from '../context/context';
 
 import '../index.scss'
 
 
 
 class PositionsPage extends Component {
-
+  static contextType = AuthStateContext;
   state = {
     searchValue: '',
     position: {},
@@ -44,6 +46,7 @@ class PositionsPage extends Component {
     data.forEach(doc => {
       // console.log(doc.id, '=>', doc.data());
       positions.push({
+        id: doc.id,
         positionName: doc.data().position_name,
         companyName: doc.data().company_name,
         desc: doc.data().description,
@@ -74,6 +77,7 @@ class PositionsPage extends Component {
 
     data.forEach(doc => {
       positions.push({
+        id: doc.id,
         positionName: doc.data().position_name,
         companyName: doc.data().company_name,
         desc: doc.data().description,
@@ -86,6 +90,20 @@ class PositionsPage extends Component {
 
   handleCancelSearch = e => {
     this.setState({positions: e.defaultPositions})
+  }
+
+  handleAddApplication = async(e) =>{
+    const response = await fetch('/applications/add', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        token: this.context.token,
+        id: e.position.id,
+        status:"Applied"
+      })
+    });
+    const body = await response.json();
+    if (response.status !== 200) throw Error(body.message);
   }
 
   render() {
@@ -134,10 +152,10 @@ class PositionsPage extends Component {
                     {
                         <div>
                           <h3> {this.state.position.positionName} </h3>
-                          <p style={{color: "grey"}}> {this.state.position.companyName} </p>
-                          {/* <p style={{textAlign: "justify", whiteSpace: "pre-line"}}>
-                            {this.state.position.desc}
-                          </p> */}
+                          <p style={{color: "grey",display:"inline"}}> {this.state.position.companyName} </p>
+                          <Button style={{float:"right"}} onClick = {()=>this.handleAddApplication(this.state)}>Add to My Applications</Button>
+                          <br></br>
+                          <br></br>
                           <Typography variant="body1" align="justify" style={{whiteSpace: 'pre-line'}}>
                               {this.state.position.desc}
                           </Typography>
