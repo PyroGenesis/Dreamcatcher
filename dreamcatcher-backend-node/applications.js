@@ -8,6 +8,8 @@ const verifyToken = require('./common_resources').verifyToken;
 
 // These paths start from /applications
 
+
+
 router.post('/update', async (req, res, next) => {
     const token = req.body.token;
     const application_id = req.body.id;
@@ -63,9 +65,13 @@ router.post('/update', async (req, res, next) => {
     }
 });
 
-router.post('/', async (req, res, next) => {
-    const token = req.body.token;
-
+router.get('/', async (req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    token = req.query.token;
+    status = req.query.status;
+    position = req.query.position;
+    console.log(status);
+    console.log(position);
     const tokenResp = await verifyToken(token);
     if (tokenResp.status !== 200) {
         res.statusCode = tokenResp.status;
@@ -73,6 +79,7 @@ router.post('/', async (req, res, next) => {
         return;
     }
     const uid = /*'5bVmAxHkjlc7iNHUNzgG8l9jHhg1'*/ tokenResp.data.uid;
+    console.log(uid);
 
     const applicationCollection = await db.collection('users').doc(uid).collection('applications').get();
     if (applicationCollection.size > 0) {
