@@ -17,14 +17,14 @@ import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
 import MenuItem from '@material-ui/core/MenuItem';
 import { firebaseDateToJSDate } from "../misc/utilities";
+import { useAuthState } from '../context/context';
 
-function createData(companyName, position, date, url, status) {
-  return { companyName, position, date, url, status };
+function createData(id, companyName, position, date, url, status) {
+  return { id, companyName, position, date, url, status };
 }
 
 function transformData(data){
   var rows = [];
-  console.log(data);
   if(data==null || data == [])
     return rows;
   for(var i = 0; i<data.applications.length;i++){
@@ -32,9 +32,8 @@ function transformData(data){
     const options = {year: "numeric", month: "long", day: "2-digit", hour: "2-digit", minute: "2-digit"};
     const datetime = firebaseDateToJSDate(dateObj, options);
     console.log(typeof(datetime));
-    rows.push(createData(data.applications[i].position.company_name,data.applications[i].position.position_name,datetime,data.applications[i].position.link,data.applications[i].status));
+    rows.push(createData(data.applications[i].id,data.applications[i].position.company_name,data.applications[i].position.position_name,datetime,data.applications[i].position.link,data.applications[i].status));
   }
-  console.log(rows);
   return rows;
 }
 
@@ -184,6 +183,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function EnhancedTable({numRows,title,data}) {
+  const userDetails = useAuthState();
   const classes = useStyles();
   const [order, setOrder] = React.useState('asc');
   const [orderBy, setOrderBy] = React.useState('');
@@ -210,11 +210,23 @@ export default function EnhancedTable({numRows,title,data}) {
     setPage(0);
   };
 
-  const handleChange = (event, index) => {
+  const handleChange = async (event, row, index) => {
+    console.log(row);
     let newArr = [...status];
     newArr[page * rowsPerPage+index] = event.target.value;
     rows[page * rowsPerPage+index].status = event.target.value;
     setStatus(newArr);
+    const response = await fetch('/applications/update', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        token: userDetails.token,
+        id: row.id,
+        status:event.target.value
+      })
+    });
+    const body = await response.json();
+    if (response.status !== 200) throw Error(body.message);
   };
 
   const emptyRows = rowsPerPage - Math.min(rowsPerPage, rows.length - page * rowsPerPage);
@@ -253,7 +265,7 @@ export default function EnhancedTable({numRows,title,data}) {
                         <FormControl className={classes.formControl}>
                           <Select
                             value={status[page * rowsPerPage+index] == null?row.status:status[page * rowsPerPage+index]}
-                            onChange={(event) => handleChange(event, index)}
+                            onChange={(event) => handleChange(event, row, index)}
                             displayEmpty
                             className={classes.selectEmpty}
                             inputProps={{ 'aria-label': 'Without label' }}

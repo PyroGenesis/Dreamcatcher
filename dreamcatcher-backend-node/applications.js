@@ -8,9 +8,7 @@ const verifyToken = require('./common_resources').verifyToken;
 
 // These paths start from /applications
 
-
-
-router.post('/update', async (req, res, next) => {
+router.post('/update', async (req, res) => {
     const token = req.body.token;
     const application_id = req.body.id;
     const new_status = req.body.status;
