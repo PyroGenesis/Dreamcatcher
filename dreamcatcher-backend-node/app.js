@@ -14,7 +14,12 @@ const testRoutes = require('./testing');
 
 // MIDDLEWARE
 const basicAPI = async (req, res, next) => {
-    res.send('API was not setup / called correctly. Caught by fallback.');
+    res.statusCode = 500;
+    res.json({
+        status: 500,
+        message: 'API was not setup / called correctly. Caught by fallback.',
+        data: null
+    });
 }
 
 // Be careful of the order here!
