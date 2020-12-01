@@ -26,7 +26,8 @@ class PositionsPage extends Component {
     position: {},
     positions: [],
     defaultPositions: [],
-    loading: true
+    loading: true,
+    opacity: 0.0
   }
 
   async componentDidMount() {
@@ -62,6 +63,11 @@ class PositionsPage extends Component {
 
   handleSearch = async(e) => {
 
+    if(e.searchValue.length < 1) {
+      this.setState({loading: false})
+      return;
+    }
+
     let searchKey = e.searchValue.toLowerCase().replace(/[^a-zA-Z ]/g, "").split(" ")
 
     const positionsReference = firestore.collection('positions');
@@ -86,9 +92,14 @@ class PositionsPage extends Component {
     });
 
     this.setState({positions: positions});
+    this.setState({position: positions[0]})
+    // this.setState({ opacity: 0.0 })
+    this.setState({ loading: false })
   }
 
   handleCancelSearch = e => {
+    // this.setState({opacity: 0.0})
+    this.setState({ loading: false })
     this.setState({positions: e.defaultPositions})
   }
 
@@ -109,8 +120,25 @@ class PositionsPage extends Component {
   render() {
     if(this.state.loading) {
       return (
-        <div className="body-content" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-          <CircularProgress size="20vw" />
+        <div className="applications" align ="center">
+            <Grid container style={{margin: 0, width: '100vw'}} spacing={3}>
+              <Grid item xs={12}>
+                <SearchBar
+                  value={this.state.searchValue}
+                  onChange={(newValue) => {this.setState({ searchValue: newValue }); /*this.setState({opacity: 0.1})*/}}
+                  onRequestSearch={() => this.handleSearch(this.state)}
+                  onCancelSearch={() => this.handleCancelSearch(this.state)}
+                  placeholder="Search positions..."
+                  style={{
+                    margin: '10px'
+                  }}
+                />
+              </Grid>
+            </Grid>
+            
+          <div className="body-content" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <CircularProgress size="20vw" />
+          </div>
         </div>
       )
     }
@@ -121,7 +149,7 @@ class PositionsPage extends Component {
               <Grid item xs={12}>
                 <SearchBar
                   value={this.state.searchValue}
-                  onChange={(newValue) => this.setState({ searchValue: newValue })}
+                  onChange={(newValue) => {this.setState({ searchValue: newValue }); /*this.setState({opacity: 0.1})*/ this.setState({loading: true}) }}
                   onRequestSearch={() => this.handleSearch(this.state)}
                   onCancelSearch={() => this.handleCancelSearch(this.state)}
                   placeholder="Search positions..."
@@ -130,7 +158,7 @@ class PositionsPage extends Component {
                   }}
                 />
               </Grid>
-              <Grid item xs={4} align="left" style={{height: "75vh", overflow: 'auto',  alignItems: "center"}}>
+              <Grid item xs={4} align="left" style={{height: "75vh", overflow: 'auto',  alignItems: "center", background: `rgba(0, 0, 0, ${this.state.opacity})`}}>
                 <TableContainer style={{marginLeft: "10px"}}>
                   <Table>
                     <TableBody>
@@ -146,8 +174,8 @@ class PositionsPage extends Component {
                   </Table>
                 </TableContainer>
               </Grid>
-              <Grid item xs={8} align="left" style={{height: "75vh", overflow: 'auto'}}>
-                <Card style={{marginRight: "10px"}}>
+              <Grid item xs={8} align="left" style={{height: "75vh", overflow: 'auto', background: `rgba(0, 0, 0, ${this.state.opacity})`}}>
+                <Card style={{marginRight: "10px", background: `rgba(0, 0, 0, ${this.state.opacity})`}}>
                   <CardContent>
                     {
                         <div>
