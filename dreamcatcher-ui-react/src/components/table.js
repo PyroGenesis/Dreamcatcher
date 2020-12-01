@@ -31,7 +31,6 @@ function transformData(data){
     const dateObj = {_seconds: data.applications[i].date._seconds, _nanoseconds:data.applications[i].date._nanoseconds};
     const options = {year: "numeric", month: "long", day: "2-digit", hour: "2-digit", minute: "2-digit"};
     const datetime = firebaseDateToJSDate(dateObj, options);
-    console.log(typeof(datetime));
     rows.push(createData(data.applications[i].id,data.applications[i].position.company_name,data.applications[i].position.position_name,datetime,data.applications[i].position.link,data.applications[i].status));
   }
   return rows;
@@ -65,7 +64,7 @@ function stableSort(array, comparator) {
 
 const headCells = [
   { id: 'companyName', numeric: false, disablePadding: true, label: 'Company Name' },
-  { id: 'position', numeric: false, disablePadding: false, label: 'Position'},
+  { id: 'position', numeric: false, disablePadding: false, label: 'Position' },
   { id: 'date', numeric: false, disablePadding: false, label: 'Date' },
   { id: 'url', numeric: false, disablePadding: false, label: 'URL' },
   { id: 'status', numeric: false, disablePadding: false, label: 'Status' },
@@ -80,7 +79,12 @@ function EnhancedTableHead(props) {
     <TableHead>
       <TableRow>
         {headCells.map((headCell) => (
-          <TableCell
+          headCell.id == 'status'?(<TableCell
+            key={headCell.id}
+            align={headCell.numeric ? 'right' : 'left'}
+            padding={'7'}
+          >{headCell.label}</TableCell>):
+          (<TableCell
             key={headCell.id}
             align={headCell.numeric ? 'right' : 'left'}
             padding={'7'}
@@ -89,7 +93,7 @@ function EnhancedTableHead(props) {
             <TableSortLabel
               active={orderBy === headCell.id}
               direction={orderBy === headCell.id ? order : 'asc'}
-              onClick={createSortHandler(headCell.id)}
+              onClick= {createSortHandler(headCell.id)}
             >
               {headCell.label}
               {orderBy === headCell.id ? (
@@ -98,7 +102,7 @@ function EnhancedTableHead(props) {
                 </span>
               ) : null}
             </TableSortLabel>
-          </TableCell>
+          </TableCell>)
         ))}
       </TableRow>
     </TableHead>
@@ -190,8 +194,7 @@ export default function EnhancedTable({numRows,title,data}) {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(numRows);
   const [tableTitle] = React.useState(title);
-  const[status,setStatus] = React.useState([]);
-  console.log(data);
+  const[status,setStatus] = React.useState({});
   var rows = transformData(data);
 
   const handleRequestSort = (event, property) => {
@@ -210,12 +213,16 @@ export default function EnhancedTable({numRows,title,data}) {
     setPage(0);
   };
 
-  const handleChange = async (event, row, index) => {
-    console.log(row);
-    let newArr = [...status];
-    newArr[page * rowsPerPage+index] = event.target.value;
-    rows[page * rowsPerPage+index].status = event.target.value;
-    setStatus(newArr);
+  const handleChange = async (event, row) => {
+    let newObj = {...status};
+    newObj[row.id] = event.target.value;
+    var r;
+    for(r of rows){
+      if(r.id == row.id){
+          r.status = event.target.value;  
+      }
+    }
+    setStatus(newObj);
     const response = await fetch('/applications/update', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
@@ -264,8 +271,8 @@ export default function EnhancedTable({numRows,title,data}) {
                       <TableCell align="left">
                         <FormControl className={classes.formControl}>
                           <Select
-                            value={status[page * rowsPerPage+index] == null?row.status:status[page * rowsPerPage+index]}
-                            onChange={(event) => handleChange(event, row, index)}
+                            value={status[row.id] == null?row.status:status[row.id]}
+                            onChange={(event) => handleChange(event, row)}
                             displayEmpty
                             className={classes.selectEmpty}
                             inputProps={{ 'aria-label': 'Without label' }}

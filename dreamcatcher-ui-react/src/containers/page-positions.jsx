@@ -17,8 +17,6 @@ import { AuthStateContext } from '../context/context';
 
 import '../index.scss'
 
-
-
 class PositionsPage extends Component {
   static contextType = AuthStateContext;
   state = {

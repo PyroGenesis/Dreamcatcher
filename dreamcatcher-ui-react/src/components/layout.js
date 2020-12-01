@@ -40,7 +40,6 @@ function getCounts(data){
     const dateObj = {_seconds: data.applications[i].date._seconds, _nanoseconds:data.applications[i].date._nanoseconds};
     const options = {year: "numeric", month: "numeric", day: "2-digit"};
     const datetime = firebaseDateToJSDate(dateObj, options);
-    console.log(datetime);
     var day = datetime.substring(3,5);
     var month = datetime.substring(0,2)-1;
     var year = datetime.substring(6);
