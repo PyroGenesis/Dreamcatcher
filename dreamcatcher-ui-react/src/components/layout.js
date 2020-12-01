@@ -54,13 +54,13 @@ function getCounts(data){
       countI++;
     else if(data.applications[i].status == "Coding Test")
       countC++;
-    if(data.applications[i].position.position_name == "Software Development Engineer")
+    if(data.applications[i].position.position_type == "Software Engineering")
       countS++;
-    else if(data.applications[i].position.position_name == "Full Stack Developer")
+    else if(data.applications[i].position.position_type == "Full Stack")
     countF++;
-    else if(data.applications[i].position.position_name == "Web Developer")
+    else if(data.applications[i].position.position_type == "Web")
     countW++;
-    else if(data.applications[i].position.position_name == "Machine Learning Engineer")
+    else if(data.applications[i].position.position_type == "Machine Learning")
     countML++;
   }
   return [countS, countF, countW, countI, countC, count120, dailyCounts, countML];

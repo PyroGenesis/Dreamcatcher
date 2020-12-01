@@ -15,7 +15,7 @@ class MLApplicationsPage extends Component {
   }
   
   callApi = async () => {
-    const response = await fetch('/applications?token='+this.context.token+'&position=Machine Learning Engineer');
+    const response = await fetch('/applications?token='+this.context.token+'&position=Machine Learning');
     const body = await response.json();
     if (response.status !== 200) throw Error(body.message);
     return body;

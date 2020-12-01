@@ -137,7 +137,7 @@ router.get('/', async (req, res, next) => {
     
             }
             else {
-                if (position == application.position.position_name)
+                if (application.position.position_type== position)
                 applications.push(application);
             }
             delete application.positionRef;
