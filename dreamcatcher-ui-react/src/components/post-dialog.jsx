@@ -107,6 +107,8 @@ export default function PostDialog(props) {
                     date: firebaseDate,
                     likes: 0,
                     dislikes: 0,
+                    likeArray: [],
+                    dislikeArray: []
                 }
             ).then(() => {
                 props.addPost({
@@ -118,6 +120,8 @@ export default function PostDialog(props) {
                     time: curTime,
                     likes: 0,
                     dislikes: 0,
+                    likeArray: [],
+                    dislikeArray: []
                 })
             })
 

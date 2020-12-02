@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import { grey } from '@material-ui/core/colors';
 import { makeStyles } from '@material-ui/core/styles';
 import { Typography, Grid } from "@material-ui/core";
@@ -69,14 +69,47 @@ const useStyles = makeStyles((theme) => ({
 export default function Comment(props) {
     const classes = useStyles();
 
-    const [likeColor, setLikeColor] = useState('grey');
-    const [dislikeColor, setDislikeColor] = useState('grey');
-    const [liked, setLiked] = useState(false);
-    const [disliked, setDisliked] = useState(false);
+    // console.log(props.comment)
+
+    const [likeColor, setLikeColor] = useState(props.comment.likeColor);
+    const [dislikeColor, setDislikeColor] = useState(props.comment.dislikeColor);
+    const [liked, setLiked] = useState(props.comment.liked);
+    const [disliked, setDisliked] = useState(props.comment.disliked);
     const [likes, setLikes] = useState(props.comment.likes);
     const [dislikes, setDislikes] = useState(props.comment.dislikes);
-    const [showCommentBox, setShowCommentBox] = useState(false);
 
+    // const [likeColor, setLikeColor] = useState('grey');
+    // const [dislikeColor, setDislikeColor] = useState('grey');
+    // const [liked, setLiked] = useState(false);
+    // const [disliked, setDisliked] = useState(false);
+    // const [likes, setLikes] = useState(props.comment.likes);
+    // const [dislikes, setDislikes] = useState(props.comment.dislikes);
+    
+
+    const [showCommentBox, setShowCommentBox] = useState(false);
+    
+    const [likeArray, setLikeArray] = useState(props.comment.likeArray)
+    const [dislikeArray, setDislikeArray] = useState(props.comment.dislikeArray)
+    const [firstRender, setFirstRender] = useState(true);
+
+    // useEffect(() => {
+    //     if(firstRender) {
+    //         if(props.comment.likeArray.includes(props.username) && liked !== true) {
+    //             console.log("here1")
+    //             setLiked(true);
+    //             setLikeColor("blue");
+    //         }
+        
+    //         if(props.comment.dislikeArray.includes(props.username) && disliked !== true) {
+    //             console.log("here2")
+    //             setDisliked(true);
+    //             setDislikeColor("blue");
+    //         }   
+    //         setFirstRender(false)
+    //     } ;
+    // })
+
+    
     // const nestedComments = (props.comment.children || []).map(comment => {
     //     return <Comment comment={comment} type="child" />
     // })
@@ -93,73 +126,155 @@ export default function Comment(props) {
         setShowCommentBox(showCommentBox => !showCommentBox);    
     }
 
-    const setDislike = () => {     
+    const setDislike = async() => {     
         if(dislikeColor === 'grey') {
             setDislikeColor('blue');
         }
         else {
             setDislikeColor('grey');
         }
-        setDisliked(!disliked);
+
+        const commentRef = db.collection('forums').doc(props.postId).collection('replies').doc(props.comment.id)
+
         if(disliked) {
-            // alert(props.comment.id)
 
-            const commentRef = db.collection('forums').doc(props.postId).collection('replies').doc(props.comment.id)
+            const newDislikeArray = dislikeArray.filter(e => e !== props.username)
 
-            // commentRef.update({ dislikes: dislikesCounterDecrement })
-            commentRef.set({ dislikes: dislikesCounterDecrement }, { merge: true })
-            
-            setDislikes(dislikes - 1)
-            props.comment.likes = dislikes - 1;
+            commentRef.set({ dislikes: dislikesCounterDecrement, dislikeArray: newDislikeArray }, { merge: true }).then(()=>{
+                setDislikeArray(newDislikeArray)
+
+                setDislikes(dislikes - 1);
+                props.comment.dislikes = dislikes - 1;
+                
+                props.comment.disliked = false;
+                props.comment.dislikeColor = 'grey'
+                props.comment.dislikeArray = newDislikeArray
+            })
         }
         else {
-            // alert(props.comment.id)
 
-            const commentRef = db.collection('forums').doc(props.postId).collection('replies').doc(props.comment.id)
-
-            // commentRef.update({ dislikes: dislikesCounterIncrement })
-            commentRef.set({ dislikes: dislikesCounterIncrement }, {merge: true})
+            dislikeArray.push(props.username)
             
-            setDislikes(dislikes + 1);
-            props.comment.likes = dislikes + 1;
+            commentRef.set({ dislikes: dislikesCounterIncrement, dislikeArray: dislikeArray }, {merge: true}).then(()=>{
+                setDislikeArray(dislikeArray)
+
+                setDislikes(dislikes + 1);
+                props.comment.dislikes = dislikes + 1;
+                
+                props.comment.disliked = true;
+                props.comment.dislikeColor = 'blue'  
+                props.comment.dislikeArray = dislikeArray  
+            })
         }
+        setDisliked(!disliked);
+        // console.log(disliked) 
+        // if(disliked) {
+        //     // alert(props.comment.id)
+
+        //     const commentRef = db.collection('forums').doc(props.postId).collection('replies').doc(props.comment.id)
+            
+        //     const newDislikeArray = dislikeArray.filter(e => e !== props.username)
+        //     // commentRef.update({ dislikes: dislikesCounterDecrement })
+        //     commentRef.set({ dislikes: dislikesCounterDecrement, dislikeArray: newDislikeArray }, { merge: true })
+            
+        //     setDislikes(dislikes - 1)
+        //     setDislikeArray(newDislikeArray)
+
+        //     props.comment.likes = dislikes - 1;
+        // }
+        // else {
+        //     // alert(props.comment.id)
+
+        //     const commentRef = db.collection('forums').doc(props.postId).collection('replies').doc(props.comment.id)
+
+        //     dislikeArray.push(props.username)
+            
+        //     // commentRef.update({ dislikes: dislikesCounterIncrement })
+        //     commentRef.set({ dislikes: dislikesCounterIncrement, dislikeArray: dislikeArray }, {merge: true})
+            
+        //     setDislikes(dislikes + 1);
+        //     setDislikeArray(dislikeArray)
+        //     props.comment.likes = dislikes + 1;
+        // }
+        // setDisliked(!disliked);
+        // console.log(disliked) 
     }
 
-    const setLike = () => {
+    const setLike = async() => {
         if(likeColor === 'grey') {
             setLikeColor('blue');
         }
         else {
             setLikeColor('grey');
-        }   
-        setLiked(!liked);
+        } 
+
+        const commentRef = db.collection('forums').doc(props.postId).collection('replies').doc(props.comment.id)
+
         if(liked) {
-            // alert(props.comment.id)
-            const commentRef = db.collection('forums').doc(props.postId).collection('replies').doc(props.comment.id)
 
-            //commentRef.update({ likes: likesCounterDecrement })
-            commentRef.set({ likes: likesCounterDecrement },{merge:true})
+            const newLikeArray = likeArray.filter(e => e !== props.username)
 
-            setLikes(likes - 1)
-            props.comment.likes = likes - 1;
-        }  
-        else {
-            // alert(props.comment.id)
-            const commentRef = db.collection('forums').doc(props.postId).collection('replies').doc(props.comment.id)
-
-            //commentRef.update({ likes: likesCounterIncrement })
-            commentRef.set({ likes: likesCounterIncrement }, {merge:true})
-
-            setLikes(likes + 1);
-            props.comment.likes = likes + 1;
-
+            commentRef.set({ likes: likesCounterDecrement, likeArray: newLikeArray },{merge:true}).then(()=>{
+                setLikeArray(newLikeArray)
+                setLikes(likes - 1);
+                props.comment.likes = likes - 1;
+    
+                props.comment.liked = false;
+                props.comment.likeColor = 'grey'
+                props.comment.likeArray = newLikeArray
+            })
         }
+        else {
+
+            likeArray.push(props.username)
+
+            commentRef.set({ likes: likesCounterIncrement, likeArray: likeArray }, {merge:true}).then(()=>{
+                setLikeArray(likeArray)
+                setLikes(likes + 1);
+                props.comment.likes = likes + 1;
+    
+                props.comment.liked = true;
+                props.comment.likeColor = 'blue'
+                props.comment.likeArray = likeArray
+            })
+        }  
+        setLiked(!liked);
+        // console.log(liked) 
+
+        // const commentRef = db.collection('forums').doc(props.postId).collection('replies').doc(props.comment.id)
+
+        // if(liked) {
+        //     // alert(props.comment.id)
+        //     //commentRef.update({ likes: likesCounterDecrement })
+        //     const newLikeArray = likeArray.filter(e => e !== props.username)
+
+        //     commentRef.set({ likes: likesCounterDecrement, likeArray: newLikeArray },{merge:true})
+
+        //     setLikes(likes - 1)            
+        //     setLikeArray(newLikeArray)
+
+        //     props.comment.likes = likes - 1;
+        // }  
+        // else {
+        //     // alert(props.comment.id)
+        //     //commentRef.update({ likes: likesCounterIncrement })
+        //     likeArray.push(props.username)
+
+        //     commentRef.set({ likes: likesCounterIncrement, likeArray: likeArray }, {merge:true})
+
+        //     setLikes(likes + 1);
+        //     setLikeArray(likeArray)
+        //     props.comment.likes = likes + 1;
+
+        // }
+        // setLiked(!liked);
+        // console.log(liked) 
     }
 
     const handleLike = async() => {
         
         if (disliked) {
-            setLike();
+            // setLike();
             setDislike();
         }
         setLike();
@@ -168,7 +283,7 @@ export default function Comment(props) {
     const handleDislike = async() => {
         
         if (liked) {
-          setDislike();
+          // setDislike();
           setLike();
         }
         setDislike();
@@ -221,7 +336,7 @@ export default function Comment(props) {
                             </Typography>
                         </Grid>
                         <Grid item>
-                            <ThumbUpIcon id={props.comment.id} fontSize="small" style={{color: likeColor}} className={classes.postIcons} onClick={handleLike}/>
+                            <ThumbUpIcon id={props.comment.id} fontSize="small" style={{color: likeColor}} className={classes.postIcons} onClick={()=>handleLike()}/>
                         </Grid>
                         <Grid item>        
                             <Typography variant="subtitle2" className={classes.iconText}>
@@ -229,7 +344,7 @@ export default function Comment(props) {
                             </Typography>
                         </Grid>
                         <Grid item>
-                            <ThumbDownIcon id={props.comment.id} fontSize="small" style={{color: dislikeColor}} className={classes.postIcons} onClick={handleDislike}/>
+                            <ThumbDownIcon id={props.comment.id} fontSize="small" style={{color: dislikeColor}} className={classes.postIcons} onClick={()=>handleDislike()}/>
                         </Grid>
                         <Grid item>
                             <CommentIcon id={props.comment.id} fontSize="small" className={classes.postIcons} onClick={addCommentBox}/>
