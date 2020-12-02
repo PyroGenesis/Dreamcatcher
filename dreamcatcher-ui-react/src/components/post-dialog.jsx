@@ -154,6 +154,8 @@ export default function PostDialog(props) {
                     placeholder="Enter post body here..."
                     type="text"
                     fullWidth
+                    multiline
+                    rows={3}
                     value = {postBody}
                     onChange = {e => setPostBody(e.target.value)}
                     style={{marginBottom: 20}}
