@@ -31,4 +31,31 @@ async function verifyToken(token) {
     return res;
 }
 
-module.exports = { verifyToken }
+async function getImages(keywords) {
+    const imageRef = db.collection('images')
+    let images = {}
+
+    keywords = [...new Set(keywords)];
+
+    let queryLists = []
+    for (let i=0; i<keywords.length; i += 10) {
+        queryLists.push(keywords.slice(i, i+10));
+    }
+
+    for (const qList of queryLists) {
+        const imagesSnapshot = await imageRef.where('keywords', 'array-contains-any', qList).get();
+        if (imagesSnapshot.size > 0) {
+            imagesSnapshot.forEach((img) => {
+                img.get('keywords').forEach((keyword) => {
+                    if (qList.includes(keyword)) {
+                        images[keyword] = img.get('image');
+                    }
+                });
+            });
+        }
+    }
+
+    return images
+}
+
+module.exports = { verifyToken, getImages }

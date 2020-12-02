@@ -721,7 +721,7 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
                   <div key={ex.start.unix()} style={{ display: 'flex' }}>
                     <Grid container spacing={0} wrap="nowrap" key={ex.start._seconds} className={classes.detailBox}>
                       <Grid item style={{ width: 75 }}>
-                        <Avatar variant="square" /*src={company1Pic}*/ >{ex.company.charAt(0)}</Avatar>
+                        <Avatar variant="square" src={ex.image}>{ex.company.charAt(0)}</Avatar>
                       </Grid>
                       <Grid item xs={12}>
                         <Typography variant="h6">{ex.position}</Typography>
@@ -755,7 +755,7 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
                   <div key={ed.startYear} style={{ display: 'flex' }}>
                     <Grid container spacing={0} wrap="nowrap" className={classes.detailBox} style={{ flexGrow: 1 }}>
                       <Grid item style={{ width: 75 }}>
-                        <Avatar variant="square">
+                        <Avatar variant="square" src={ed.image}>
                           {ed.university.charAt(0)}
                         </Avatar>
                       </Grid>

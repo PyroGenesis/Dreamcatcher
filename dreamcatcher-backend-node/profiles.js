@@ -5,6 +5,7 @@ const firebase = require('./firestore-init');
 const db = firebase.firestore();
 
 const verifyToken = require('./common_resources').verifyToken;
+const getImages = require('./common_resources').getImages;
 
 // These paths start from /profiles
 
@@ -102,11 +103,29 @@ async function getProfileFromUID(uid) {
     const profileSnapshot = await db.collection('users').doc(uid).collection('profile').doc('default').get();
     
     if (profileSnapshot.exists) {
+        const profileData = profileSnapshot.data();
+
+        const imageQueries = []
+        profileData.education.forEach(ed => {
+            imageQueries.push(ed.university.toLowerCase())
+        });
+        profileData.experience.forEach(ex => {
+            imageQueries.push(ex.company.toLowerCase())
+        });
+        
+        const images = await getImages(imageQueries);
+        profileData.education.forEach(ed => {
+            ed.image = images[ed.university.toLowerCase()];
+        });
+        profileData.experience.forEach(ex => {
+            ex.image = images[ex.company.toLowerCase()];
+        });
+
         return {
             status: 200,
             message: 'success',
             data: {
-                profile: profileSnapshot.data()
+                profile: profileData
             }
         };
     } else {
