@@ -7,7 +7,7 @@ import { grey } from '@material-ui/core/colors';
 import PostsTable from '../components/posts-table';
 import Fab from '@material-ui/core/Fab';
 import AddIcon from '@material-ui/icons/Add';
-import PositionsDialog from '../components/positions-dialog'
+import PostDialog from '../components/post-dialog'
 import {firebaseDateToJSDate} from "../misc/utilities"
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { useAuthState, useAuthDispatch } from '../context/context';
@@ -250,7 +250,7 @@ function ForumsPage(props) {
             </Grid>
             <Grid item xs={12}>
             {
-              dialog ? <PositionsDialog dialog={dialog} setDialog={showDialog} forumNum={forumNum} addPost={addPost}/> : null
+              dialog ? <PostDialog dialog={dialog} setDialog={showDialog} forumNum={forumNum} addPost={addPost}/> : null
             } 
             </Grid>
             <Grid item xs={12} style={{ marginLeft: '20px', marginRight: '20px'}}>
