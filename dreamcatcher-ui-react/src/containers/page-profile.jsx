@@ -150,6 +150,57 @@ class ProfilePage extends Component {
   }
 }
 
+function BioEdit({ data, open, closeFn, /*modifyFn,*/ saveFn }) {
+  const handleClose = () => {
+    closeFn();
+  };
+
+  const handleSave = () => {
+    saveFn(data);
+    handleClose();
+  }
+
+  const textFieldChanged = (e) => {
+    data[e.target.id] = e.target.value;
+    // modifyFn(e.target.id, e.target.value);
+  }
+
+  return (
+    <div>
+      <Dialog open={open} onClose={handleClose} aria-labelledby="bio-edit-dialog">
+        <DialogTitle id="bio-edit-dialog">Bio</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Edit biographical data
+          </DialogContentText>
+          <Grid container spacing={0}>
+            <Grid item xs={12} style={{ paddingLeft: 8, paddingRight: 8 }}>
+              <TextField autoFocus required margin="dense" id="headline" label="Headline" type="text"
+                defaultValue={data ? data.headline : ''} onChange={textFieldChanged} fullWidth />
+            </Grid>
+            <Grid item xs={12} style={{ paddingLeft: 8, paddingRight: 8 }}>
+              <TextField required margin="dense" id="location" label="Location" type="text"
+                defaultValue={data ? data.location : ''} onChange={textFieldChanged} fullWidth />
+            </Grid>
+            <Grid item xs={12} style={{ paddingLeft: 8, paddingRight: 8 }}>
+              <TextField required margin="dense" id="about" label="About" type="text" multiline
+                defaultValue={data ? data.about : ''} onChange={textFieldChanged} fullWidth />
+            </Grid>
+          </Grid>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleSave} color="primary">
+            Save
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </div>
+  );
+}
+
 function ExperienceEdit({ data, open, closeFn, modifyFn, saveFn }) {
   const handleClose = () => {
     closeFn();
@@ -393,13 +444,6 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
     ex.end = moment(ex.end);
   });
 
-  // useEffect(() => {
-  //   profileData.experience.map((ex) => {
-  //     ex.start = moment(firebaseDateToJSDateObj(ex.start))
-  //     ex.end = moment(firebaseDateToJSDateObj(ex.end))
-  //   });
-  // })
-
   const [about, changeAbout] = React.useState(profileData.about);
   const [education, changeEducation] = React.useState(profileData.education);
   const [experience, changeExperience] = React.useState(profileData.experience);
@@ -548,7 +592,50 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
     });
   }
 
-  console.log(experience);
+
+  // for about, headline, and location
+  const [bioEdit, toggleBioEdit] = React.useState(false);
+  const [bioData, setBioData] = React.useState(null);
+  // const [exSelected, setExSelected] = React.useState(-1);
+  const showBioEdit = () => {
+    setBioData({headline, location, about});
+    toggleBioEdit(true);
+  }
+  const closeBioEdit = () => {
+    toggleBioEdit(false);
+  }
+  // const modifyBio = (field, newData) => {
+  //   if (field === 'headline') {
+  //     changeHeadline(newData);
+  //   } else if (field === 'location') {
+  //     changeLocation(newData);
+  //   } else if (field === 'about') {
+  //     changeAbout(newData);
+  //   } else {
+  //     console.assert(false, "Invalid modification", field, newData);
+  //   }
+  // }
+  const saveBio = (newData) => {
+
+    fetch('/profiles/bio', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: accessInfo, headline: newData.headline, location: newData.location, about: newData.about })
+    }).then((res) => {
+      return res.json();
+    }).then(success => {
+      if (success.status == 200) {
+        changeHeadline(newData.headline);
+        changeLocation(newData.location);
+        changeAbout(newData.about);
+      } else {
+        console.log('API error: ', success);
+      }
+    }, error => {
+      console.log('Unknown error: ', error)
+    });
+  }
+
   return (
     // <div className="body-content profile">
     //   <h1>Profile!</h1>
@@ -571,6 +658,14 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
           saveFn={(newData) => { saveEx(newData) }}
         />
 
+        {bioData && <BioEdit
+          open={bioEdit}
+          data={bioData}
+          closeFn={closeBioEdit}
+          // modifyFn={modifyBio}
+          saveFn={saveBio}
+        />}
+
         <Grid container spacing={1} style={{ height: '100%', width: '100%', padding: 8 }}>
           <Grid item xs={12} sm={4}>
             <Card elevation={3}>
@@ -581,12 +676,19 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
                 <Typography align="center" variant="h4" style={{ paddingTop: 20 }}>
                   {fullname}
                 </Typography>
-                <Typography variant="h6" style={{ paddingTop: 20 }}>
-                  {headline}
-                </Typography>
-                <Typography align="right" variant="subtitle2" className={classes.lightGreyText}>
-                  {location}
-                </Typography>
+                <div style={{ display: 'flex' }}>
+                  <div style={{ flexGrow: 1 }}>
+                    <Typography variant="h6" style={{ paddingTop: 20 }}>
+                      {headline}
+                    </Typography>
+                    <Typography align="right" variant="subtitle2" className={classes.lightGreyText}>
+                      {location}
+                    </Typography>
+                  </div>
+                  <IconButton aria-label="edit" style={{ alignSelf: 'center' }} onClick={() => { showBioEdit() }}>
+                    <Edit />
+                  </IconButton>
+                </div>
 
                 <Divider />
                 <Typography variant="overline">

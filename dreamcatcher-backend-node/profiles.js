@@ -13,7 +13,7 @@ router.get('/test', async (req, res, next) => {
 });
 
 async function updateProfileField(field, token, data) {
-    tokenResp = await verifyToken(token);
+    const tokenResp = await verifyToken(token);
     if (tokenResp.status !== 200) {
         return tokenResp;
     }
@@ -53,6 +53,49 @@ router.post('/education', async (req, res) => {
         res.statusCode = updateResp.status;
     }
     res.json(updateResp);
+});
+
+router.post('/bio', async (req, res) => {
+    const tokenResp = await verifyToken(req.body.token);
+    if (tokenResp.status !== 200) {
+        res.statusCode = tokenResp.status;
+        res.json(tokenResp);
+        return;
+    }
+
+    if (req.body.headline == null || req.body.location == null || req.body.about == null) {
+        res.statusCode = 400;
+        res.json({
+            status: res.statusCode,
+            message: 'Missing data',
+            data: null
+        });
+        return;
+    }
+
+    const uid = tokenResp.data.uid;
+    const profileRef = db.collection('users').doc(uid).collection('profile').doc('default');
+
+    try {
+        await profileRef.update({
+            headline: req.body.headline,
+            location: req.body.location,
+            about: req.body.about
+        });
+        res.statusCode = 200;
+        res.json({
+            status: res.statusCode,
+            message: 'success',
+            data: null
+        });
+    } catch (error) {
+        res.statusCode = 500;
+        res.json({
+            status: res.statusCode,
+            message: 'unknown error',
+            data: error
+        });
+    }
 });
 
 async function getProfileFromUID(uid) {
