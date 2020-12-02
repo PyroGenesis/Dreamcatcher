@@ -46,11 +46,12 @@ async function getImages(keywords) {
         const imagesSnapshot = await imageRef.where('keywords', 'array-contains-any', qList).get();
         if (imagesSnapshot.size > 0) {
             imagesSnapshot.forEach((img) => {
-                img.get('keywords').forEach((keyword) => {
+                for (const keyword of img.get('keywords')) {
                     if (qList.includes(keyword)) {
                         images[keyword] = img.get('image');
+                        break;
                     }
-                });
+                }
             });
         }
     }
