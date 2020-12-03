@@ -66,6 +66,8 @@ export default function CommentBox(props) {
                 date: firebaseDate,
                 likes: 0,
                 dislikes: 0,
+                likeArray: [],
+                dislikeArray: []
             }
         ).then(() => {
             props.updateCommentThread(
@@ -76,7 +78,13 @@ export default function CommentBox(props) {
                     userName: props.username,
                     body: quotedBody,
                     likes: 0,
-                    dislikes: 0
+                    dislikes: 0,
+                    likeArray: [],
+                    dislikeArray: [],
+                    liked: false,
+                    disliked: false,
+                    likeColor: 'grey',
+                    dislikeColor: 'grey'
                 }
             );
         })
