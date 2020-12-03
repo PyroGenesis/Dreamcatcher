@@ -1,26 +1,41 @@
 import React, { Component, useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { AppBar, Toolbar, Button, Typography, IconButton } from "@material-ui/core";
+import { Box, AppBar, Toolbar, Button, Typography, IconButton, createMuiTheme } from "@material-ui/core";
 import { logout } from '../context/actions'
 import { makeStyles } from '@material-ui/core/styles';
 import { useAuthDispatch, useAuthState } from '../context/context';
-import {checkToken} from '../context/actions'
+import { checkToken } from '../context/actions'
 import logo from '../assets/logo.png'
 import CollapsedNavbar from './collapsed-navbar';
 
+// This function is insane: https://stackoverflow.com/a/45402026/7120031
+const toolbarRelativeProperties = (property, modifier = value => value) => theme =>
+  Object.keys(theme.mixins.toolbar).reduce((style, key) => {
+    const value = theme.mixins.toolbar[key];
+    if (key === 'minHeight') {
+      return { ...style, [property]: modifier(value) };
+    }
+    if (value.minHeight !== undefined) {
+      return { ...style, [key]: { [property]: modifier(value.minHeight) } };
+    }
+    return style;
+  }, {});
+
+// console.log('height', toolbarRelativeProperties('height',  value => value)(createMuiTheme()));
 
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
-    // position: "absolute",
-    // right: 0
   },
   logo: {
     height: theme.spacing(5),
     marginTop: theme.spacing(0.5)
   },
-  menuButton: {
-    marginRight: theme.spacing(2),
+  button: {
+    minHeight: '100%',
+    '&:hover': {
+      color: 'white'
+    }
   },
   darkBackground: {
     backgroundColor: theme.palette.primary.dark
@@ -31,7 +46,8 @@ const useStyles = makeStyles((theme) => ({
   navBar: {
     [theme.breakpoints.down("sm")]: {
       display: "none"
-    }
+    },
+    ...toolbarRelativeProperties('height',  value => value)(theme)
   }
 }));
 
@@ -41,13 +57,14 @@ export default function Navbar(props) {
   // const [tokenStatus, setTokenStatus] = useState('');
   // const [isLoading, setLoading] = useState(true);
 
-  const userDetails = useAuthState()
+  const userDetails = useAuthState();
   const dispatch = useAuthDispatch();
+  const isLoggedIn = userDetails.token ? true : false
 
 
   const handleLogout = () => {
     //setTokenStatus('');
-    logout(dispatch); 
+    logout(dispatch);
   }
 
   // useEffect(() => {
@@ -63,28 +80,30 @@ export default function Navbar(props) {
   // }
 
   return (
-    <div className={classes.root}>
-      <CollapsedNavbar/>
+    <>
+      <CollapsedNavbar />
       <AppBar position="static" elevation={0} className={classes.navBar}>
-        <Toolbar>
-            <Typography variant="h6" className={classes.title}>
-              <Button color="inherit" href="/">
-                <img src={logo} alt="Logo" className={classes.logo}/>
-              </Button>
-            </Typography>
-            <Button color="inherit" href="/">Home</Button>
-            <Button color="inherit" href="/dashboard">Dashboard</Button>
-            <Button color="inherit" href="/profile">Profile</Button>
-            <Button color="inherit" href="/positions">Positions</Button>
-            <Button color="inherit" href="/forums">Forums</Button>
-            <Button color="inherit" href="/about">About</Button>
-            { userDetails.token 
-              ? <Button color="inherit" onClick={handleLogout}>Logout</Button>
-              : null
-            }
+        <Toolbar style={{height: '100%'}} /** Note that here the height can be 100% because AppBar actually stole the height of Toolbar */>
+          <Typography variant="h6" className={classes.title}>
+            <Button color="inherit" href="/">
+              <img src={logo} alt="Logo" className={classes.logo} />
+            </Button>
+          </Typography>
+          {!isLoggedIn && <Button color="inherit" className={classes.button} href="/">Home</Button>}
+          {isLoggedIn && <>
+            <Button color="inherit" className={classes.button} href="/dashboard">Dashboard</Button>
+            <Button color="inherit" className={classes.button} href="/profile">Profile</Button>
+            <Button color="inherit" className={classes.button} href="/positions">Positions</Button>
+            <Button color="inherit" className={classes.button} href="/forums">Forums</Button>
+          </>}
+          <Button color="inherit" href="/about">About</Button>
+          {isLoggedIn
+            ? <Button color="inherit" onClick={handleLogout}>Logout</Button>
+            : null
+          }
         </Toolbar>
       </AppBar>
-    </div>
+    </>
   );
 }
 

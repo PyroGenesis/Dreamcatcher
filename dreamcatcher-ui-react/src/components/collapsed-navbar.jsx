@@ -1,7 +1,7 @@
-import React, {useState} from 'react'
+import React, { useState } from 'react'
 import { makeStyles } from '@material-ui/core/styles';
 
-import { AppBar, Toolbar, Button, Typography, IconButton } from "@material-ui/core";
+import { Box, AppBar, Toolbar, Button, Typography, IconButton } from "@material-ui/core";
 import logo from '../assets/logo.png'
 import Drawer from '@material-ui/core/Drawer';
 import HomeIcon from "@material-ui/icons/Home";
@@ -21,6 +21,10 @@ const useStyles = makeStyles((theme) => ({
             display: "none"
         },
     },
+    paper: {
+        width: 100,
+        alignItems: 'end'
+    },
     logo: {
         // height: theme.spacing(5),
         height: '5vh',
@@ -33,13 +37,14 @@ export default function CollapsedNavbar(props) {
 
     const [openDrawer, setOpenDrawer] = useState(false);
 
-    const userDetails = useAuthState()
+    const userDetails = useAuthState();
     const dispatch = useAuthDispatch();
-  
-  
+    const isLoggedIn = userDetails.token ? true : false
+
+
     const handleLogout = () => {
-      //setTokenStatus('');
-      logout(dispatch); 
+        //setTokenStatus('');
+        logout(dispatch);
     }
 
     return (
@@ -47,21 +52,24 @@ export default function CollapsedNavbar(props) {
             <AppBar position="static" elevation={0} className={classes.drawer}>
                 <Toolbar>
                     <Typography variant="h6" className={classes.title}>
-                    <Button color="inherit" href="/">
-                        <img src={logo} alt="Logo" className={classes.logo}/>
-                    </Button>
+                        <Button color="inherit" href="/">
+                            <img src={logo} alt="Logo" className={classes.logo} />
+                        </Button>
                     </Typography>
-                    <IconButton onClick={()=>{setOpenDrawer(!openDrawer)}} style={{marginLeft: 'auto'}}>
-                        <MenuIcon style={{color: "white"}}/>
+                    <IconButton onClick={() => { setOpenDrawer(!openDrawer) }} style={{ marginLeft: 'auto' }}>
+                        <MenuIcon style={{ color: "white" }} />
                     </IconButton>
-                    <Drawer anchor={'right'} open={openDrawer} onClose={()=>{setOpenDrawer(!openDrawer)}}>
-                        <Button color="inherit" href="/">Home</Button>
-                        <Button color="inherit" href="/dashboard">Dashboard</Button>
-                        <Button color="inherit" href="/profile">Profile</Button>
-                        <Button color="inherit" href="/positions">Positions</Button>
-                        <Button color="inherit" href="/forums">Forums</Button>
+                    <Drawer anchor={'right'} classes={{paper: classes.paper}}
+                     open={openDrawer} onClose={() => { setOpenDrawer(!openDrawer) }} >
+                        {!isLoggedIn && <Button color="inherit" href="/">Home</Button>}
+                        {isLoggedIn && <>
+                            <Button color="inherit" href="/dashboard">Dashboard</Button>
+                            <Button color="inherit" href="/profile">Profile</Button>
+                            <Button color="inherit" href="/positions">Positions</Button>
+                            <Button color="inherit" href="/forums">Forums</Button>
+                        </>}
                         <Button color="inherit" href="/about">About</Button>
-                        { userDetails.token 
+                        {isLoggedIn
                             ? <Button color="inherit" onClick={handleLogout}>Logout</Button>
                             : null
                         }
