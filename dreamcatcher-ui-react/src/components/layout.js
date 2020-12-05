@@ -7,10 +7,7 @@ import Typography from '@material-ui/core/Typography';
 import Calendar from '../components/calendar'
 import 'react-calendar-heatmap/dist/styles.css';
 import Paper from '@material-ui/core/Paper';
-import Checkbox from '@material-ui/core/Checkbox';
-import { green } from '@material-ui/core/colors';
-import { withStyles } from '@material-ui/core/styles';
-import { firebaseDateToJSDate } from "../misc/utilities";
+import { useAuthState } from '../context/context';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -28,48 +25,62 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-
-function getCounts(data){
-  var countS = 0, countF = 0, countW = 0, countI = 0, countC = 0,  countML = 0, count120 = 0;
-  var dailyCounts = new Array(120);
-  dailyCounts.fill(0);
-  const today = new Date();
-  if(data==null)
-    return [countS, countF, countW, countI, countC, count120, dailyCounts, countML];
-  for(var i = 0; i<data.applications.length;i++){
-    const dateObj = {_seconds: data.applications[i].date._seconds, _nanoseconds:data.applications[i].date._nanoseconds};
-    const options = {year: "numeric", month: "numeric", day: "2-digit"};
-    const datetime = firebaseDateToJSDate(dateObj, options);
-    var day = datetime.substring(3,5);
-    var month = datetime.substring(0,2)-1;
-    var year = datetime.substring(6);
-    var date = new Date(year,month,day);
-    var res = Math.abs(today - date) / 1000;
-    var days = Math.floor(res / 86400);
-    if(days<=120){
-      count120++;
-      dailyCounts[days]+=1;
-    }
-    if(data.applications[i].status == "Interview")
-      countI++;
-    else if(data.applications[i].status == "Coding Test")
-      countC++;
-    if(data.applications[i].position.position_type == "Software Engineering")
-      countS++;
-    else if(data.applications[i].position.position_type == "Full Stack")
-    countF++;
-    else if(data.applications[i].position.position_type == "Web")
-    countW++;
-    else if(data.applications[i].position.position_type == "Machine Learning")
-    countML++;
-  }
-  return [countS, countF, countW, countI, countC, count120, dailyCounts, countML];
-}
 export default function CenteredGrid(tableData) {
+
   const classes = useStyles();
   const data = tableData.tableData.data;
   const count = data == null?0:data.applications.length;
-  const counts = getCounts(data);
+  const userDetails = useAuthState();
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [countI, setCountI] = React.useState(0);
+  const [countC, setCountC] = React.useState(0);
+  const [countS,setCountS] = React.useState(0);
+  const [countW, setCountW] = React.useState(0);
+  const [countML, setCountML] = React.useState(0);
+  const [countF,setCountF] = React.useState(0);
+  const [count120, setCount120] = React.useState(0);
+  const [dailyCounts,setDailyCounts] = React.useState([]);
+  
+
+  React.useEffect(() => {
+    (async function() {
+      var response =  await fetch('/applications/data?token='+userDetails.token);
+      const body = await response.json();
+      console.log(body.data.countS);
+      setCountS(body.data.countS);
+      setCountC(body.data.countC);
+      setCountW(body.data.countW);
+      setCountF(body.data.countF);
+      setCountI(body.data.countI);
+      setCount120(body.data.count120);
+      setCountML(body.data.countML);
+      setDailyCounts(body.data.dailyCounts);
+    })();
+  })
+
+  const handleChangeStatus = (oldStatusValue,newStatusValue) => {
+    var countCoding = countC;
+    var countInterview = countI;
+    if(oldStatusValue == "Coding Test"){
+      countCoding -= 1;
+      setCountC(countCoding);
+    }
+
+    else if(oldStatusValue == "Interview"){
+      countInterview -= 1;
+      setCountI(countInterview);
+    }
+
+    if(newStatusValue == "Interview"){
+      countInterview += 1;
+      setCountI(countInterview);
+    }
+    else if(oldStatusValue == "Coding Test"){
+      countCoding += 1;
+      setCountC(countCoding);
+    }
+  }
+
   return (
     <div className={classes.root}>
       <Grid container spacing={5}
@@ -86,7 +97,7 @@ export default function CenteredGrid(tableData) {
 
           <Paper className = {classes.paper}>
             <Typography variant="h5" component="h2" style={{ flex: 1 }}>
-                  Coding Tests Received: {counts[4]}/{count} 
+                  Coding Tests Received: {countC}/{count} 
               </Typography>
               <Button href="coding-tests">View</Button>
           </Paper>
@@ -94,7 +105,7 @@ export default function CenteredGrid(tableData) {
 
           <Paper className = {classes.paper}>
             <Typography variant="h5" component="h2" style={{ flex: 1 }}>
-                  Interview Scheduled: {counts[3]}/{count}
+                  Interview Scheduled: {countI}/{count}
               </Typography>
               <Button href="interviews" >View</Button>
           </Paper>
@@ -102,7 +113,7 @@ export default function CenteredGrid(tableData) {
 
           <Paper className = {classes.paper}>
             <Typography variant="h5" component="h2" style={{ flex: 1 }}>
-                  Software Development Engineer: {counts[0]}
+                  Software Development Engineer: {countS}
               </Typography>
               <Button href="software-applications">View</Button>
           </Paper>
@@ -110,7 +121,7 @@ export default function CenteredGrid(tableData) {
 
           <Paper className = {classes.paper}>
             <Typography variant="h5" component="h2" style={{ flex: 1 }}>
-                  Full Stack Developer: {counts[1]}
+                  Full Stack Developer: {countF}
               </Typography>
               <Button href="full-stack-applications">View</Button>
           </Paper>
@@ -119,7 +130,7 @@ export default function CenteredGrid(tableData) {
 
           <Paper className = {classes.paper}>
             <Typography variant="h5" component="h2" style={{ flex: 1 }}>
-                  Web Developer: {counts[2]}
+                  Web Developer: {countW}
               </Typography>
               <Button  href="web-applications" >View</Button>
           </Paper>
@@ -128,14 +139,14 @@ export default function CenteredGrid(tableData) {
           
           <Paper className = {classes.paper}>
             <Typography variant="h5" component="h2" style={{ flex: 1 }}>
-                  Machine Learning Engineer: {counts[7]}
+                  Machine Learning Engineer: {countML}
               </Typography>
               <Button  href="ml-applications" >View</Button>
           </Paper>
 
         </Grid>
         <Grid item xs={6} justify= "center" alignContent = "center"> 
-          <h1 style={{fontFamily: "Roboto"}}> {counts[5]} applications in the past 4 months</h1>
+          <h1 style={{fontFamily: "Roboto"}}> {count120} applications in the past 4 months</h1>
           <Paper >
             <br></br>
             <Paper square style ={{display: 'inline-block', width: 20, height: 20,background: '#eeeeee', marginLeft: 5}}></Paper>
@@ -148,12 +159,12 @@ export default function CenteredGrid(tableData) {
             <span>  7-10 applications</span>
             <Paper square style ={{display: 'inline-block', width: 20, height: 20,background: '#1e6823', marginLeft: 5}}></Paper>
             <span>  {">"} 10 applications</span>
-            <Calendar countArray = {counts[6]}/> 
+            <Calendar countArray = {dailyCounts}/> 
           </Paper>
           <br></br>
           <br></br>
           <br></br>
-          <Table numRows = "5" title = "Past Applications" data = {data}/> 
+          <Table numRows = "5" title = "Past Applications" data = {data} onChangeStatus ={handleChangeStatus}/> 
         </Grid>
       </Grid> 
     </div>

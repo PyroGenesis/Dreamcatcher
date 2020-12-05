@@ -17,7 +17,6 @@ class PastApplicationsPage extends Component {
   callApi = async () => {
     const response = await fetch('/applications?token='+this.context.token);
     const body = await response.json();
-    console.log(body);
     if (response.status !== 200) throw Error(body.message);
     return body;
   };

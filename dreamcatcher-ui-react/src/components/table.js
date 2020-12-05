@@ -186,7 +186,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function EnhancedTable({numRows,title,data}) {
+export default function EnhancedTable(props) {
+  const numRows = props.numRows;
+  const title = props.title;
+  const data = props.data;
   const userDetails = useAuthState();
   const classes = useStyles();
   const [order, setOrder] = React.useState('asc');
@@ -196,7 +199,7 @@ export default function EnhancedTable({numRows,title,data}) {
   const [tableTitle] = React.useState(title);
   const[status,setStatus] = React.useState({});
   var rows = transformData(data);
-
+  
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
@@ -219,7 +222,9 @@ export default function EnhancedTable({numRows,title,data}) {
     var r;
     for(r of rows){
       if(r.id == row.id){
-          r.status = event.target.value;  
+        if(props.onChangeStatus != undefined)
+          props.onChangeStatus(r.status,event.target.value);
+        r.status = event.target.value;  
       }
     }
     setStatus(newObj);

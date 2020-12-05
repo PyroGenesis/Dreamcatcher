@@ -9,13 +9,13 @@ class DashboardPage extends Component {
   };
   componentDidMount() {
     this.callApi()
-      .then(data => this.setState({ data}))
+      .then(data => this.setState({data}))
       .catch(err => console.log(err));
       
   }
   
   callApi = async () => {
-    const response = await fetch('/applications?token='+this.context.token);
+    const response = await fetch('/applications/data?token='+this.context.token);
     const body = await response.json();
     if (response.status !== 200) throw Error(body.message);
     return body;
