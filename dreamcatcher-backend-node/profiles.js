@@ -5,6 +5,7 @@ const firebase = require('./firestore-init');
 const db = firebase.firestore();
 
 const verifyToken = require('./common_resources').verifyToken;
+const getImages = require('./common_resources').getImages;
 
 // These paths start from /profiles
 
@@ -13,7 +14,7 @@ router.get('/test', async (req, res, next) => {
 });
 
 async function updateProfileField(field, token, data) {
-    tokenResp = await verifyToken(token);
+    const tokenResp = await verifyToken(token);
     if (tokenResp.status !== 200) {
         return tokenResp;
     }
@@ -55,15 +56,76 @@ router.post('/education', async (req, res) => {
     res.json(updateResp);
 });
 
+router.post('/bio', async (req, res) => {
+    const tokenResp = await verifyToken(req.body.token);
+    if (tokenResp.status !== 200) {
+        res.statusCode = tokenResp.status;
+        res.json(tokenResp);
+        return;
+    }
+
+    if (req.body.headline == null || req.body.location == null || req.body.about == null) {
+        res.statusCode = 400;
+        res.json({
+            status: res.statusCode,
+            message: 'Missing data',
+            data: null
+        });
+        return;
+    }
+
+    const uid = tokenResp.data.uid;
+    const profileRef = db.collection('users').doc(uid).collection('profile').doc('default');
+
+    try {
+        await profileRef.update({
+            headline: req.body.headline,
+            location: req.body.location,
+            about: req.body.about
+        });
+        res.statusCode = 200;
+        res.json({
+            status: res.statusCode,
+            message: 'success',
+            data: null
+        });
+    } catch (error) {
+        res.statusCode = 500;
+        res.json({
+            status: res.statusCode,
+            message: 'unknown error',
+            data: error
+        });
+    }
+});
+
 async function getProfileFromUID(uid) {
     const profileSnapshot = await db.collection('users').doc(uid).collection('profile').doc('default').get();
     
     if (profileSnapshot.exists) {
+        const profileData = profileSnapshot.data();
+
+        const imageQueries = []
+        profileData.education.forEach(ed => {
+            imageQueries.push(ed.university.toLowerCase())
+        });
+        profileData.experience.forEach(ex => {
+            imageQueries.push(ex.company.toLowerCase())
+        });
+        
+        const images = await getImages(imageQueries);
+        profileData.education.forEach(ed => {
+            ed.image = images[ed.university.toLowerCase()];
+        });
+        profileData.experience.forEach(ex => {
+            ex.image = images[ex.company.toLowerCase()];
+        });
+
         return {
             status: 200,
             message: 'success',
             data: {
-                profile: profileSnapshot.data()
+                profile: profileData
             }
         };
     } else {

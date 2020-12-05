@@ -11,7 +11,7 @@ import CommentIcon from '@material-ui/icons/Comment';
 import { useState } from 'react';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import {firebaseDateToJSDate} from "../misc/utilities"
-
+import { useAuthState } from '../context/context';
 import {firestore} from '../components/firebase'
 import firebase from 'firebase/app';
 import "firebase/firestore";
@@ -161,6 +161,8 @@ const useStyles = makeStyles((theme) => ({
 
 function Post(props) {
 
+    const userDetails = useAuthState();
+
     const { id } = useParams();
 
     const classes = useStyles();
@@ -178,6 +180,8 @@ function Post(props) {
     const [posts, setPosts] = useState([])
     const [threads, setThreads] = useState([])
     const [username, setUsername] = useState('')
+    const [likeArray, setLikeArray] = useState([])
+    const [dislikeArray, setDislikeArray] = useState([])
 
     const likesCounterIncrement = firebase.firestore.FieldValue.increment(1);
     const dislikesCounterIncrement = firebase.firestore.FieldValue.increment(1);
@@ -191,6 +195,15 @@ function Post(props) {
         (async function() {
 
             setIsLoading(true);
+
+            const requestOptions = {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: userDetails.token })
+            }
+
+            const response = await fetch('/auth/getUsername', requestOptions)
+            const usernameObj = await response.json()
 
             const postReference = firestore.collection('forums').where("__name__", "==", id);
 
@@ -212,6 +225,22 @@ function Post(props) {
       
                 const date = datetime.substr(0, datetime.length - 10)
                 const time = datetime.substr(datetime.length-8, datetime.length)
+
+                const likeArray = doc.data().likeArray
+                const dislikeArray = doc.data().dislikeArray
+
+                setLikeArray(likeArray)
+                setDislikeArray(dislikeArray)
+
+                if(likeArray.includes(usernameObj.data.username)) {
+                    setLiked(true);
+                    setLikeColor("blue");
+                }
+
+                if(dislikeArray.includes(usernameObj.data.username)) {
+                    setDisliked(true);
+                    setDislikeColor("blue");
+                }
 
                 postsArr.push({
                     id: doc.id,
@@ -249,6 +278,24 @@ function Post(props) {
                 const date = datetime.substr(0, datetime.length - 10)
                 const time = datetime.substr(datetime.length-8, datetime.length)
 
+                const likeArray = doc.data().likeArray
+                const dislikeArray = doc.data().dislikeArray
+
+                let liked = false;
+                let disliked = false;
+                let likeColor = 'grey';
+                let dislikeColor = 'grey';
+
+                if(likeArray.includes(usernameObj.data.username) /*&& liked !== true*/) {
+                    liked = true;
+                    likeColor = 'blue';
+                }
+            
+                if(dislikeArray.includes(usernameObj.data.username) /*&& disliked !== true*/) {
+                    disliked = true;
+                    dislikeColor = 'blue';
+                }   
+
                 threadsArr.push({
                     id: doc.id,
                     date: date,
@@ -256,13 +303,20 @@ function Post(props) {
                     userName: doc.data().username,
                     body: doc.data().body,
                     likes: doc.data().likes,
-                    dislikes: doc.data().dislikes
+                    dislikes: doc.data().dislikes,
+                    likeArray: likeArray,
+                    dislikeArray: dislikeArray,
+                    liked: liked,
+                    disliked: disliked,
+                    likeColor: likeColor,
+                    dislikeColor: dislikeColor
                 })
             })
 
             setThreads(threadsArr)
 
-            setUsername(location.state.username)
+            // setUsername(location.state.username)
+            setUsername(usernameObj.data.username)
 
             setIsLoading(false)
 
@@ -276,27 +330,41 @@ function Post(props) {
         else {
             setDislikeColor('grey');
         }
+        // console.log(disliked) 
 
-        setDisliked(!disliked);
+        const commentRef = db.collection('forums').doc(id)
+
         if(disliked) {
             // alert(props.comment.id)
-            const commentRef = db.collection('forums').doc(id)
+
+            // console.log(dislikeArray)
+            const newDislikeArray = dislikeArray.filter(e => e !== username)
+            //console.log(newDislikeArray)
 
             // commentRef.update({ dislikes: dislikesCounterDecrement })
-            commentRef.set({ dislikes: dislikesCounterDecrement }, { merge: true })
-            
-            setDislikes(dislikes - 1)
+            commentRef.set({ dislikes: dislikesCounterDecrement, dislikeArray: newDislikeArray }, { merge: true }).then(()=>{
+                setDislikes(dislikes - 1)
+                setDislikeArray(newDislikeArray)
+            })
         }
         else {
             // alert(props.comment.id)
 
             const commentRef = db.collection('forums').doc(id)    
 
+            // const newDislikeArray = dislikeArray.push(username)
+            dislikeArray.push(username)
+
             //commentRef.update({ likes: likesCounterIncrement })
-            commentRef.set({ dislikes: dislikesCounterIncrement }, {merge:true})
+            commentRef.set({ dislikes: dislikesCounterIncrement, dislikeArray: dislikeArray }, {merge:true}).then(()=>{
+                setDislikes(dislikes + 1);
+                setDislikeArray(dislikeArray)
+            })
             
-            setDislikes(dislikes + 1);
+
         }
+        setDisliked(!disliked);
+        // console.log(disliked) 
     }
 
     const setLike = () => {
@@ -305,33 +373,42 @@ function Post(props) {
         }
         else {
             setLikeColor('grey');
-        }   
-        setLiked(!liked);
+        }  
+        // console.log(liked) 
+        const commentRef = db.collection('forums').doc(id)
+
         if(liked) {
             // alert(props.comment.id)
-            const commentRef = db.collection('forums').doc(id)
+
+            const newLikeArray = likeArray.filter(e => e !== username)
 
             //commentRef.update({ likes: likesCounterDecrement })
-            commentRef.set({ likes: likesCounterDecrement },{merge:true})
-
-            setLikes(likes - 1)
+            commentRef.set({ likes: likesCounterDecrement, likeArray: newLikeArray },{merge:true}).then(()=>{
+                setLikes(likes - 1)
+                setLikeArray(newLikeArray)
+            })
         }  
         else {
             // alert(props.comment.id)
-            const commentRef = db.collection('forums').doc(id)
+            // console.log(likeArray)
+            likeArray.push(username)
+            //console.log(newLikeArray)
 
             //commentRef.update({ likes: likesCounterIncrement })
-            commentRef.set({ likes: likesCounterIncrement }, {merge:true})
-
-            setLikes(likes + 1);
+            commentRef.set({ likes: likesCounterIncrement, likeArray: likeArray }, {merge:true}).then(()=>{
+                setLikes(likes + 1);
+                setLikeArray(likeArray)
+            })
 
         }    
+        setLiked(!liked);
+        // console.log(liked) 
     }
 
     const handleLike = () => {
         
         if (disliked) {
-            setLike();
+            // setLike();
             setDislike();
         }
         setLike();
@@ -340,7 +417,7 @@ function Post(props) {
     const handleDislike = () => {
         
         if (liked) {
-          setDislike();
+          // setDislike();
           setLike();
         }
         setDislike();

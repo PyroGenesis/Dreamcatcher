@@ -9,83 +9,107 @@ import { Typography } from "@material-ui/core";
 import { useAuthState } from '../context/context';
 import firebase from 'firebase/app';
 import "firebase/firestore";
-
-function getCurrentDateTime() {
-    let today = new Date()
-
-    let day = String(today.getDate()).padStart(2, '0');
-
-    let months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-    let month = months[today.getMonth()]
-
-    let year = today.getFullYear()
-
-    let amOrPm = ''
-
-    let hour = today.getHours()
-
-    hour > 12 ? amOrPm = 'PM' : amOrPm = 'AM'
-
-    if(hour > 12) {
-        hour -= 12;
-    }
-
-    const minutes = String(today.getMinutes()).padStart(2, '0')
-
-    const date = `${day} ${month}, ${year}`
-    const time = `${hour}:${minutes} ${amOrPm}`
-
-    return [date, time]
-}
-
+import InputLabel from '@material-ui/core/InputLabel';
+import MenuItem from '@material-ui/core/MenuItem';
+import Select from '@material-ui/core/Select';
+import FormHelperText from '@material-ui/core/FormHelperText';
+import FormControl from '@material-ui/core/FormControl';
 
 export default function PositionsDialog(props) {
-
-    const [postTitle, setPostTitle] = useState('')
-    const [postBody, setPostBody] = useState('')
-    const [titleError, setTitleError] = useState('')
-    const [bodyError, setBodyError] = useState('')
-
+    
     const userDetails = useAuthState();
 
-    const categories = ["Interview Experiences", "Offer Discussion", "Technical Questions", "General Discussion"]
+    const [companyName, setCompanyName] = useState('')
+    const [positionName, setPositionName] = useState('')
+    const [positionLink, setPositionLink] = useState('')
+    const [jobDescription, setJobDescription] = useState('')
+    const [positionType, setPositionType] = useState('')
+    const [positionLevel, setPositionLevel] = useState('')
+    const [positionDuration, setPositionDuration] = useState('')
+
+    const [companyNameError, setCompanyNameError] = useState('')
+    const [positionNameError, setPositionNameError] = useState('')
+    const [positionLinkError, setPositionLinkError] = useState('')
+    const [jobDescriptionError, setJobDescriptionError] = useState('')
+    const [positionTypeError, setPositionTypeError] = useState('')
+    const [positionLevelError, setPositionLevelError] = useState('')
+    const [positionDurationError, setPositionDurationError] = useState('')
 
     const validateInput = () => {
 
         let isError = false;
         
         const errors = {
-            titleError: '',
-            bodyError: '',
+            companyNameError: '',
+            positionNameError: '',
+            positionLinkError: '',
+            jobDescriptionError: '',
+            positionTypeError: '',
+            positionLevelError: '',
+            positionDurationError: ''
         };
 
-        if(postTitle.length < 5) {
+        if(companyName.length < 2) {
             isError = true;
-            errors.titleError = 'Title must be at least 5 characters long'
+            errors.companyNameError = 'Company name must be at least 2 characters long'
         }
 
-        if(postBody.length < 5) {
+        if(positionName.length < 3) {
             isError = true;
-            errors.bodyError = 'Body must be at least 5 characters long'
+            errors.positionNameError = 'Position name must be at least 3 characters long'
         }
+
+        // let urlRegex = '/(https?:\/\/[^\s]+)/g';
         
-        setTitleError(errors.titleError)
-        setBodyError(errors.bodyError)
+        if(positionLink.match(/(https?:\/\/[^\s]+)/g) === null) {
+            isError = true;
+            errors.positionLinkError = 'Position link must be a valid link'
+        }
+
+        if(jobDescription.length < 10) {
+            isError = true;
+            errors.jobDescriptionError = 'Job description must be at least 10 characters long'
+        }
+
+        if(positionType === "") {
+            isError = true;
+            errors.positionTypeError = 'Please select a valid type'
+        }
+
+        if(positionLevel === "") {
+            isError = true;
+            errors.positionLevelError = 'Please select a valid type'
+        }
+
+        if(positionDuration === "") {
+            isError = true;
+            errors.positionDurationError = 'Please select a valid type'
+        }
+
+        setCompanyNameError(errors.companyNameError)
+        setPositionNameError(errors.positionNameError)
+        setPositionLinkError(errors.positionLinkError)
+        setJobDescriptionError(errors.jobDescriptionError)
+        setPositionTypeError(errors.positionTypeError)
+        setPositionLevelError(errors.positionLevelError)
+        setPositionDurationError(errors.positionDurationError)
 
         return isError;
     }
-    
-    const submitPost = async() => {
+
+    const submitPosition = async() => {
+
+        console.log(props.searchValue)
 
         const err = validateInput()
-        
+
         if(!err) {
+
+            const position_name_array = positionName.toLowerCase().replace(/[^a-zA-Z ]/g, "").split(" ")
+
             const db = firebase.firestore();
 
-            const postRef = db.collection('forums').doc()
-            const firebaseDate = firebase.firestore.FieldValue.serverTimestamp();
-
-            const [curDate, curTime] = getCurrentDateTime()
+            const positionRef = db.collection('positions').doc()
             
             const requestOptions = {
                 method: 'POST',
@@ -96,73 +120,142 @@ export default function PositionsDialog(props) {
             const response = await fetch('/auth/getUsername', requestOptions)
             const usernameObj = await response.json()
 
-            // console.log(firebaseDate)
+            let searchKey = props.searchValue.toLowerCase().replace(/[^a-zA-Z ]/g, "").split(" ")
 
-            postRef.set(
-                {  
-                    category: categories[props.forumNum-1],
-                    username: usernameObj.data.username,
-                    body: postBody,
-                    title: postTitle,
-                    date: firebaseDate,
-                    likes: 0,
-                    dislikes: 0,
+            positionRef.set({  
+                position_type: "Software Engineering",
+                username: usernameObj.data.username,
+                company_name: companyName,
+                description: jobDescription,
+                link: positionLink,
+                position_name: positionName,
+                position_name_array: position_name_array,
+                position_type: positionType,
+                position_level: positionLevel,
+                position_duration: positionDuration
+            }).then(() => {
+                if(searchKey.some(elem => position_name_array.includes(elem))) {    
+                    props.addPosition({
+                        id: positionRef.id,
+                        username: usernameObj.data.username,
+                        companyName: companyName,
+                        desc: jobDescription,
+                        link: positionLink,
+                        positionName: positionName,
+                        positionLevel: positionLevel,
+                        positionDuration: positionDuration
+                    })
                 }
-            ).then(() => {
-                props.addPost({
-                    id: postRef.id,
-                    username: usernameObj.data.username,
-                    body: postBody,
-                    title: postTitle,
-                    date: curDate,
-                    time: curTime,
-                    likes: 0,
-                    dislikes: 0,
-                })
             })
 
-            props.setDialog()
+            props.setDialog(false)
         }
+
+        // alert("Submitted")
     }
 
     return(
-        <Dialog open={props.dialog} maxWidth={"lg"} fullWidth={true} onClose={()=>{props.setDialog()}} aria-labelledby="form-dialog-title">
+        <Dialog open={props.dialog} maxWidth={"lg"} fullWidth={true} onClose={()=>{props.setDialog(false)}} aria-labelledby="form-dialog-title">
             <DialogTitle id="form-dialog-title">Add Post</DialogTitle>
             <DialogContent>
                 <Typography variant="subtitle2">
-                    Post Title
+                    Position Name
                 </Typography>
                 <TextField
                     autoFocus
                     margin="dense"
-                    id="title"
-                    placeholder="Enter post title here..."
+                    id="positionName"
+                    placeholder="Enter position title here..."
                     type="text"
                     fullWidth
-                    value = {postTitle}
-                    onChange = {e => setPostTitle(e.target.value)}
+                    value = {positionName}
+                    onChange = {e => setPositionName(e.target.value)}
                     style={{marginBottom: 20}}
-                    error={titleError.length === 0 ? false : true}
-                    helperText={titleError}
+                    error={positionNameError.length === 0 ? false : true}
+                    helperText={positionNameError}
                 />
                 <Typography variant="subtitle2">
-                    Post Body
+                    Company Name
+                </Typography>
+                <TextField
+                    autoFocus
+                    margin="dense"
+                    id="companyName"
+                    placeholder="Enter company name here..."
+                    type="text"
+                    fullWidth
+                    value = {companyName}
+                    onChange = {e => setCompanyName(e.target.value)}
+                    style={{marginBottom: 20}}
+                    error={companyNameError.length === 0 ? false : true}
+                    helperText={companyNameError}
+                />
+                <Typography variant="subtitle2">
+                    Job Description
                 </Typography>
                 <TextField
                     margin="dense"
-                    id="body"
-                    placeholder="Enter post body here..."
+                    id="jobDescription"
+                    placeholder="Enter job description here..."
                     type="text"
                     fullWidth
-                    value = {postBody}
-                    onChange = {e => setPostBody(e.target.value)}
+                    multiline
+                    rows={3}
+                    value = {jobDescription}
+                    onChange = {e => setJobDescription(e.target.value)}
                     style={{marginBottom: 20}}
-                    error={bodyError.length === 0 ? false : true}
-                    helperText={bodyError}
+                    error={jobDescriptionError.length === 0 ? false : true}
+                    helperText={jobDescriptionError}
                 />
+                <Typography variant="subtitle2">
+                    Link to Application
+                </Typography>
+                <TextField
+                    margin="dense"
+                    id="positionLink"
+                    placeholder="Enter link to application here..."
+                    type="text"
+                    fullWidth
+                    value = {positionLink}
+                    onChange = {e => setPositionLink(e.target.value)}
+                    style={{marginBottom: 20}}
+                    error={positionLinkError.length === 0 ? false : true}
+                    helperText={positionLinkError}
+                />
+                <Typography variant="subtitle2">
+                    Position Type
+                </Typography>
+                <Select displayEmpty value={positionType} onChange={(e)=>setPositionType(e.target.value)} error={positionTypeError.length === 0 ? false : true}>
+                    <MenuItem value=""> <em>None</em> </MenuItem>
+                    <MenuItem value={'Software Engineering'}>Software Engineering</MenuItem>
+                    <MenuItem value={'Web'}>Web</MenuItem>
+                    <MenuItem value={'Machine Learning'}>Machine Learning</MenuItem>
+                    <MenuItem value={'Full Stack'}>Full Stack</MenuItem>
+                </Select>
+                <FormHelperText style={{color: 'red', marginBottom: '20px'}}> {positionTypeError} </FormHelperText>
+                <Typography variant="subtitle2">
+                    Position Level
+                </Typography>
+                <Select displayEmpty value={positionLevel} onChange={(e)=>setPositionLevel(e.target.value)} error={positionLevelError.length === 0 ? false : true}>
+                    <MenuItem value=""> <em>None</em> </MenuItem>
+                    <MenuItem value={'Entry'}>Entry</MenuItem>
+                    <MenuItem value={'Mid-level'}>Mid-level</MenuItem>
+                    <MenuItem value={'Senior'}>Senior</MenuItem>
+                </Select>
+                <FormHelperText style={{color: 'red', marginBottom: '20px'}}> {positionLevelError} </FormHelperText>
+                <Typography variant="subtitle2">
+                    Position Duration
+                </Typography>
+                <Select displayEmpty value={positionDuration} onChange={(e)=>setPositionDuration(e.target.value)} error={positionDurationError.length === 0 ? false : true}>
+                    <MenuItem value=""> <em>None</em> </MenuItem>
+                    <MenuItem value={'Full-time'}>Full-time</MenuItem>
+                    <MenuItem value={'Part-time'}>Part-time</MenuItem>
+                    <MenuItem value={'Contract'}>Contract</MenuItem>
+                </Select>
+                <FormHelperText style={{color: 'red', marginBottom: '20px'}}> {positionDurationError} </FormHelperText>
             </DialogContent>
             <DialogActions>
-                <Button color="primary" onClick={submitPost}>
+                <Button color="primary" onClick={submitPosition}>
                     Submit
                 </Button>
             </DialogActions>

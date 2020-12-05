@@ -11,11 +11,15 @@ export default function CommentTree(props) {
     const [firstRender, setFirstRender] = useState(true);
 
     const updateCommentThread = (s) => {
+        // console.log("updated")
         setLoading(true);
         updateComments([...comments, s]);
+        // setLoading(false);
+        // console.log(comments)
     }
 
     useEffect(() => {
+        // console.log("useeffect")
         if(firstRender) {
             updateComments(props.comments);
             setFirstRender(false);
@@ -35,11 +39,12 @@ export default function CommentTree(props) {
             <div>
                 { props.showCommentBox ? <CommentBox comment={comments[comments.length-1]} username={props.username} postId={props.postId} postComment={true} updateCommentThread={updateCommentThread}/> : null }
                 {
-                    comments.map((comment) => {
-                        return (
+                    comments.map((comment) => (
+                        // console.log("here1")
+                        // return (
                             <Comment key={comment.id} comment={comment} postId={props.postId} username={props.username} updateCommentThread={updateCommentThread}/> 
-                        )
-                    })   
+                        // )
+                    ))   
                 }
             </div>
         )

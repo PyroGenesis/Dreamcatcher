@@ -9,6 +9,7 @@ const db = firebase.firestore();
 const auth = require('./auth');
 const profileRoutes = require('./profiles');
 const applications = require('./applications');
+const imageRoutes = require('./images');
 // routes for testing purposes
 const testRoutes = require('./testing');
 
@@ -27,6 +28,7 @@ app.use('/tests', testRoutes);
 app.use('/applications', applications);
 app.use('/auth', auth);
 app.use('/profiles', profileRoutes);
+app.use('/images', imageRoutes);
 app.use('/', basicAPI)
 
 
