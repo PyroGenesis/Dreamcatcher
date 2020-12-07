@@ -30,20 +30,36 @@ router.post('/add', async (req, res) => {
         return;
     }
     const uid = tokenResp.data.uid;
-    const docRef = db.collection('users').doc(uid).collection('applications').doc();
+    const docRef = db.collection('users').doc(uid).collection('applications').doc(position_id);
 
     try {
-        await docRef.set({
-            date: firebase.firestore.Timestamp.fromDate(new Date()),
-            positionRef: db.collection('positions').doc(position_id),
-            status: status
+
+        docRef.get()
+        .then((docSnapshot) => {
+          if (docSnapshot.exists) {
+            res.statusCode = 200;
+            res.json({
+                status: res.statusCode,
+                message: 'Already applied to this position!!',
+                data: null
             });
-        res.statusCode = 200;
-        res.json({
-            status: res.statusCode,
-            message: 'success',
-            data: null
-        });
+            
+          } else {
+            docRef.set({
+                date: firebase.firestore.Timestamp.fromDate(new Date()),
+                positionRef: db.collection('positions').doc(position_id),
+                status: status
+            });
+            res.statusCode = 201;
+            res.json({
+                status: res.statusCode,
+                message: 'success',
+                data: null
+            }); 
+          }
+          
+      });
+        
     } catch (error) {
         res.statusCode = 400;
         res.json({
@@ -104,6 +120,83 @@ router.post('/update', async (req, res) => {
         res.json({
             status: res.statusCode,
             message: 'Invalid application ID or unknown error',
+            data: null
+        });
+    }
+});
+
+router.get('/data', async (req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    token = req.query.token;
+    const tokenResp = await verifyToken(token);
+    if (tokenResp.status !== 200) {
+        res.statusCode = tokenResp.status;
+        res.json(tokenResp);
+        return;
+    }
+    const uid = /*'5bVmAxHkjlc7iNHUNzgG8l9jHhg1'*/ tokenResp.data.uid;
+    var countS = 0, countF = 0, countW = 0, countI = 0, countC = 0,  countML = 0, count120 = 0;
+    var dailyCounts = new Array(120);
+    dailyCounts.fill(0);
+    const today = new Date();
+
+    const applicationCollection = await db.collection('users').doc(uid).collection('applications').get();
+    if (applicationCollection.size > 0) {
+        const applications = [];
+        for (appl of applicationCollection.docs) {
+            let application = appl.data();
+            application.id = appl.id;
+            application.position = (await application.positionRef.get()).data();
+            const dateObj = {_seconds: application.date._seconds, _nanoseconds:application.date._nanoseconds};
+            const options = {year: "numeric", month: "numeric", day: "2-digit"};
+            const datetime = utilities.firebaseDateToJSDate(dateObj, options);
+            // const datetime ="11/23/2020";
+            day = datetime.substring(3,5);
+            month = datetime.substring(0,2)-1;
+            year = datetime.substring(6);
+            date = new Date(year,month,day);
+            result = Math.abs(today - date) / 1000;
+            days = Math.floor(result / 86400);
+            if(days<=120){
+            count120++;
+            dailyCounts[days]+=1;
+            }
+            if(application.status == "Interview")
+                countI++;
+            else if(application.status == "Coding Test")
+                countC++;
+            if(application.position.position_type == "Software Engineering")
+                countS++;
+            else if(application.position.position_type == "Full Stack")
+                countF++;
+            else if(application.position.position_type == "Web")
+                countW++;
+            else if(application.position.position_type == "Machine Learning")
+                countML++;
+            applications.push(application);
+            delete application.positionRef;
+        }
+        res.statusCode = 200;
+        res.json({
+            status: res.statusCode,
+            message: 'success',
+            data: {
+                applications: applications,
+                countS: countS,
+                countI: countI,
+                countF: countF,
+                countW: countW,
+                countML: countML,
+                countC: countC,
+                count120: count120,
+                dailyCounts: dailyCounts
+            }
+        });
+    } else {
+        res.statusCode = 404;
+        res.json({
+            status: res.statusCode,
+            message: 'No applications found',
             data: null
         });
     }

@@ -8,6 +8,7 @@ import Calendar from '../components/calendar'
 import 'react-calendar-heatmap/dist/styles.css';
 import Paper from '@material-ui/core/Paper';
 import { useAuthState } from '../context/context';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -25,13 +26,14 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-export default function CenteredGrid(tableData) {
+export default function CenteredGrid() {
 
   const classes = useStyles();
-  const data = tableData.tableData.data;
-  const count = data == null?0:data.applications.length;
   const userDetails = useAuthState();
+  const [count,setCount] = React.useState(0);
+  const [refresh,setRefresh] = React.useState(true);
   const [isLoading, setIsLoading] = React.useState(true);
+  const [data,setData] = React.useState(null);
   const [countI, setCountI] = React.useState(0);
   const [countC, setCountC] = React.useState(0);
   const [countS,setCountS] = React.useState(0);
@@ -40,47 +42,39 @@ export default function CenteredGrid(tableData) {
   const [countF,setCountF] = React.useState(0);
   const [count120, setCount120] = React.useState(0);
   const [dailyCounts,setDailyCounts] = React.useState([]);
-  
+
 
   React.useEffect(() => {
     (async function() {
       var response =  await fetch('/applications/data?token='+userDetails.token);
       const body = await response.json();
-      console.log(body.data.countS);
-      setCountS(body.data.countS);
-      setCountC(body.data.countC);
-      setCountW(body.data.countW);
-      setCountF(body.data.countF);
-      setCountI(body.data.countI);
-      setCount120(body.data.count120);
-      setCountML(body.data.countML);
-      setDailyCounts(body.data.dailyCounts);
+      console.log(body);
+      setData(body.data);
+      setCount(body.data == null?0:body.data.applications.length);
+      setCountS(body.data == null?0:body.data.countS);
+      setCountC(body.data == null?0:body.data.countC);
+      setCountW(body.data == null?0:body.data.countW);
+      setCountF(body.data == null?0:body.data.countF);
+      setCountI(body.data == null?0:body.data.countI);
+      setCount120(body.data == null?0:body.data.count120);
+      setCountML(body.data == null?0:body.data.countML);
+      setDailyCounts(body.data == null?0:body.data.dailyCounts);
+      setIsLoading(false);
     })();
-  })
+  },[refresh])
 
-  const handleChangeStatus = (oldStatusValue,newStatusValue) => {
-    var countCoding = countC;
-    var countInterview = countI;
-    if(oldStatusValue == "Coding Test"){
-      countCoding -= 1;
-      setCountC(countCoding);
-    }
-
-    else if(oldStatusValue == "Interview"){
-      countInterview -= 1;
-      setCountI(countInterview);
-    }
-
-    if(newStatusValue == "Interview"){
-      countInterview += 1;
-      setCountI(countInterview);
-    }
-    else if(oldStatusValue == "Coding Test"){
-      countCoding += 1;
-      setCountC(countCoding);
-    }
+  const handleChangeStatus = () => {
+    setRefresh(refresh==true?false:true);
   }
 
+  if(isLoading) {
+    return (
+      <div className="body-content" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <CircularProgress size="10vw" />
+      </div>
+    );
+  }
+  else {
   return (
     <div className={classes.root}>
       <Grid container spacing={5}
@@ -169,4 +163,5 @@ export default function CenteredGrid(tableData) {
       </Grid> 
     </div>
   );
+  }
 }
