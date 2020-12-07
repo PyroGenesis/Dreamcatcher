@@ -40,6 +40,14 @@ async function updateProfileField(field, token, data) {
     }
 }
 
+router.post('/image', async (req, res) => {
+    const updateResp = await updateProfileField('image', req.body.token, req.body.image);
+    if (updateResp.status !== 200) {
+        res.statusCode = updateResp.status;
+    }
+    res.json(updateResp);
+});
+
 router.post('/experience', async (req, res) => {
     const updateResp = await updateProfileField('experience', req.body.token, req.body.experience);
     if (updateResp.status !== 200) {

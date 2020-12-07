@@ -23,12 +23,19 @@ const useStyles = makeStyles((theme) => ({
     },
     paper: {
         width: 100,
-        alignItems: 'end'
+        alignItems: 'end',
+        backgroundColor: theme.palette.primary.main
     },
     logo: {
         // height: theme.spacing(5),
         height: '5vh',
         marginTop: theme.spacing(0.5)
+    },
+    button: {
+        minWidth: '100%',
+        '&:hover': {
+            color: 'white'
+        }
     },
 }));
 
@@ -59,18 +66,20 @@ export default function CollapsedNavbar(props) {
                     <IconButton onClick={() => { setOpenDrawer(!openDrawer) }} style={{ marginLeft: 'auto' }}>
                         <MenuIcon style={{ color: "white" }} />
                     </IconButton>
-                    <Drawer anchor={'right'} classes={{paper: classes.paper}}
-                     open={openDrawer} onClose={() => { setOpenDrawer(!openDrawer) }} >
-                        {!isLoggedIn && <Button color="inherit" href="/">Home</Button>}
+                    <Drawer anchor={'right'} classes={{ paper: classes.paper }}
+                        open={openDrawer} onClose={() => { setOpenDrawer(!openDrawer) }} >
+                        {!isLoggedIn && <Button color="primary" variant="contained" disableElevation className={classes.button} href="/">Home</Button>}
                         {isLoggedIn && <>
-                            <Button color="inherit" href="/dashboard">Dashboard</Button>
-                            <Button color="inherit" href="/profile">Profile</Button>
-                            <Button color="inherit" href="/positions">Positions</Button>
-                            <Button color="inherit" href="/forums">Forums</Button>
+                            <Button color="primary" variant="contained" disableElevation className={classes.button} href="/dashboard">Dashboard</Button>
+                            <Button color="primary" variant="contained" disableElevation className={classes.button} href="/profile">Profile</Button>
+                            <Button color="primary" variant="contained" disableElevation className={classes.button} href="/positions">Positions</Button>
+                            <Button color="primary" variant="contained" disableElevation className={classes.button} href="/forums">Forums</Button>
                         </>}
-                        <Button color="inherit" href="/about">About</Button>
+                        <Button color="primary" variant="contained" disableElevation className={classes.button} href="/about">
+                            About
+                        </Button>
                         {isLoggedIn
-                            ? <Button color="inherit" onClick={handleLogout}>Logout</Button>
+                            ? <Button color="primary" variant="contained" disableElevation className={classes.button} onClick={handleLogout}>Logout</Button>
                             : null
                         }
                     </Drawer>
