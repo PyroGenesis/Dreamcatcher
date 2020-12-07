@@ -3,8 +3,8 @@ import video from '../videos/ad.mp4';
 import { Card, CardContent, Typography, withStyles } from "@material-ui/core";
 import Grid from '@material-ui/core/Grid';
 import Avatar from '@material-ui/core/Avatar';
-import user from '../images/user.png';
-import burhan from '../images/burhan.jpg';
+import defaultuser from '../assets/images/user.png';
+import burhan from '../assets/images/burhan.jpg';
 
 const styles = theme => ({
     root: {
@@ -24,7 +24,7 @@ class AboutPage extends Component {
         const devs = [{
             name: 'Anand Abhay Deshpande',
             position: 'Full Stack Engineer',
-            image: user
+            image: defaultuser
         }, {
             name: 'Burhanuddin M. Lakdawala',
             position: 'Backend Engineer and DBA',
@@ -32,7 +32,7 @@ class AboutPage extends Component {
         }, {
             name: 'Yash Kulkarni',
             position: 'Full Stack Engineer',
-            image: user
+            image: defaultuser
         }];
 
         const { theme, classes } = this.props;

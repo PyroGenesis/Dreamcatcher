@@ -18,20 +18,19 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import MenuItem from '@material-ui/core/MenuItem';
 import { Container, IconButton, ThemeProvider } from '@material-ui/core';
-import { Add, AccessAlarm, ThreeDRotation, Edit, Delete } from '@material-ui/icons';
+import { Add, AccessAlarm, ThreeDRotation, Edit, Delete, PhotoCamera } from '@material-ui/icons';
 import { DatePicker } from "@material-ui/pickers";
 import moment from 'moment';
 
+import defaultuser from '../assets/images/user.png';
 import { BurhanGlobalTheme } from "../styles/themes";
 import { firebaseDateToJSDate, firebaseDateToJSDateObj } from "../misc/utilities";
 import { grey } from '@material-ui/core/colors';
 
-import profilePic from '../assets/mock-profile/profile-icon.jpg'
-import company1Pic from '../assets/mock-profile/company1.png'
-import company2Pic from '../assets/mock-profile/company2.png'
-import uniPic from '../assets/mock-profile/university1.png'
 import { useParams, withRouter } from 'react-router-dom';
 import { useAuthState, AuthStateContext } from '../context/context';
+
+import Compress from "compress.js";
 
 const PROFILE_DATE_OPTIONS = {
   month: 'short',
@@ -450,8 +449,9 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
   const [fullname, changeFullname] = React.useState(profileData.fullname);
   const [headline, changeHeadline] = React.useState(profileData.headline);
   const [location, changeLocation] = React.useState(profileData.location);
-  // console.log(about, education, experience, fullname, headline, location);
-  // console.log(profileData)
+
+  const [image, changeImage] = React.useState(profileData.image);
+  const [profileImageHovered, toggleHover] = React.useState(false);
 
   // For education edit
   const [edEdit, toggleEdEdit] = React.useState(false);
@@ -598,7 +598,7 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
   const [bioData, setBioData] = React.useState(null);
   // const [exSelected, setExSelected] = React.useState(-1);
   const showBioEdit = () => {
-    setBioData({headline, location, about});
+    setBioData({ headline, location, about });
     toggleBioEdit(true);
   }
   const closeBioEdit = () => {
@@ -636,6 +636,34 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
     });
   }
 
+  useEffect(() => {
+    const compress = new Compress();
+    compress.attach('#profile-photo-input', {
+      maxHeight: 100,
+      maxWidth: 100,
+      resize: true,
+      size: 0.5,
+      quality: 1
+    }).then((data) => {
+      const base64Image = data[0].prefix + data[0].data;
+      fetch('/profiles/image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: accessInfo, image: base64Image })
+      }).then((res) => {
+        return res.json();
+      }).then(success => {
+        if (success.status == 200) {
+          changeImage(base64Image);
+        } else {
+          console.log('API error: ', success);
+        }
+      }, error => {
+        console.log('Unknown error: ', error)
+      });
+    });
+  });
+
   return (
     // <div className="body-content profile">
     //   <h1>Profile!</h1>
@@ -670,9 +698,19 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
           <Grid item xs={12} sm={4}>
             <Card elevation={3}>
               <CardContent style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                <div className={classes.centerContainer}>
-                  <Avatar alt="B" className={classes.largeAvatar} src={profilePic} />
-                </div>
+
+                <input accept="image/*" className={classes.input} id="profile-photo-input" type="file" style={{ display: 'none' }} />
+                <label htmlFor="profile-photo-input" className={classes.centerContainer}>
+                  <IconButton color="primary" aria-label="upload picture" component="span" className={classes.largeAvatar}
+                    onMouseOver={(e) => { toggleHover(true) }} onMouseOut={(e) => { toggleHover(false) }} >
+                    {
+                      profileImageHovered ?
+                        <PhotoCamera /> :
+                        <Avatar alt="B" className={classes.largeAvatar} src={image} />
+                    }
+                  </IconButton>
+                </label>
+
                 <Typography align="center" variant="h4" style={{ paddingTop: 20 }}>
                   {fullname}
                 </Typography>
