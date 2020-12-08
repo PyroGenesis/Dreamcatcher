@@ -664,35 +664,42 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
     });
   });
 
+
   return (
     // <div className="body-content profile">
     //   <h1>Profile!</h1>
     // </div>
     <div className="body-content">
       <ThemeProvider theme={BurhanGlobalTheme}>
-        <EducationEdit
-          open={edEdit}
-          data={edEditData}
-          closeFn={() => { closeEdEdit() }}
-          modifyFn={(newData) => { modifyEd(newData) }}
-          saveFn={(newData) => { saveEd(newData) }}
-        />
+        {
+          !isUsername && <EducationEdit
+            open={edEdit}
+            data={edEditData}
+            closeFn={() => { closeEdEdit() }}
+            modifyFn={(newData) => { modifyEd(newData) }}
+            saveFn={(newData) => { saveEd(newData) }}
+          />
+        }
 
-        <ExperienceEdit
-          open={exEdit}
-          data={exEditData}
-          closeFn={() => { closeExEdit() }}
-          modifyFn={(newData) => { modifyEx(newData) }}
-          saveFn={(newData) => { saveEx(newData) }}
-        />
+        {
+          !isUsername && <ExperienceEdit
+            open={exEdit}
+            data={exEditData}
+            closeFn={() => { closeExEdit() }}
+            modifyFn={(newData) => { modifyEx(newData) }}
+            saveFn={(newData) => { saveEx(newData) }}
+          />
+        }
 
-        {bioData && <BioEdit
-          open={bioEdit}
-          data={bioData}
-          closeFn={closeBioEdit}
-          // modifyFn={modifyBio}
-          saveFn={saveBio}
-        />}
+        {
+          !isUsername && bioData && <BioEdit
+            open={bioEdit}
+            data={bioData}
+            closeFn={closeBioEdit}
+            // modifyFn={modifyBio}
+            saveFn={saveBio}
+          />
+        }
 
         <Grid container spacing={1} style={{ height: '100%', width: '100%', padding: 8 }}>
           <Grid item xs={12} sm={4}>
@@ -704,7 +711,7 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
                   <IconButton color="primary" aria-label="upload picture" component="span" className={classes.largeAvatar}
                     onMouseOver={(e) => { toggleHover(true) }} onMouseOut={(e) => { toggleHover(false) }} >
                     {
-                      profileImageHovered ?
+                      !isUsername && profileImageHovered ?
                         <PhotoCamera /> :
                         <Avatar alt="B" className={classes.largeAvatar} src={image} />
                     }
@@ -723,9 +730,11 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
                       {location}
                     </Typography>
                   </div>
-                  <IconButton aria-label="edit" style={{ alignSelf: 'center' }} onClick={() => { showBioEdit() }}>
-                    <Edit />
-                  </IconButton>
+                  {
+                    !isUsername && <IconButton aria-label="edit" style={{ alignSelf: 'center' }} onClick={() => { showBioEdit() }}>
+                      <Edit />
+                    </IconButton>
+                  }
                 </div>
 
                 <Divider />
@@ -750,9 +759,11 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
                   <Typography variant="overline" style={{ flexGrow: 1 }}>
                     Experience
                   </Typography>
-                  <IconButton aria-label="add" style={{ alignSelf: 'start' }} onClick={() => { showExEdit(null, -1) }}>
-                    <Add />
-                  </IconButton>
+                  {
+                    !isUsername && <IconButton aria-label="add" style={{ alignSelf: 'start' }} onClick={() => { showExEdit(null, -1) }}>
+                      <Add />
+                    </IconButton>
+                  }
                 </div>
 
                 {experience.map((ex, exIdx) => (
@@ -771,12 +782,16 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
                         <Typography>{ex.description}</Typography>
                       </Grid>
                     </Grid>
-                    <IconButton aria-label="edit" edge="end" style={{ alignSelf: 'start' }} onClick={() => { showExEdit(ex, exIdx) }}>
-                      <Edit />
-                    </IconButton>
-                    <IconButton aria-label="delete" edge="end" style={{ alignSelf: 'start' }} onClick={() => { deleteEx(exIdx) }}>
-                      <Delete />
-                    </IconButton>
+                    {
+                      !isUsername && <>
+                        <IconButton aria-label="edit" edge="end" style={{ alignSelf: 'start' }} onClick={() => { showExEdit(ex, exIdx) }}>
+                          <Edit />
+                        </IconButton>
+                        <IconButton aria-label="delete" edge="end" style={{ alignSelf: 'start' }} onClick={() => { deleteEx(exIdx) }}>
+                          <Delete />
+                        </IconButton>
+                      </>
+                    }
                   </div>
                 ))}
 
@@ -784,9 +799,11 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
                   <Typography variant="overline" style={{ flexGrow: 1 }}>
                     Education
                   </Typography>
-                  <IconButton aria-label="add" style={{ alignSelf: 'start' }} onClick={() => { showEdit(null, -1) }}>
-                    <Add />
-                  </IconButton>
+                  {
+                    !isUsername && <IconButton aria-label="add" style={{ alignSelf: 'start' }} onClick={() => { showEdit(null, -1) }}>
+                      <Add />
+                    </IconButton>
+                  }
                 </div>
 
                 {education.map((ed, edIdx) => (
@@ -803,12 +820,16 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
                         <Typography variant="subtitle2" className={classes.lightGreyText}>{ed.startYear} - {ed.endYear}</Typography>
                       </Grid>
                     </Grid>
-                    <IconButton aria-label="edit" edge="end" style={{ alignSelf: 'start' }} onClick={() => { showEdit(ed, edIdx) }}>
-                      <Edit />
-                    </IconButton>
-                    <IconButton aria-label="delete" edge="end" style={{ alignSelf: 'start' }} onClick={() => { deleteEd(edIdx) }}>
-                      <Delete />
-                    </IconButton>
+                    {
+                      !isUsername && <>
+                        <IconButton aria-label="edit" edge="end" style={{ alignSelf: 'start' }} onClick={() => { showEdit(ed, edIdx) }}>
+                          <Edit />
+                        </IconButton>
+                        <IconButton aria-label="delete" edge="end" style={{ alignSelf: 'start' }} onClick={() => { deleteEd(edIdx) }}>
+                          <Delete />
+                        </IconButton>
+                      </>
+                    }
                   </div>
                 ))}
 
