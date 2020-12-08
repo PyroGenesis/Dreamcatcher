@@ -34,12 +34,17 @@ const useStyles = makeStyles((theme) => ({
     button: {
         minWidth: '100%',
         '&:hover': {
-            color: 'white'
+            color: theme.palette.common.white,
+            backgroundColor: theme.palette.primary.dark
         }
+    },
+    highlightedButton: {
+        backgroundColor: theme.palette.secondary.dark
     },
 }));
 
 export default function CollapsedNavbar(props) {
+    const { selectedPage } = props;
     const classes = useStyles();
 
     const [openDrawer, setOpenDrawer] = useState(false);
@@ -70,12 +75,12 @@ export default function CollapsedNavbar(props) {
                         open={openDrawer} onClose={() => { setOpenDrawer(!openDrawer) }} >
                         {!isLoggedIn && <Button color="primary" variant="contained" disableElevation className={classes.button} href="/">Home</Button>}
                         {isLoggedIn && <>
-                            <Button color="primary" variant="contained" disableElevation className={classes.button} href="/dashboard">Dashboard</Button>
-                            <Button color="primary" variant="contained" disableElevation className={classes.button} href="/profile">Profile</Button>
-                            <Button color="primary" variant="contained" disableElevation className={classes.button} href="/positions">Positions</Button>
-                            <Button color="primary" variant="contained" disableElevation className={classes.button} href="/forums">Forums</Button>
+                            <Button color="primary" variant="contained" disableElevation className={classes.button + (selectedPage === 1 ? ` ${classes.highlightedButton}` : '')} href="/dashboard">Dashboard</Button>
+                            <Button color="primary" variant="contained" disableElevation className={classes.button + (selectedPage === 2 ? ` ${classes.highlightedButton}` : '')} href="/profile">Profile</Button>
+                            <Button color="primary" variant="contained" disableElevation className={classes.button + (selectedPage === 3 ? ` ${classes.highlightedButton}` : '')} href="/positions">Positions</Button>
+                            <Button color="primary" variant="contained" disableElevation className={classes.button + (selectedPage === 4 ? ` ${classes.highlightedButton}` : '')} href="/forums">Forums</Button>
                         </>}
-                        <Button color="primary" variant="contained" disableElevation className={classes.button} href="/about">
+                        <Button color="primary" variant="contained" disableElevation className={classes.button + (selectedPage === 5 ? ` ${classes.highlightedButton}` : '')} href="/about">
                             About
                         </Button>
                         {isLoggedIn
