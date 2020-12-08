@@ -22,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
         },
     },
     paper: {
-        width: 100,
+        width: 120,
         alignItems: 'end',
         backgroundColor: theme.palette.primary.main
     },

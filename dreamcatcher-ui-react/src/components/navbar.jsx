@@ -96,9 +96,9 @@ export default function Navbar(props) {
             <Button color="inherit" className={classes.button} href="/positions">Positions</Button>
             <Button color="inherit" className={classes.button} href="/forums">Forums</Button>
           </>}
-          <Button color="inherit" href="/about">About</Button>
+          <Button color="inherit" className={classes.button} href="/about">About</Button>
           {isLoggedIn
-            ? <Button color="inherit" onClick={handleLogout}>Logout</Button>
+            ? <Button color="inherit" className={classes.button} onClick={handleLogout}>Logout</Button>
             : null
           }
         </Toolbar>
