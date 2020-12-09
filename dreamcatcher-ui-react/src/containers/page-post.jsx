@@ -259,7 +259,7 @@ function Post(props) {
 
             setPosts(postsArr)
 
-            const repliesReference = firestore.collection('forums').doc(id).collection('replies');
+            const repliesReference = firestore.collection('forums').doc(id).collection('replies').orderBy("date", "desc");
 
             const repliesData = await repliesReference.get();
 
