@@ -9,6 +9,7 @@ import 'react-calendar-heatmap/dist/styles.css';
 import Paper from '@material-ui/core/Paper';
 import { useAuthState } from '../context/context';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import DashBoardTable from '../components/dashboardTable';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -157,7 +158,7 @@ export default function CenteredGrid() {
           <br></br>
           <br></br>
           <br></br>
-          <Table numRows = "5" title = "Past Applications" data = {data} onChangeStatus ={handleChangeStatus}/> 
+          <DashBoardTable numRows = "5" title = "Past Applications" data = {data} onChangeStatus ={handleChangeStatus}/> 
         </Grid>
       </Grid> 
     </div>
