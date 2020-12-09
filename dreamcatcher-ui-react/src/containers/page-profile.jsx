@@ -476,13 +476,8 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
     // console.log(newData);
     // return;
     let edCopy = education.slice();
-    if (edSelected === -1) {
-      edCopy.push(newData);
-    } else {
-      edCopy[edSelected] = newData;
-    }
-    edCopy.sort((a, b) => b.startYear - a.startYear);
-    console.log(edCopy, edSelected);
+    console.log(JSON.stringify({ queries: [newData.university] }));
+
 
     fetch('/profiles/education', {
       method: 'POST',
@@ -491,8 +486,25 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
     }).then((res) => {
       return res.json();
     }).then(success => {
-      if (success.status == 200) {
-        changeEducation(edCopy);
+      if (success.status === 200) {
+
+        // get the image for the changed education
+        fetch('/images', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ queries: [newData.university.toLowerCase()] })
+        }).then(res => res.json()).then(resp => {
+          if (resp.status === 200) {
+            newData.image = resp.data[newData.university.toLowerCase()]
+            if (edSelected === -1) {
+              edCopy.push(newData);
+            } else {
+              edCopy[edSelected] = newData;
+            }
+            edCopy.sort((a, b) => b.startYear - a.startYear);
+          }
+          changeEducation(edCopy);
+        });
       } else {
         console.log('API error: ', success);
       }
@@ -540,19 +552,8 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
     setExEditData({ ...exEditData, ...newData });
   }
   const saveEx = (newData) => {
-    // console.log(newData);
-    // return;
-    // newData.start = newData.start.toDate();
-    // newData.end = newData.end.toDate();
 
     let exCopy = experience.slice();
-    if (exSelected === -1) {
-      exCopy.push(newData);
-    } else {
-      exCopy[exSelected] = newData;
-    }
-    exCopy.sort((a, b) => b.start - a.start);
-    console.log(exCopy, exSelected);
 
     fetch('/profiles/experience', {
       method: 'POST',
@@ -562,7 +563,25 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
       return res.json();
     }).then(success => {
       if (success.status == 200) {
-        changeExperience(exCopy);
+        
+        // get the image for the changed education
+        fetch('/images', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ queries: [newData.company.toLowerCase()] })
+        }).then(res => res.json()).then(resp => {
+          if (resp.status === 200) {
+            newData.image = resp.data[newData.company.toLowerCase()]
+            if (exSelected === -1) {
+              exCopy.push(newData);
+            } else {
+              exCopy[exSelected] = newData;
+            }
+            exCopy.sort((a, b) => b.start - a.start);
+          }
+          changeExperience(exCopy);
+        });
+        
       } else {
         console.log('API error: ', success);
       }
