@@ -27,7 +27,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function CenteredGrid() {
-
   const classes = useStyles();
   const userDetails = useAuthState();
   const [count,setCount] = React.useState(0);
@@ -41,7 +40,7 @@ export default function CenteredGrid() {
   const [countML, setCountML] = React.useState(0);
   const [countF,setCountF] = React.useState(0);
   const [count120, setCount120] = React.useState(0);
-  const [dailyCounts,setDailyCounts] = React.useState([]);
+  const [dailyCounts,setDailyCounts] = React.useState(new Array(120).fill(0));
 
 
   React.useEffect(() => {
@@ -58,7 +57,7 @@ export default function CenteredGrid() {
       setCountI(body.data == null?0:body.data.countI);
       setCount120(body.data == null?0:body.data.count120);
       setCountML(body.data == null?0:body.data.countML);
-      setDailyCounts(body.data == null?0:body.data.dailyCounts);
+      setDailyCounts(body.data == null?new Array(120).fill(0):body.data.dailyCounts);
       setIsLoading(false);
     })();
   },[refresh])
