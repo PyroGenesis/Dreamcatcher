@@ -11,25 +11,14 @@ const getImages = require('./common_resources').getImages;
 
 
 router.post('/', async (req, res) => {
-    // tokenResp = await verifyToken(req.body.token);
-    // if (tokenResp.status !== 200) {
-    //     res.statusCode = tokenResp.status;
-    //     res.json(tokenResp);
-    //     return;
-    // }
-    const docIds = req.body.docIds;
-    const images = await getImages(docIds);
+    const queries = req.body.queries;
+    const images = await getImages(queries);
 
     res.json({
         status: 200,
         message: 'success',
         data: images
     })
-
-    // const uid = tokenResp.data.uid;
-    // const profileResp = await getProfileFromUID(uid);
-    // res.statusCode = profileResp.status;
-    // res.json(profileResp);
 });
 
 
