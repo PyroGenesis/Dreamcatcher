@@ -476,13 +476,8 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
     // console.log(newData);
     // return;
     let edCopy = education.slice();
-    if (edSelected === -1) {
-      edCopy.push(newData);
-    } else {
-      edCopy[edSelected] = newData;
-    }
-    edCopy.sort((a, b) => b.startYear - a.startYear);
-    console.log(edCopy, edSelected);
+    console.log(JSON.stringify({ queries: [newData.university] }));
+
 
     fetch('/profiles/education', {
       method: 'POST',
@@ -491,8 +486,25 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
     }).then((res) => {
       return res.json();
     }).then(success => {
-      if (success.status == 200) {
-        changeEducation(edCopy);
+      if (success.status === 200) {
+
+        // get the image for the changed education
+        fetch('/images', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ queries: [newData.university.toLowerCase()] })
+        }).then(res => res.json()).then(resp => {
+          if (resp.status === 200) {
+            newData.image = resp.data[newData.university.toLowerCase()]
+            if (edSelected === -1) {
+              edCopy.push(newData);
+            } else {
+              edCopy[edSelected] = newData;
+            }
+            edCopy.sort((a, b) => b.startYear - a.startYear);
+          }
+          changeEducation(edCopy);
+        });
       } else {
         console.log('API error: ', success);
       }
@@ -540,19 +552,8 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
     setExEditData({ ...exEditData, ...newData });
   }
   const saveEx = (newData) => {
-    // console.log(newData);
-    // return;
-    // newData.start = newData.start.toDate();
-    // newData.end = newData.end.toDate();
 
     let exCopy = experience.slice();
-    if (exSelected === -1) {
-      exCopy.push(newData);
-    } else {
-      exCopy[exSelected] = newData;
-    }
-    exCopy.sort((a, b) => b.start - a.start);
-    console.log(exCopy, exSelected);
 
     fetch('/profiles/experience', {
       method: 'POST',
@@ -562,7 +563,25 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
       return res.json();
     }).then(success => {
       if (success.status == 200) {
-        changeExperience(exCopy);
+        
+        // get the image for the changed education
+        fetch('/images', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ queries: [newData.company.toLowerCase()] })
+        }).then(res => res.json()).then(resp => {
+          if (resp.status === 200) {
+            newData.image = resp.data[newData.company.toLowerCase()]
+            if (exSelected === -1) {
+              exCopy.push(newData);
+            } else {
+              exCopy[exSelected] = newData;
+            }
+            exCopy.sort((a, b) => b.start - a.start);
+          }
+          changeExperience(exCopy);
+        });
+        
       } else {
         console.log('API error: ', success);
       }
@@ -664,35 +683,42 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
     });
   });
 
+
   return (
     // <div className="body-content profile">
     //   <h1>Profile!</h1>
     // </div>
     <div className="body-content">
       <ThemeProvider theme={BurhanGlobalTheme}>
-        <EducationEdit
-          open={edEdit}
-          data={edEditData}
-          closeFn={() => { closeEdEdit() }}
-          modifyFn={(newData) => { modifyEd(newData) }}
-          saveFn={(newData) => { saveEd(newData) }}
-        />
+        {
+          !isUsername && <EducationEdit
+            open={edEdit}
+            data={edEditData}
+            closeFn={() => { closeEdEdit() }}
+            modifyFn={(newData) => { modifyEd(newData) }}
+            saveFn={(newData) => { saveEd(newData) }}
+          />
+        }
 
-        <ExperienceEdit
-          open={exEdit}
-          data={exEditData}
-          closeFn={() => { closeExEdit() }}
-          modifyFn={(newData) => { modifyEx(newData) }}
-          saveFn={(newData) => { saveEx(newData) }}
-        />
+        {
+          !isUsername && <ExperienceEdit
+            open={exEdit}
+            data={exEditData}
+            closeFn={() => { closeExEdit() }}
+            modifyFn={(newData) => { modifyEx(newData) }}
+            saveFn={(newData) => { saveEx(newData) }}
+          />
+        }
 
-        {bioData && <BioEdit
-          open={bioEdit}
-          data={bioData}
-          closeFn={closeBioEdit}
-          // modifyFn={modifyBio}
-          saveFn={saveBio}
-        />}
+        {
+          !isUsername && bioData && <BioEdit
+            open={bioEdit}
+            data={bioData}
+            closeFn={closeBioEdit}
+            // modifyFn={modifyBio}
+            saveFn={saveBio}
+          />
+        }
 
         <Grid container spacing={1} style={{ height: '100%', width: '100%', padding: 8 }}>
           <Grid item xs={12} sm={4}>
@@ -704,7 +730,7 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
                   <IconButton color="primary" aria-label="upload picture" component="span" className={classes.largeAvatar}
                     onMouseOver={(e) => { toggleHover(true) }} onMouseOut={(e) => { toggleHover(false) }} >
                     {
-                      profileImageHovered ?
+                      !isUsername && profileImageHovered ?
                         <PhotoCamera /> :
                         <Avatar alt="B" className={classes.largeAvatar} src={image} />
                     }
@@ -723,9 +749,11 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
                       {location}
                     </Typography>
                   </div>
-                  <IconButton aria-label="edit" style={{ alignSelf: 'center' }} onClick={() => { showBioEdit() }}>
-                    <Edit />
-                  </IconButton>
+                  {
+                    !isUsername && <IconButton aria-label="edit" style={{ alignSelf: 'center' }} onClick={() => { showBioEdit() }}>
+                      <Edit />
+                    </IconButton>
+                  }
                 </div>
 
                 <Divider />
@@ -750,9 +778,11 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
                   <Typography variant="overline" style={{ flexGrow: 1 }}>
                     Experience
                   </Typography>
-                  <IconButton aria-label="add" style={{ alignSelf: 'start' }} onClick={() => { showExEdit(null, -1) }}>
-                    <Add />
-                  </IconButton>
+                  {
+                    !isUsername && <IconButton aria-label="add" style={{ alignSelf: 'start' }} onClick={() => { showExEdit(null, -1) }}>
+                      <Add />
+                    </IconButton>
+                  }
                 </div>
 
                 {experience.map((ex, exIdx) => (
@@ -771,12 +801,16 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
                         <Typography>{ex.description}</Typography>
                       </Grid>
                     </Grid>
-                    <IconButton aria-label="edit" edge="end" style={{ alignSelf: 'start' }} onClick={() => { showExEdit(ex, exIdx) }}>
-                      <Edit />
-                    </IconButton>
-                    <IconButton aria-label="delete" edge="end" style={{ alignSelf: 'start' }} onClick={() => { deleteEx(exIdx) }}>
-                      <Delete />
-                    </IconButton>
+                    {
+                      !isUsername && <>
+                        <IconButton aria-label="edit" edge="end" style={{ alignSelf: 'start' }} onClick={() => { showExEdit(ex, exIdx) }}>
+                          <Edit />
+                        </IconButton>
+                        <IconButton aria-label="delete" edge="end" style={{ alignSelf: 'start' }} onClick={() => { deleteEx(exIdx) }}>
+                          <Delete />
+                        </IconButton>
+                      </>
+                    }
                   </div>
                 ))}
 
@@ -784,9 +818,11 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
                   <Typography variant="overline" style={{ flexGrow: 1 }}>
                     Education
                   </Typography>
-                  <IconButton aria-label="add" style={{ alignSelf: 'start' }} onClick={() => { showEdit(null, -1) }}>
-                    <Add />
-                  </IconButton>
+                  {
+                    !isUsername && <IconButton aria-label="add" style={{ alignSelf: 'start' }} onClick={() => { showEdit(null, -1) }}>
+                      <Add />
+                    </IconButton>
+                  }
                 </div>
 
                 {education.map((ed, edIdx) => (
@@ -803,12 +839,16 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
                         <Typography variant="subtitle2" className={classes.lightGreyText}>{ed.startYear} - {ed.endYear}</Typography>
                       </Grid>
                     </Grid>
-                    <IconButton aria-label="edit" edge="end" style={{ alignSelf: 'start' }} onClick={() => { showEdit(ed, edIdx) }}>
-                      <Edit />
-                    </IconButton>
-                    <IconButton aria-label="delete" edge="end" style={{ alignSelf: 'start' }} onClick={() => { deleteEd(edIdx) }}>
-                      <Delete />
-                    </IconButton>
+                    {
+                      !isUsername && <>
+                        <IconButton aria-label="edit" edge="end" style={{ alignSelf: 'start' }} onClick={() => { showEdit(ed, edIdx) }}>
+                          <Edit />
+                        </IconButton>
+                        <IconButton aria-label="delete" edge="end" style={{ alignSelf: 'start' }} onClick={() => { deleteEd(edIdx) }}>
+                          <Delete />
+                        </IconButton>
+                      </>
+                    }
                   </div>
                 ))}
 

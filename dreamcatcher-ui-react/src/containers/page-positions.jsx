@@ -7,7 +7,7 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Grid from '@material-ui/core/Grid';
-import { Card, CardContent, Box } from "@material-ui/core";
+import { Card, CardContent, Box, Avatar } from "@material-ui/core";
 import positions from "./page-positions-data";
 import {firestore} from "../components/firebase"
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -35,15 +35,33 @@ const myPromise = new Promise(function(resolve, reject) {
 
     const observer = query.onSnapshot(querySnapshot => {
       querySnapshot.docChanges().forEach(change => {
+
+        // const imgData = await (await fetch('/images', {
+        //   method: 'POST',
+        //   headers: { 'Content-Type': 'application/json' },
+        //   body: JSON.stringify({ queries: [change.doc.data().company_name] })
+        // })).json();
+
+        fetch('/images', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ queries: [change.doc.data().company_name.toLowerCase()] })
+        }).then(res => {
+          return res.json();
+        }).then(imgData => {
+
+          const position = {
+            companyName: change.doc.data().company_name,
+            desc: change.doc.data().description,
+            link: change.doc.data().link,
+            positionName: change.doc.data().position_name,
+            image: imgData.data[change.doc.data().company_name.toLowerCase()]
+          }
+          
+          defaultPositions.push(position)
+        });
         
-        const position = {
-          companyName: change.doc.data().company_name,
-          desc: change.doc.data().description,
-          link: change.doc.data().link,
-          positionName: change.doc.data().position_name
-        }
         
-        defaultPositions.push(position)
       })
     })
   
@@ -81,6 +99,14 @@ class PositionsPage extends Component {
       return;
     }  
     
+    const imgQ = data.docs.map(d => d.data().company_name.toLowerCase());
+
+    const imgData = await (await fetch('/images', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ queries: imgQ })
+    })).json();
+
     let positions = []
 
     data.forEach(doc => {
@@ -90,7 +116,8 @@ class PositionsPage extends Component {
         positionName: doc.data().position_name,
         companyName: doc.data().company_name,
         desc: doc.data().description,
-        link: doc.data().link
+        link: doc.data().link,
+        image: imgData.data[doc.data().company_name.toLowerCase()]
       })
     });
 
@@ -118,6 +145,14 @@ class PositionsPage extends Component {
       return;
     }  
     
+    const imgQ = data.docs.map(d => d.data().company_name.toLowerCase());
+
+    const imgData = await (await fetch('/images', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ queries: imgQ })
+    })).json();
+    
     let positions = []
 
     data.forEach(doc => {
@@ -126,7 +161,8 @@ class PositionsPage extends Component {
         positionName: doc.data().position_name,
         companyName: doc.data().company_name,
         desc: doc.data().description,
-        link: doc.data().link
+        link: doc.data().link,
+        image: imgData.data[doc.data().company_name.toLowerCase()]
       })
     });
 
@@ -271,6 +307,9 @@ class PositionsPage extends Component {
                       <TableBody>
                         {this.state.positions.map((position) => (
                           <TableRow key={position.id}>
+                            <TableCell>
+                              <Avatar variant="square" src={position.image}>{position.companyName.charAt(0)}</Avatar>
+                            </TableCell>
                             <TableCell onClick={()=>this.setState({ position: position })}>
                               <p style={{fontSize: "20px"}}> {position.positionName} </p> 
                               <p style={{color: "grey"}}> {position.companyName} </p>
