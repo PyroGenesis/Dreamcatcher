@@ -63,7 +63,7 @@ function stableSort(array, comparator) {
 }
 
 const headCells = [
-  { id: 'companyName', numeric: false, disablePadding: true, label: 'Company Name' },
+  { id: 'companyName', numeric: false, disablePadding: true, label: 'Company' },
   { id: 'position', numeric: false, disablePadding: false, label: 'Position' },
   { id: 'date', numeric: false, disablePadding: false, label: 'Date' },
   { id: 'url', numeric: false, disablePadding: false, label: 'URL' },

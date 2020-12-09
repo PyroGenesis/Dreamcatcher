@@ -80,7 +80,7 @@ export default function CenteredGrid() {
       justify="center">
         <Grid item xs={4}> 
           <Paper className = {classes.paper}>
-            <Typography variant="h5" component="h2"  href="past-applications" style={{ flex: 1 }}>
+            <Typography  component="p"  href="past-applications" style={{ flex: 1, fontSize:20 }}>
                   Total Applications: {count}        
               </Typography>
               <Button href ="past-applications">View</Button>
@@ -89,7 +89,7 @@ export default function CenteredGrid() {
           <br></br><br></br>
 
           <Paper className = {classes.paper}>
-            <Typography variant="h5" component="h2" style={{ flex: 1 }}>
+            <Typography component="p" style={{ flex: 1, fontSize:20}}>
                   Coding Tests Received: {countC}/{count} 
               </Typography>
               <Button href="coding-tests">View</Button>
@@ -97,7 +97,7 @@ export default function CenteredGrid() {
           <br></br><br></br>
 
           <Paper className = {classes.paper}>
-            <Typography variant="h5" component="h2" style={{ flex: 1 }}>
+            <Typography component="p"style={{ flex: 1, fontSize:20 }}>
                   Interview Scheduled: {countI}/{count}
               </Typography>
               <Button href="interviews" >View</Button>
@@ -105,7 +105,7 @@ export default function CenteredGrid() {
           <br></br><br></br>
 
           <Paper className = {classes.paper}>
-            <Typography variant="h5" component="h2" style={{ flex: 1 }}>
+            <Typography component="p" style={{ flex: 1, fontSize:20 }}>
                   Software Development Engineer: {countS}
               </Typography>
               <Button href="software-applications">View</Button>
@@ -113,7 +113,7 @@ export default function CenteredGrid() {
           <br></br><br></br>
 
           <Paper className = {classes.paper}>
-            <Typography variant="h5" component="h2" style={{ flex: 1 }}>
+            <Typography component="p" style={{ flex: 1, fontSize:20 }}>
                   Full Stack Developer: {countF}
               </Typography>
               <Button href="full-stack-applications">View</Button>
@@ -122,7 +122,7 @@ export default function CenteredGrid() {
           <br></br><br></br>
 
           <Paper className = {classes.paper}>
-            <Typography variant="h5" component="h2" style={{ flex: 1 }}>
+            <Typography component="p" style={{ flex: 1, fontSize:20 }}>
                   Web Developer: {countW}
               </Typography>
               <Button  href="web-applications" >View</Button>
@@ -131,7 +131,7 @@ export default function CenteredGrid() {
           <br></br><br></br>
           
           <Paper className = {classes.paper}>
-            <Typography variant="h5" component="h2" style={{ flex: 1 }}>
+            <Typography component="p" style={{ flex: 1, fontSize:20 }}>
                   Machine Learning Engineer: {countML}
               </Typography>
               <Button  href="ml-applications" >View</Button>
@@ -139,7 +139,7 @@ export default function CenteredGrid() {
 
         </Grid>
         <Grid item xs={6} justify= "center" alignContent = "center"> 
-          <h1 style={{fontFamily: "Roboto"}}> {count120} applications in the past 4 months</h1>
+          <h3 style={{fontFamily: "Roboto"}}> {count120} applications in the past 4 months</h3>
           <Paper >
             <br></br>
             <Paper square style ={{display: 'inline-block', width: 20, height: 20,background: '#eeeeee', marginLeft: 5}}></Paper>
