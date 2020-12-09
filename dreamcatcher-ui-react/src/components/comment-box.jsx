@@ -6,6 +6,8 @@ import TextField from '@material-ui/core/TextField';
 import Timeline from "@material-ui/lab/Timeline";
 import TimelineItem from "@material-ui/lab/TimelineItem";
 import TimelineContent from "@material-ui/lab/TimelineContent";
+import MEDitor, {commands} from "@uiw/react-md-editor"
+import FormHelperText from '@material-ui/core/FormHelperText';
 
 import firebase from 'firebase/app';
 import "firebase/firestore";
@@ -32,6 +34,7 @@ function getCurrentDateTime() {
 export default function CommentBox(props) {
 
     const [body, updateBody] = useState('');
+    const [commentError, setCommentError] = useState('')
 
     const [date, time] = getCurrentDateTime();
 
@@ -39,62 +42,109 @@ export default function CommentBox(props) {
 
     // console.log(time);
 
-    const addComment = async() => {
+    const validateInput = () => {
+        
+        let isError = false;
 
-        let quotedBody = ''
-
-        if(props.postComment)
-            quotedBody = body;            
-        else {
-            if(props.comment.body[0] === '`') {
-                // quotedBody = props.comment.body.substring(0, props.comment.body.lastIndexOf('`')) + props.comment.body.substring(props.comment.body.lastIndexOf('`')+1, props.comment.body.length) + '`' + body
-                quotedBody = '`' + props.comment.body.substring(props.comment.body.lastIndexOf('`') + 1, props.comment.body.length) + '`' + body
-            }
-            else {
-                quotedBody = '`' + props.comment.body + '`' + body;
-            }
+        const errors = {
+            commentError: ''
         }
 
-        const repliesRef = db.collection('forums').doc(props.postId).collection('replies').doc()
+        if(body.length < 3) {
+            isError = true;
+            errors.commentError = 'Comment body must be atleast 3 characters long'
+        }
 
-        const firebaseDate = firebase.firestore.FieldValue.serverTimestamp();
+        setCommentError(errors.commentError);
+        
+        return isError;
+    }
 
-        repliesRef.set(
-            {  
-                username: props.username,
-                body: quotedBody,
-                date: firebaseDate,
-                likes: 0,
-                dislikes: 0,
-                likeArray: [],
-                dislikeArray: []
+    const addComment = async() => {
+
+        // console.log(body)
+
+        const err = validateInput()
+
+        if(!err) {
+            let quotedBody;
+
+            if(props.postComment) {
+                quotedBody = body;            
+                console.log(quotedBody)
             }
-        ).then(() => {
-            props.updateCommentThread(
-                {
-                    id: repliesRef.id,
-                    date: date,
-                    time: time,
-                    userName: props.username,
+            else {
+                // if(props.comment.body[0] === '`') {
+                    console.log(props.comment.body)
+                if(props.comment.body[0] === '>') {
+                    // quotedBody = props.comment.body.substring(0, props.comment.body.lastIndexOf('`')) + props.comment.body.substring(props.comment.body.lastIndexOf('`')+1, props.comment.body.length) + '`' + body
+                    // quotedBody = '`' + props.comment.body.substring(props.comment.body.lastIndexOf('`') + 1, props.comment.body.length) + '`' + body
+                    quotedBody = `> ${props.comment.body.substring(props.comment.body.lastIndexOf('\n')+1)}  \n  \n${body}`;
+                    // console.log(quotedBody)
+                }
+                else {
+                    // quotedBody = '`' + props.comment.body + '`' + body;
+                    quotedBody = `> ${props.comment.body}  \n  \n${body}`;
+                }
+            }
+    
+            const repliesRef = db.collection('forums').doc(props.postId).collection('replies').doc()
+    
+            const firebaseDate = firebase.firestore.FieldValue.serverTimestamp();
+    
+            repliesRef.set(
+                {  
+                    username: props.username,
                     body: quotedBody,
+                    date: firebaseDate,
                     likes: 0,
                     dislikes: 0,
                     likeArray: [],
-                    dislikeArray: [],
-                    liked: false,
-                    disliked: false,
-                    likeColor: 'grey',
-                    dislikeColor: 'grey'
+                    dislikeArray: []
                 }
-            );
-        })
+            ).then(() => {
+                props.updateCommentThread(
+                    {
+                        id: repliesRef.id,
+                        date: date,
+                        time: time,
+                        userName: props.username,
+                        body: quotedBody,
+                        likes: 0,
+                        dislikes: 0,
+                        likeArray: [],
+                        dislikeArray: [],
+                        liked: false,
+                        disliked: false,
+                        likeColor: 'grey',
+                        dislikeColor: 'grey'
+                    }
+                );
+            })
+    
+            props.updateCommentThread({
+                id: repliesRef.id,
+                date: date,
+                time: time,
+                userName: props.username,
+                body: quotedBody,
+                likes: 0,
+                dislikes: 0,
+                likeArray: [],
+                dislikeArray: [],
+                liked: false,
+                disliked: false,
+                likeColor: 'grey',
+                dislikeColor: 'grey'
+            });
+        }
     }
 
     return (
         <div>
             <Timeline>
                 <TimelineContent>
-                    <TextField
+                    {/* <TextField
                         id="standard-full-width"
                         style={{ paddingBottom: 16, marginLeft: 5 }}
                         placeholder="Comment here..."
@@ -104,8 +154,11 @@ export default function CommentBox(props) {
                             shrink: true,
                         }}
                         onChange = {e => updateBody(e.target.value)}
-                    />
-                    <Button size="small" style={{backgroundColor: "#3f51b5", color: "white", marginLeft: 5, marginBottom: -20}} onClick={addComment}>
+                    /> */}
+                    <FormHelperText style={{ paddingBottom: 5 }}>Comment here... (Markdown supported)</FormHelperText>
+                    <MEDitor style={{ paddingBottom: 16 }} height={100} value={body} onChange={updateBody} preview={'live'} commands={[commands.codeEdit, commands.codeLive, commands.codePreview]} />
+                    <FormHelperText style={{ paddingBottom: 5 }} error={commentError.length === 0 ? false : true}>{commentError}</FormHelperText>
+                    <Button size="small" style={{backgroundColor: "#3f51b5", color: "white", marginBottom: -20}} onClick={addComment}>
                         Reply
                     </Button>
                 </TimelineContent>

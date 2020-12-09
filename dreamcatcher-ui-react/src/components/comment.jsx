@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from 'react';
+import ReactMarkdown from 'react-markdown'
 import { grey } from '@material-ui/core/colors';
 import { makeStyles } from '@material-ui/core/styles';
 import { Typography, Grid } from "@material-ui/core";
@@ -22,6 +23,10 @@ import firebase from 'firebase/app';
 import "firebase/firestore";
 
 import CommentBox from './comment-box';
+
+import {render} from 'react-dom'
+import CodeBlock from './code-block';
+
 
 const useStyles = makeStyles((theme) => ({
     small: {
@@ -65,6 +70,12 @@ const useStyles = makeStyles((theme) => ({
     }
     
 }));
+
+// let text = `> test  \n  \ntest`
+
+// export default function Comment(props) {
+//     render(<ReactMarkdown source={text} />, document.body)
+// }
 
 export default function Comment(props) {
     const classes = useStyles();
@@ -291,9 +302,9 @@ export default function Comment(props) {
 
     // console.log(props.comment)
 
-    let quoteBody = props.comment.body.substring(1, props.comment.body.lastIndexOf('`'))
+    // let quoteBody = props.comment.body.substring(1, props.comment.body.lastIndexOf('`'))
 
-    let body = props.comment.body.substring(props.comment.body.lastIndexOf('`') + 1, props.comment.body.length);
+    // let body = props.comment.body.substring(props.comment.body.lastIndexOf('`') + 1, props.comment.body.length);
 
     return (
         <Timeline>
@@ -309,7 +320,7 @@ export default function Comment(props) {
                     <Typography variant="subtitle2" className={classes.comment_details}>
                         {props.comment.userName} • Posted on {props.comment.date} at {props.comment.time}
                     </Typography>
-                    {
+                    {/* {
                         quoteBody.length > 1 ? <div> 
                             <Timeline>
                                 <TimelineItem>
@@ -325,10 +336,16 @@ export default function Comment(props) {
                                 </TimelineItem>
                             </Timeline> 
                         </div> : null
-                    }
-                    <Typography variant="body1" align="justify" paragraph={true}>
+                    } */}
+                    {/* <Typography variant="body1" align="justify" paragraph={true}>
                         {body}
+                    </Typography> */}
+                    <Typography variant="body1" align="justify" paragraph={true}>       
+                        <ReactMarkdown>
+                            {props.comment.body}
+                        </ReactMarkdown>
                     </Typography>
+                    {/* <ReactMarkdown source={'Test  \nTest  \nTest'} /> */}
                     <Grid item xs container direction="row">
                         <Grid item>        
                             <Typography variant="subtitle2" className={classes.iconText}>
