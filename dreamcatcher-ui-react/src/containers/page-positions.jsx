@@ -7,7 +7,7 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Grid from '@material-ui/core/Grid';
-import { Card, CardContent, Box, Avatar } from "@material-ui/core";
+import { Card, CardContent, Box, Avatar, DialogContentText } from "@material-ui/core";
 import positions from "./page-positions-data";
 import {firestore} from "../components/firebase"
 import CircularProgress from '@material-ui/core/CircularProgress';
@@ -21,6 +21,8 @@ import firebase from 'firebase/app';
 import "firebase/firestore";
 
 import '../index.scss'
+import ErrorDialog from "../components/error-dialog";
+import SuccessDialog from "../components/success-dialog";
 
 const myPromise = new Promise(function(resolve, reject) {
   
@@ -61,7 +63,6 @@ const myPromise = new Promise(function(resolve, reject) {
           defaultPositions.push(position)
         });
         
-        
       })
     })
   
@@ -82,7 +83,11 @@ class PositionsPage extends Component {
     defaultPositions: [],
     loading: true,
     opacity: 0.0,
-    dialog: false
+    dialog: false,
+    errorDialog: false,
+    errorMessage: '',
+    successDialog: false,
+    successMessage: ''
   }
 
   async componentDidMount() {
@@ -94,9 +99,11 @@ class PositionsPage extends Component {
 
     const data = await positionsReference.get();
     
+    // if (data.emty) {
     if (data.empty) {
-      alert("Error retrieving positions");
-      return;
+      // alert("Error retrieving positions");
+      this.setState({ errorDialog: true })
+      this.setState({ errorMessage: 'Error retrieving positions. Please refresh page and check again. '})
     }  
     
     const imgQ = data.docs.map(d => d.data().company_name.toLowerCase());
@@ -141,7 +148,12 @@ class PositionsPage extends Component {
     const data = await positionsReference.where("position_name_array", "array-contains-any", searchKey).get();
     
     if (data.empty) {
-      alert('No matching positions found.');
+      // alert('No matching positions found.');
+      // return;
+      this.setState({ searchValue: '' })
+      this.setState({ loading: false })
+      this.setState({ errorDialog: true })
+      this.setState({ errorMessage: 'No matching positions found '})
       return;
     }  
     
@@ -224,10 +236,25 @@ class PositionsPage extends Component {
       })
     });
     const body = await response.json();
-    if (response.status == 200)
-      alert(body.message);
-    else if (response.status !== 201) 
-      throw Error(body.message);
+    if (response.status == 200) {
+      this.setState({
+        errorDialog: true,
+        errorMessage: body.message
+      })
+    }
+    else if (response.status == 201) {
+      this.setState({
+        successDialog: true,
+        successMessage: 'Successfully added application!'
+      })
+    }
+    else {
+      // throw Error(body.message);
+      this.setState({
+        errorDialog: true,
+        errorMessage: body.message
+      })
+    }
   }
 
   addPosition = (e) => {
@@ -292,6 +319,12 @@ class PositionsPage extends Component {
               {
                 this.state.dialog ? <PositionsDialog dialog={this.state.dialog} setDialog={(e)=>this.showDialog(e)} addPosition={this.addPosition} searchValue={this.state.searchValue}/> : null
               } 
+              {
+                this.state.errorDialog ? <ErrorDialog dialog={this.state.errorDialog} setDialog={(e)=>this.setState({errorDialog: e})} value={this.state.errorMessage}/> : null
+              }
+              {
+                this.state.successDialog ? <SuccessDialog dialog={this.state.successDialog} setDialog={(e)=>this.setState({successDialog: e})} value={this.state.successMessage}/> : null
+              }
               </Grid>
             </Grid>
           </Grid>

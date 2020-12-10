@@ -5,6 +5,7 @@ import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import { loginUser } from '../context/actions';
 import { useAuthDispatch, useAuthState } from '../context/context';
+import ErrorDialog from '../components/error-dialog';
 
 function Login(props) {
 
@@ -12,6 +13,8 @@ function Login(props) {
     const[emailError, setEmailError] = useState('');
     const[password, setPassword] = useState('');
     const[passwordError, setPasswordError] = useState('');
+    const [errorDialog, setErrorDialog] = useState(false);
+    const [loginErrorMessage, setLoginErrorMessage] = useState('')
     
     const dispatch = useAuthDispatch();
     const { loading, errorMessage } = useAuthState() //read the values of loading and errorMessage from context
@@ -50,14 +53,20 @@ function Login(props) {
                 }
                 props.history.push("/dashboard");
             } catch(error) {
-                var errorCode = error.code;
-                var errorMessage = error.message;
+
+                // alert(error.message)
+
+                // var errorCode = error.code;
+                // var errorMessage = error.message;
     
-                alert(errorMessage);    
+                setErrorDialog(true);
+                setLoginErrorMessage(error.message)
+
+                // // alert(errorMessage);    
     
-                console.log(errorCode);
-                console.log(errorMessage);
-                console.log(error);
+                // console.log(errorCode);
+                // console.log(errorMessage);
+                // console.log(error);
             }
 
             setEmail('');
@@ -69,33 +78,36 @@ function Login(props) {
     }
 
     return (
-        <form>
-            <TextField 
-                name = 'email' 
-                type = 'email'
-                label = 'Email' 
-                value = { email } 
-                error = { emailError.length === 0 ? false : true }
-                helperText = { emailError }
-                onChange = {e => setEmail(e.target.value) } 
-                disabled = {loading}
-                required
-                />
-            <br />
-            <TextField 
-                name = 'password' 
-                type = 'password'
-                label = 'Password' 
-                value = { password } 
-                error = { passwordError.length === 0 ? false : true }
-                helperText = { passwordError }
-                onChange = {e => setPassword(e.target.value) }
-                disabled = {loading}
-                required
-                />
-            <br />
-            <Button style={{marginTop: '30px', marginBottom: '20px'}} variant="contained" color="primary" onClick={onSubmit} disabled={loading}> Login </Button>
-        </form>
+        <div>
+            { errorDialog ? <ErrorDialog dialog={errorDialog} setDialog={(e)=>setErrorDialog(e)} value={loginErrorMessage}/> : null }
+            <form>
+                <TextField 
+                    name = 'email' 
+                    type = 'email'
+                    label = 'Email' 
+                    value = { email } 
+                    error = { emailError.length === 0 ? false : true }
+                    helperText = { emailError }
+                    onChange = {e => setEmail(e.target.value) } 
+                    disabled = {loading}
+                    required
+                    />
+                <br />
+                <TextField 
+                    name = 'password' 
+                    type = 'password'
+                    label = 'Password' 
+                    value = { password } 
+                    error = { passwordError.length === 0 ? false : true }
+                    helperText = { passwordError }
+                    onChange = {e => setPassword(e.target.value) }
+                    disabled = {loading}
+                    required
+                    />
+                <br />
+                <Button style={{marginTop: '30px', marginBottom: '20px'}} variant="contained" color="primary" onClick={onSubmit} disabled={loading}> Login </Button>
+            </form>
+        </div>
     );
 }
 

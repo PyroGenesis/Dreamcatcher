@@ -6,6 +6,7 @@ import { signUpUser } from '../context/actions';
 
 import { useAuthDispatch, useAuthState } from '../context/context';
 import { checkUsernameExists } from '../components/firebase';
+import ErrorDialog from '../components/error-dialog';
 
 function SignUp(props) {
 
@@ -19,6 +20,9 @@ function SignUp(props) {
     const[emailError, setEmailError] = useState('');
     const[password, setPassword] = useState('');
     const[passwordError, setPasswordError] = useState('');
+
+    const [errorDialog, setErrorDialog] = useState(false);
+    const [signupErrorMessage, setSignupErrorMessage] = useState('')
 
     const dispatch = useAuthDispatch();
     const { loading, errorMessage } = useAuthState() //read the values of loading and errorMessage from context
@@ -90,6 +94,7 @@ function SignUp(props) {
             }
 
             try {
+
                 let response = await signUpUser(dispatch, loginDetails, additionalData);
 
                 if(!response) {
@@ -99,14 +104,17 @@ function SignUp(props) {
                 props.history.push("/dashboard");
 
             } catch(error) {
-                var errorCode = error.code;
-                var errorMessage = error.message;
+                // var errorCode = error.code;
+                // var errorMessage = error.message;
 
-                alert(errorMessage);
+                // alert(errorMessage);
 
-                console.log(errorCode);
-                console.log(errorMessage);
-                console.log(error);
+                // console.log(errorCode);
+                // console.log(errorMessage);
+                // console.log(error);
+
+                setErrorDialog(true);
+                setSignupErrorMessage(error.message)
             }
 
             setFirstName('');
@@ -123,61 +131,65 @@ function SignUp(props) {
     }
 
     return (
-        <form>
-            <TextField 
-                name="firstName" 
-                label="First Name"
-                value = { firstName } 
-                onChange = {e => setFirstName(e.target.value) } 
-                error = { firstNameError.length === 0 ? false : true }
-                helperText = { firstNameError } 
-                required 
-                />
-            <br />
-            <TextField 
-                name = 'lastName'
-                label = 'Last Name' 
-                value = { lastName } 
-                onChange = {e => setLastName(e.target.value) }
-                error = { lastNameError.length === 0 ? false : true }
-                helperText = { lastNameError } 
-                required
-                />
-            <br />
-            <TextField 
-                name = 'userName' 
-                label = 'User Name' 
-                value = { userName } 
-                error = { userNameError.length === 0 ? false : true }
-                helperText = { userNameError }
-                onChange = {e => setUserName(e.target.value) } 
-                required
-                />
-            <br />
-            <TextField 
-                name = 'email' 
-                type = 'email'
-                label = 'Email' 
-                value = { email } 
-                error = { emailError.length === 0 ? false : true }
-                helperText = { emailError }                    
-                onChange = {e => setEmail(e.target.value) } 
-                required
-                />
-            <br />
-            <TextField 
-                name = 'password' 
-                type = 'password'
-                label = 'Password' 
-                value = { password } 
-                error = { passwordError.length === 0 ? false : true }
-                helperText = { passwordError }
-                onChange = {e => setPassword(e.target.value) } 
-                required
-                />
-            <br />
-            <Button style={{marginTop: '30px', marginBottom: '20px'}} variant="contained" color="primary" onClick={onSubmit} > Sign up </Button>
-        </form>
+        <div>
+            { errorDialog ? <ErrorDialog dialog={errorDialog} setDialog={(e)=>setErrorDialog(e)} value={signupErrorMessage}/> : null }
+            <form>
+                <TextField 
+                    name="firstName" 
+                    label="First Name"
+                    value = { firstName } 
+                    onChange = {e => setFirstName(e.target.value) } 
+                    error = { firstNameError.length === 0 ? false : true }
+                    helperText = { firstNameError } 
+                    required 
+                    />
+                <br />
+                <TextField 
+                    name = 'lastName'
+                    label = 'Last Name' 
+                    value = { lastName } 
+                    onChange = {e => setLastName(e.target.value) }
+                    error = { lastNameError.length === 0 ? false : true }
+                    helperText = { lastNameError } 
+                    required
+                    />
+                <br />
+                <TextField 
+                    name = 'userName' 
+                    label = 'User Name' 
+                    value = { userName } 
+                    error = { userNameError.length === 0 ? false : true }
+                    helperText = { userNameError }
+                    onChange = {e => setUserName(e.target.value) } 
+                    required
+                    />
+                <br />
+                <TextField 
+                    name = 'email' 
+                    type = 'email'
+                    label = 'Email' 
+                    value = { email } 
+                    error = { emailError.length === 0 ? false : true }
+                    helperText = { emailError }                    
+                    onChange = {e => setEmail(e.target.value) } 
+                    required
+                    />
+                <br />
+                <TextField 
+                    name = 'password' 
+                    type = 'password'
+                    label = 'Password' 
+                    value = { password } 
+                    error = { passwordError.length === 0 ? false : true }
+                    helperText = { passwordError }
+                    onChange = {e => setPassword(e.target.value) } 
+                    required
+                    />
+                <br />
+                <Button style={{marginTop: '30px', marginBottom: '20px'}} variant="contained" color="primary" onClick={onSubmit} > Sign up </Button>
+            </form>
+        </div>
+        
     );
 }
 
