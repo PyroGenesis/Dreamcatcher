@@ -31,6 +31,7 @@ import { useParams, withRouter } from 'react-router-dom';
 import { useAuthState, AuthStateContext } from '../context/context';
 
 import Compress from "compress.js";
+import ConfirmDialog from '../components/confirm-dialog';
 
 const PROFILE_DATE_OPTIONS = {
   month: 'short',
@@ -628,7 +629,7 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
       // console.log(JSON.stringify({ token: accessInfo, experience: exCopy }));
       // console.log('resp', success);
       if (success.status == 200) {
-        
+
         // get the image for the changed education
         fetch('/images', {
           method: 'POST',
@@ -647,7 +648,7 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
           }
           changeExperience(exCopy);
         });
-        
+
       } else {
         console.log('API error: ', success);
       }
@@ -880,9 +881,16 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
                         <IconButton aria-label="edit" edge="end" style={{ alignSelf: 'start' }} onClick={() => { showExEdit(ex, exIdx) }}>
                           <Edit />
                         </IconButton>
-                        <IconButton aria-label="delete" edge="end" style={{ alignSelf: 'start' }} onClick={() => { deleteEx(exIdx) }}>
-                          <Delete />
-                        </IconButton>
+                        <ConfirmDialog
+                          title="Are you sure you want to delete the experience?"
+                          content=""
+                          yesFn={() => { deleteEx(exIdx) }}
+                          noFn={() => { }}
+                        >
+                          <IconButton aria-label="delete" edge="end" style={{ alignSelf: 'start' }}>
+                            <Delete />
+                          </IconButton>
+                        </ConfirmDialog>
                       </>
                     }
                   </div>
@@ -926,9 +934,18 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
                         <IconButton aria-label="edit" edge="end" style={{ alignSelf: 'start' }} onClick={() => { showEdit(ed, edIdx) }}>
                           <Edit />
                         </IconButton>
-                        <IconButton aria-label="delete" edge="end" style={{ alignSelf: 'start' }} onClick={() => { deleteEd(edIdx) }}>
-                          <Delete />
-                        </IconButton>
+
+                        <ConfirmDialog
+                          title="Are you sure you want to delete the education?"
+                          content=""
+                          yesFn={() => { deleteEd(edIdx) }}
+                          noFn={() => { }}
+                        >
+                          <IconButton aria-label="delete" edge="end" style={{ alignSelf: 'start' }}>
+                            <Delete />
+                          </IconButton>
+                        </ConfirmDialog>
+
                       </>
                     }
                   </div>
