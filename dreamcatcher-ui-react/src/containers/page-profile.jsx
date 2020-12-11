@@ -830,11 +830,19 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
                     Experience
                   </Typography>
                   {
-                    !isUsername && <IconButton aria-label="add" style={{ alignSelf: 'start' }} onClick={() => { showExEdit(null, -1) }}>
+                    !isUsername && experience.length > 0 &&
+                    <IconButton aria-label="add" style={{ alignSelf: 'start' }} onClick={() => { showExEdit(null, -1) }}>
                       <Add />
                     </IconButton>
                   }
                 </div>
+
+                {
+                  experience.length == 0 &&
+                  <Button variant="contained" color="primary" style={{ width: 'fit-content' }} onClick={() => { showExEdit(null, -1) }}>
+                    Add Experience
+                  </Button>
+                }
 
                 {experience.map((ex, exIdx) => (
                   <div key={ex.start.unix()} style={{ display: 'flex' }}>
@@ -870,11 +878,19 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
                     Education
                   </Typography>
                   {
-                    !isUsername && <IconButton aria-label="add" style={{ alignSelf: 'start' }} onClick={() => { showEdit(null, -1) }}>
+                    !isUsername && education.length > 0 &&
+                    <IconButton aria-label="add" style={{ alignSelf: 'start' }} onClick={() => { showEdit(null, -1) }}>
                       <Add />
                     </IconButton>
                   }
                 </div>
+
+                {
+                  education.length == 0 &&
+                  <Button variant="contained" color="primary" style={{ width: 'fit-content' }} onClick={() => { showEdit(null, -1) }}>
+                    Add Education
+                  </Button>
+                }
 
                 {education.map((ed, edIdx) => (
                   <div key={ed.startYear} style={{ display: 'flex' }}>
