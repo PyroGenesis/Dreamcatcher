@@ -527,7 +527,12 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
     // console.log(newData);
     // return;
     let edCopy = education.slice();
-    console.log(JSON.stringify({ queries: [newData.university] }));
+    if (edSelected === -1) {
+      edCopy.push(newData);
+    } else {
+      edCopy[edSelected] = newData;
+    }
+    edCopy.sort((a, b) => b.startYear - a.startYear);
 
 
     fetch('/profiles/education', {
@@ -546,6 +551,7 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
           body: JSON.stringify({ queries: [newData.university.toLowerCase()] })
         }).then(res => res.json()).then(resp => {
           if (resp.status === 200) {
+            edCopy = education.slice();
             newData.image = resp.data[newData.university.toLowerCase()]
             if (edSelected === -1) {
               edCopy.push(newData);
@@ -605,6 +611,12 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
   const saveEx = (newData) => {
 
     let exCopy = experience.slice();
+    if (exSelected === -1) {
+      exCopy.push(newData);
+    } else {
+      exCopy[exSelected] = newData;
+    }
+    exCopy.sort((a, b) => b.start - a.start);
 
     fetch('/profiles/experience', {
       method: 'POST',
@@ -613,6 +625,8 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
     }).then((res) => {
       return res.json();
     }).then(success => {
+      // console.log(JSON.stringify({ token: accessInfo, experience: exCopy }));
+      // console.log('resp', success);
       if (success.status == 200) {
         
         // get the image for the changed education
@@ -622,6 +636,7 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
           body: JSON.stringify({ queries: [newData.company.toLowerCase()] })
         }).then(res => res.json()).then(resp => {
           if (resp.status === 200) {
+            exCopy = experience.slice();
             newData.image = resp.data[newData.company.toLowerCase()]
             if (exSelected === -1) {
               exCopy.push(newData);
