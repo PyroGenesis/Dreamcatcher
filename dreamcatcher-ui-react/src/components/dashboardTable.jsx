@@ -83,11 +83,13 @@ function EnhancedTableHead(props) {
             key={headCell.id}
             align={headCell.numeric ? 'right' : 'left'}
             padding={'7'}
+            style= {{fontWeight:'bold'}}
           >{headCell.label}</TableCell>):
           (<TableCell
             key={headCell.id}
             align={headCell.numeric ? 'right' : 'left'}
             padding={'7'}
+            style= {{fontWeight:'bold'}}
             sortDirection={orderBy === headCell.id ? order : false}
           >
             <TableSortLabel

@@ -158,7 +158,7 @@ export default function CenteredGrid() {
           <br></br>
           <br></br>
           <br></br>
-          <DashBoardTable numRows = "5" title = "Past Applications" data = {data} onChangeStatus ={handleChangeStatus}/> 
+          <DashBoardTable numRows = "5" title = "Recent Applications" data = {data} onChangeStatus ={handleChangeStatus}/> 
         </Grid>
       </Grid> 
     </div>

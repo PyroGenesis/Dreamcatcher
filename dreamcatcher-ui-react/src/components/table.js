@@ -83,11 +83,13 @@ function EnhancedTableHead(props) {
             key={headCell.id}
             align={headCell.numeric ? 'right' : 'left'}
             padding={'7'}
+            style= {{fontWeight:'bold'}}
           >{headCell.label}</TableCell>):
           (<TableCell
             key={headCell.id}
             align={headCell.numeric ? 'right' : 'left'}
             padding={'7'}
+            style= {{fontWeight:'bold'}}
             sortDirection={orderBy === headCell.id ? order : false}
           >
             <TableSortLabel
@@ -153,7 +155,7 @@ const EnhancedTableToolbar = (props) => {
           {numSelected} selected
         </Typography>
       ) : (
-        <Typography className={classes.title} variant="h6" id="tableTitle" component="div">
+        <Typography className={classes.title} variant="h6" id="tableTitle" component="div" style= {{fontWeight:'bold'}}>
           {props.tableTitle}
         </Typography>
       )}
@@ -272,7 +274,7 @@ export default function EnhancedTable(props) {
                       </TableCell>
                       <TableCell align="left">{row.position}</TableCell>
                       <TableCell align="left">{row.date}</TableCell>
-                      <TableCell align="left">{row.url}</TableCell>
+                      <TableCell align="left"><a href={row.url}>{row.url}</a></TableCell>
                       <TableCell align="left">
                         <FormControl className={classes.formControl}>
                           <Select
