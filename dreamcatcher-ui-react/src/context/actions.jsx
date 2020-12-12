@@ -43,15 +43,17 @@ export async function signUpUser(dispatch, signUpPayload, additionalData) {
             } catch(error) {
                 dispatch({ type: 'LOGIN_ERROR', error: error});
 
-                var errorCode = error.code;
-                var errorMessage = error.message;
+                // var errorCode = error.code;
+                // var errorMessage = error.message;
     
-                alert(errorMessage);    
+                // alert(errorMessage);    
     
-                console.log(errorCode);
-                console.log(errorMessage);
-                console.log(error);
-                return;
+                // console.log(errorCode);
+                // console.log(errorMessage);
+                // console.log(error);
+                // return;
+
+                throw new Error(error.message)
             }
         }
     } catch(error) {
@@ -61,9 +63,11 @@ export async function signUpUser(dispatch, signUpPayload, additionalData) {
         var errorMessage = error.message;
 
         if (errorCode == 'auth/weak-password') {
-          alert('The password is too weak.');
+          // alert('The password is too weak.');
+          throw new Error('The password is too weak.')
         } else {
-          alert(errorMessage);
+          // alert(errorMessage);
+          throw new Error(errorMessage)
         }
         console.log(error);
     }
@@ -90,28 +94,32 @@ export async function loginUser(dispatch, loginPayload) {
 
             } catch(error) {
                 dispatch({ type: 'LOGIN_ERROR', error: error});
-                var errorCode = error.code;
-                var errorMessage = error.message;
+                // var errorCode = error.code;
+                // var errorMessage = error.message;
     
-                alert(errorMessage);    
+                // // alert(errorMessage);    
     
-                console.log(errorCode);
-                console.log(errorMessage);
-                console.log(error);
-                return;
+                // console.log(errorCode);
+                // console.log(errorMessage);
+                // console.log(error);
+
+                throw new Error(error.message);
+
+                // return;
             }
         }
     } catch(error) {
         dispatch({ type: 'LOGIN_ERROR', error: error});
-        var errorCode = error.code;
-        var errorMessage = error.message;
+        // var errorCode = error.code;
+        // var errorMessage = error.message;
 
-        alert(errorMessage);    
+        // // alert(errorMessage);    
 
-        console.log(errorCode);
-        console.log(errorMessage);
-        console.log(error);
-        return;
+        // console.log(errorCode);
+        // console.log(errorMessage);
+        // console.log(error);
+        throw new Error(error.message);
+
     }
 }
 

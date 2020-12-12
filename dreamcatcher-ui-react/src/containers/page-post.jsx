@@ -16,6 +16,8 @@ import {firestore} from '../components/firebase'
 import firebase from 'firebase/app';
 import "firebase/firestore";
 
+import ReactMarkdown from 'react-markdown'
+
 const useStyles = makeStyles((theme) => ({
     small: {
       maxWidth: '100%',
@@ -257,7 +259,7 @@ function Post(props) {
 
             setPosts(postsArr)
 
-            const repliesReference = firestore.collection('forums').doc(id).collection('replies');
+            const repliesReference = firestore.collection('forums').doc(id).collection('replies').orderBy("date", "desc");
 
             const repliesData = await repliesReference.get();
 
@@ -454,10 +456,15 @@ function Post(props) {
                                         <Typography variant="subtitle2" className = {classes.subtitle}>
                                             {posts[0].userName} • Posted on {posts[0].date} at {posts[0].time}
                                         </Typography>
-                                        <Typography variant="body1" align="justify" paragraph={true}>
+                                        {/* <Typography variant="body1" align="justify" paragraph={true}>
                                             {posts[0].body}
+                                        </Typography> */}
+                                        <Typography variant="body1" align="justify" paragraph={true} style={{marginLeft: 12, marginRight: 20}}>
+                                            <ReactMarkdown>
+                                                {posts[0].body}
+                                            </ReactMarkdown>
                                         </Typography>
-                                        <Grid item xs container direction="row">
+                                        <Grid item xs container direction="row" style={{marginLeft: 12}}>
                                             <Grid item>        
                                                 <Typography variant="subtitle2" className={classes.small_comment}>
                                                 {
@@ -483,12 +490,12 @@ function Post(props) {
                                             </Grid>
                                         </Grid>
                                         <Divider className={classes.divider}/>
-                                        <Typography variant="h6">
+                                        <Typography variant="h6" style={{marginLeft: 12}}>
                                             Comments:
                                         </Typography>
                                     </Grid>
                                 </Grid>
-                                <Grid item xs={12}>
+                                <Grid item xs={12} style={{ marginLeft: 20 }}>
                                     <CommentTree comments={threads} postId={id} username={username} showCommentBox = {showCommentBox}/>
                                 </Grid>
                             </Grid>

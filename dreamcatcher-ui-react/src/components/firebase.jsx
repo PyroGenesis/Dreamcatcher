@@ -46,7 +46,11 @@ export const createUserProfileDocument = async (userAuth, additionalData) => {
 }
 
 export const checkUsernameExists = async (userName) => {
-    const usernameMapDoc =  await firestore.doc(`usernameToDetails/${userName}`);
+    // const usernameMapDoc =  await firestore.doc(`usernameToDetails/${userName}`);
+    // const snapShot =  await usernameMapDoc.get();
+    // console.log("HEREEE")
+
+    const usernameMapDoc =  await firestore.collection('usernameToDetails').doc(userName)
     const snapShot =  await usernameMapDoc.get();
 
     if(snapShot.exists) {

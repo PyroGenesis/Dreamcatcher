@@ -69,7 +69,8 @@ function ForumsPage(props) {
         
         setIsLoading(true);
 
-        const forumsReference = firestore.collection('forums').where("category", "==", categories[forumNum-1]);
+        const forumsReference = firestore.collection('forums').orderBy("date", "desc").where("category", "==", categories[forumNum-1]);
+        // const forumsReference = firestore.collection('forums').where("category", "==", categories[forumNum-1]);
 
         const data = await forumsReference.get();
 
@@ -188,13 +189,13 @@ function ForumsPage(props) {
     }
 
     const addPost = (post) => {
-      setPosts([...posts, {
+      setPosts([{
         id: post.id,
         title: post.title,
         date: post.date,
         time: post.time,
         username: post.username
-      }])
+      }, ...posts])
     }
 
     if(isLoading) {

@@ -31,6 +31,7 @@ import { useParams, withRouter } from 'react-router-dom';
 import { useAuthState, AuthStateContext } from '../context/context';
 
 import Compress from "compress.js";
+import ConfirmDialog from '../components/confirm-dialog';
 
 const PROFILE_DATE_OPTIONS = {
   month: 'short',
@@ -149,12 +150,37 @@ class ProfilePage extends Component {
   }
 }
 
+function validate(fields, ignore) {
+  // let isError = false;
+
+  if (!fields) {
+    return false;
+  }
+
+  for (const key in fields) {
+    // console.log(key, fields[key]);
+    if (ignore.includes(key)) {
+      continue;
+    }
+    if (fields[key] == null || fields[key] === '') {
+      return false;
+    }
+  }
+  return true;
+}
+
 function BioEdit({ data, open, closeFn, /*modifyFn,*/ saveFn }) {
+  const [dummy, triggerReRender] = React.useState(0);
+
   const handleClose = () => {
     closeFn();
   };
 
   const handleSave = () => {
+    if (!validate(data)) {
+      triggerReRender(dummy + 1);
+      return;
+    }
     saveFn(data);
     handleClose();
   }
@@ -174,15 +200,21 @@ function BioEdit({ data, open, closeFn, /*modifyFn,*/ saveFn }) {
           </DialogContentText>
           <Grid container spacing={0}>
             <Grid item xs={12} style={{ paddingLeft: 8, paddingRight: 8 }}>
-              <TextField autoFocus required margin="dense" id="headline" label="Headline" type="text"
+              <TextField autoFocus required
+                error={data && data.headline.length === 0} helperText={data && data.headline.length === 0 ? "This field is required" : ''}
+                margin="dense" id="headline" label="Headline" type="text"
                 defaultValue={data ? data.headline : ''} onChange={textFieldChanged} fullWidth />
             </Grid>
             <Grid item xs={12} style={{ paddingLeft: 8, paddingRight: 8 }}>
-              <TextField required margin="dense" id="location" label="Location" type="text"
+              <TextField required
+                error={data && data.location.length === 0} helperText={data && data.location.length === 0 ? "This field is required" : ''}
+                margin="dense" id="location" label="Location" type="text"
                 defaultValue={data ? data.location : ''} onChange={textFieldChanged} fullWidth />
             </Grid>
             <Grid item xs={12} style={{ paddingLeft: 8, paddingRight: 8 }}>
-              <TextField required margin="dense" id="about" label="About" type="text" multiline
+              <TextField required
+                error={data && data.about.length === 0} helperText={data && data.about.length === 0 ? "This field is required" : ''}
+                margin="dense" id="about" label="About" type="text" multiline
                 defaultValue={data ? data.about : ''} onChange={textFieldChanged} fullWidth />
             </Grid>
           </Grid>
@@ -201,11 +233,17 @@ function BioEdit({ data, open, closeFn, /*modifyFn,*/ saveFn }) {
 }
 
 function ExperienceEdit({ data, open, closeFn, modifyFn, saveFn }) {
+  const [dummy, triggerReRender] = React.useState(0);
+
   const handleClose = () => {
     closeFn();
   };
 
   const handleSave = () => {
+    if (!validate(data, ['image'])) {
+      triggerReRender(dummy + 1);
+      return;
+    }
     saveFn(data);
     handleClose();
   }
@@ -226,13 +264,20 @@ function ExperienceEdit({ data, open, closeFn, modifyFn, saveFn }) {
 
   const textFieldChanged = (e) => {
     basicCheck();
-    data[e.target.id] = e.target.value;
+    modifyFn({
+      ...data,
+      [e.target.id]: e.target.value
+    })
+    // data
   }
 
   const selectFieldChanged = (e) => {
-    console.log(e.target);
     basicCheck();
-    data[e.target.name] = e.target.value;
+    modifyFn({
+      ...data,
+      [e.target.name]: e.target.value
+    })
+    // data[e.target.name] = e.target.value;
   }
 
   const dateFieldChanged = (id) => (dateObj) => {
@@ -255,15 +300,21 @@ function ExperienceEdit({ data, open, closeFn, modifyFn, saveFn }) {
           </DialogContentText>
           <Grid container spacing={0}>
             <Grid item xs={12} style={{ paddingLeft: 8, paddingRight: 8 }}>
-              <TextField autoFocus required margin="dense" id="company" label="Company" type="text"
+              <TextField autoFocus required
+                error={!data || data.company.length === 0} helperText={!data || data.company.length === 0 ? "This field is required" : ''}
+                margin="dense" id="company" label="Company" type="text"
                 defaultValue={data ? data.company : ''} onChange={textFieldChanged} fullWidth />
             </Grid>
             <Grid item xs={8} style={{ paddingLeft: 8, paddingRight: 8 }}>
-              <TextField required margin="dense" id="position" label="Position" type="text"
+              <TextField required
+                error={!data || data.position.length === 0} helperText={!data || data.position.length === 0 ? "This field is required" : ''}
+                margin="dense" id="position" label="Position" type="text"
                 defaultValue={data ? data.position : ''} onChange={textFieldChanged} fullWidth />
             </Grid>
             <Grid item xs={4} style={{ paddingLeft: 8, paddingRight: 8 }}>
-              <TextField required margin="dense" id="type" name="type" label="Type" select
+              <TextField required
+                error={!data || data.type.length === 0} helperText={!data || data.type.length === 0 ? "This field is required" : ''}
+                margin="dense" id="type" name="type" label="Type" select
                 defaultValue={data ? data.type : ''} onChange={selectFieldChanged} fullWidth >
                 {jobTypes.map((type) => (
                   <MenuItem key={type} value={type}>
@@ -273,19 +324,27 @@ function ExperienceEdit({ data, open, closeFn, modifyFn, saveFn }) {
               </TextField>
             </Grid>
             <Grid item xs={3} style={{ paddingLeft: 8, paddingRight: 8 }}>
-              <DatePicker required margin="dense" id="start" label="Start Date" disableFuture format="MMM DD, yyyy"
+              <DatePicker required
+                error={!data || !data.start} helperText={!data || !data.start ? "This field is required" : ''}
+                margin="dense" id="start" label="Start Date" disableFuture format="MMM DD, yyyy"
                 value={data ? data.start : null} onChange={dateFieldChanged('start')} fullWidth />
             </Grid>
             <Grid item xs={3} style={{ paddingLeft: 8, paddingRight: 8 }}>
-              <DatePicker required margin="dense" id="end" label="End Date" format="MMM DD, yyyy"
+              <DatePicker required
+                error={!data || !data.end} helperText={!data || !data.end ? "This field is required" : ''}
+                margin="dense" id="end" label="End Date" format="MMM DD, yyyy"
                 value={data ? data.end : null} onChange={dateFieldChanged('end')} fullWidth />
             </Grid>
             <Grid item xs={6} style={{ paddingLeft: 8, paddingRight: 8 }}>
-              <TextField required margin="dense" id="location" label="Location" type="text"
+              <TextField required
+                error={!data || data.location.length === 0} helperText={!data || data.location.length === 0 ? "This field is required" : ''}
+                margin="dense" id="location" label="Location" type="text"
                 defaultValue={data ? data.location : ''} onChange={textFieldChanged} fullWidth />
             </Grid>
             <Grid item xs={12} style={{ paddingLeft: 8, paddingRight: 8 }}>
-              <TextField required margin="dense" id="description" label="Description" type="text" multiline
+              <TextField required
+                error={!data || data.description.length === 0} helperText={!data || data.description.length === 0 ? "This field is required" : ''}
+                margin="dense" id="description" label="Description" type="text" multiline
                 defaultValue={data ? data.description : ''} onChange={textFieldChanged} fullWidth />
             </Grid>
           </Grid>
@@ -304,32 +363,7 @@ function ExperienceEdit({ data, open, closeFn, modifyFn, saveFn }) {
 }
 
 function EducationEdit({ data, open, closeFn, modifyFn, saveFn }) {
-  // const [open, setOpen] = React.useState(ed);
-  // const [data, changeData] = React.useState({
-  //   university: inputData ? inputData.university : '',
-  //   degree: inputData ? inputData.degree : '',
-  //   major: inputData ? inputData.major : '',
-  //   startYear: inputData ? inputData.startYear : '',
-  //   endYear: inputData ? inputData.endYear : ''
-  // });
-
-  // console.log('input', inputData?true:false, inputData);
-
-  // useEffect(() => {
-  //   inputData
-  // })
-
-  // if (data == null) {
-  //   data = {
-  //     university: '',
-  //     degree: '',
-  //     major: '',
-  //     startYear: '',
-  //     endYear: ''
-  //   }
-  // } else {
-  //   data = { ...data };
-  // }
+  const [dummy, triggerReRender] = React.useState(0);
 
   const handleClose = () => {
     closeFn();
@@ -338,6 +372,10 @@ function EducationEdit({ data, open, closeFn, modifyFn, saveFn }) {
   };
 
   const handleSave = () => {
+    if (!validate(data, ['image'])) {
+      triggerReRender(dummy + 1);
+      return;
+    }
     saveFn(data);
     handleClose();
   }
@@ -352,7 +390,11 @@ function EducationEdit({ data, open, closeFn, modifyFn, saveFn }) {
         endYear: null
       };
     }
-    data[e.target.id] = e.target.value;
+    modifyFn({
+      ...data,
+      [e.target.id]: e.target.value
+    })
+    // data[e.target.id] = e.target.value;
     // changeData({
     //   ...data,
     //   [e.target.id]: e.target.value
@@ -392,23 +434,33 @@ function EducationEdit({ data, open, closeFn, modifyFn, saveFn }) {
           </DialogContentText>
           <Grid container spacing={0}>
             <Grid item xs={12} style={{ paddingLeft: 8, paddingRight: 8 }}>
-              <TextField autoFocus required margin="dense" id="university" label="University" type="text"
+              <TextField autoFocus required
+                error={!data || data.university.length === 0} helperText={!data || data.university.length === 0 ? "This field is required" : ''}
+                margin="dense" id="university" label="University" type="text"
                 defaultValue={data ? data.university : ''} onChange={textFieldChanged} fullWidth />
             </Grid>
             <Grid item xs={4} style={{ paddingLeft: 8, paddingRight: 8 }}>
-              <TextField required margin="dense" id="degree" label="Program" type="text"
+              <TextField required
+                error={!data || data.degree.length === 0} helperText={!data || data.degree.length === 0 ? "This field is required" : ''}
+                margin="dense" id="degree" label="Program" type="text"
                 defaultValue={data ? data.degree : ''} onChange={textFieldChanged} fullWidth />
             </Grid>
             <Grid item xs={8} style={{ paddingLeft: 8, paddingRight: 8 }}>
-              <TextField required margin="dense" id="major" label="Major" type="text"
+              <TextField required
+                error={!data || data.major.length === 0} helperText={!data || data.major.length === 0 ? "This field is required" : ''}
+                margin="dense" id="major" label="Major" type="text"
                 defaultValue={data ? data.major : ''} onChange={textFieldChanged} fullWidth />
             </Grid>
             <Grid item xs={6} style={{ paddingLeft: 8, paddingRight: 8 }}>
-              <DatePicker required margin="dense" id="startYear" label="Start Year" views={["year"]} disableFuture
+              <DatePicker required
+                error={!data || !data.startYear} helperText={!data || !data.startYear ? "This field is required" : ''}
+                margin="dense" id="startYear" label="Start Year" views={["year"]} disableFuture
                 value={data && data.startYear ? moment([data.startYear]) : null} onChange={dateFieldChanged('startYear')} fullWidth />
             </Grid>
             <Grid item xs={6} style={{ paddingLeft: 8, paddingRight: 8 }}>
-              <DatePicker required margin="dense" id="endYear" label="End Year" views={["year"]}
+              <DatePicker required
+                error={!data || !data.endYear} helperText={!data || !data.endYear ? "This field is required" : ''}
+                margin="dense" id="endYear" label="End Year" views={["year"]}
                 value={data && data.endYear ? moment([data.endYear]) : null} onChange={dateFieldChanged('endYear')} fullWidth />
             </Grid>
           </Grid>
@@ -476,7 +528,12 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
     // console.log(newData);
     // return;
     let edCopy = education.slice();
-    console.log(JSON.stringify({ queries: [newData.university] }));
+    if (edSelected === -1) {
+      edCopy.push(newData);
+    } else {
+      edCopy[edSelected] = newData;
+    }
+    edCopy.sort((a, b) => b.startYear - a.startYear);
 
 
     fetch('/profiles/education', {
@@ -495,6 +552,7 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
           body: JSON.stringify({ queries: [newData.university.toLowerCase()] })
         }).then(res => res.json()).then(resp => {
           if (resp.status === 200) {
+            edCopy = education.slice();
             newData.image = resp.data[newData.university.toLowerCase()]
             if (edSelected === -1) {
               edCopy.push(newData);
@@ -554,6 +612,12 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
   const saveEx = (newData) => {
 
     let exCopy = experience.slice();
+    if (exSelected === -1) {
+      exCopy.push(newData);
+    } else {
+      exCopy[exSelected] = newData;
+    }
+    exCopy.sort((a, b) => b.start - a.start);
 
     fetch('/profiles/experience', {
       method: 'POST',
@@ -562,8 +626,10 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
     }).then((res) => {
       return res.json();
     }).then(success => {
+      // console.log(JSON.stringify({ token: accessInfo, experience: exCopy }));
+      // console.log('resp', success);
       if (success.status == 200) {
-        
+
         // get the image for the changed education
         fetch('/images', {
           method: 'POST',
@@ -571,6 +637,7 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
           body: JSON.stringify({ queries: [newData.company.toLowerCase()] })
         }).then(res => res.json()).then(resp => {
           if (resp.status === 200) {
+            exCopy = experience.slice();
             newData.image = resp.data[newData.company.toLowerCase()]
             if (exSelected === -1) {
               exCopy.push(newData);
@@ -581,7 +648,7 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
           }
           changeExperience(exCopy);
         });
-        
+
       } else {
         console.log('API error: ', success);
       }
@@ -779,11 +846,19 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
                     Experience
                   </Typography>
                   {
-                    !isUsername && <IconButton aria-label="add" style={{ alignSelf: 'start' }} onClick={() => { showExEdit(null, -1) }}>
+                    !isUsername && experience.length > 0 &&
+                    <IconButton aria-label="add" style={{ alignSelf: 'start' }} onClick={() => { showExEdit(null, -1) }}>
                       <Add />
                     </IconButton>
                   }
                 </div>
+
+                {
+                  experience.length == 0 &&
+                  <Button variant="contained" color="primary" style={{ width: 'fit-content' }} onClick={() => { showExEdit(null, -1) }}>
+                    Add Experience
+                  </Button>
+                }
 
                 {experience.map((ex, exIdx) => (
                   <div key={ex.start.unix()} style={{ display: 'flex' }}>
@@ -806,9 +881,16 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
                         <IconButton aria-label="edit" edge="end" style={{ alignSelf: 'start' }} onClick={() => { showExEdit(ex, exIdx) }}>
                           <Edit />
                         </IconButton>
-                        <IconButton aria-label="delete" edge="end" style={{ alignSelf: 'start' }} onClick={() => { deleteEx(exIdx) }}>
-                          <Delete />
-                        </IconButton>
+                        <ConfirmDialog
+                          title="Are you sure you want to delete the experience?"
+                          content=""
+                          yesFn={() => { deleteEx(exIdx) }}
+                          noFn={() => { }}
+                        >
+                          <IconButton aria-label="delete" edge="end" style={{ alignSelf: 'start' }}>
+                            <Delete />
+                          </IconButton>
+                        </ConfirmDialog>
                       </>
                     }
                   </div>
@@ -819,11 +901,19 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
                     Education
                   </Typography>
                   {
-                    !isUsername && <IconButton aria-label="add" style={{ alignSelf: 'start' }} onClick={() => { showEdit(null, -1) }}>
+                    !isUsername && education.length > 0 &&
+                    <IconButton aria-label="add" style={{ alignSelf: 'start' }} onClick={() => { showEdit(null, -1) }}>
                       <Add />
                     </IconButton>
                   }
                 </div>
+
+                {
+                  education.length == 0 &&
+                  <Button variant="contained" color="primary" style={{ width: 'fit-content' }} onClick={() => { showEdit(null, -1) }}>
+                    Add Education
+                  </Button>
+                }
 
                 {education.map((ed, edIdx) => (
                   <div key={ed.startYear} style={{ display: 'flex' }}>
@@ -844,9 +934,18 @@ function ProfilePageUI({ profileData, isUsername, accessInfo }) {
                         <IconButton aria-label="edit" edge="end" style={{ alignSelf: 'start' }} onClick={() => { showEdit(ed, edIdx) }}>
                           <Edit />
                         </IconButton>
-                        <IconButton aria-label="delete" edge="end" style={{ alignSelf: 'start' }} onClick={() => { deleteEd(edIdx) }}>
-                          <Delete />
-                        </IconButton>
+
+                        <ConfirmDialog
+                          title="Are you sure you want to delete the education?"
+                          content=""
+                          yesFn={() => { deleteEd(edIdx) }}
+                          noFn={() => { }}
+                        >
+                          <IconButton aria-label="delete" edge="end" style={{ alignSelf: 'start' }}>
+                            <Delete />
+                          </IconButton>
+                        </ConfirmDialog>
+
                       </>
                     }
                   </div>

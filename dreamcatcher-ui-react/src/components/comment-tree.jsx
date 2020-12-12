@@ -13,7 +13,7 @@ export default function CommentTree(props) {
     const updateCommentThread = (s) => {
         // console.log("updated")
         setLoading(true);
-        updateComments([...comments, s]);
+        updateComments([s, ...comments]);
         // setLoading(false);
         // console.log(comments)
     }

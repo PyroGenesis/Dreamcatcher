@@ -9,6 +9,8 @@ import { Typography } from "@material-ui/core";
 import { useAuthState } from '../context/context';
 import firebase from 'firebase/app';
 import "firebase/firestore";
+import MEDitor, {commands} from "@uiw/react-md-editor"
+import FormHelperText from '@material-ui/core/FormHelperText';
 
 function getCurrentDateTime() {
     let today = new Date()
@@ -152,7 +154,7 @@ export default function PostDialog(props) {
                 <Typography variant="subtitle2">
                     Post Body
                 </Typography>
-                <TextField
+                {/* <TextField
                     margin="dense"
                     id="body"
                     placeholder="Enter post body here..."
@@ -165,7 +167,10 @@ export default function PostDialog(props) {
                     style={{marginBottom: 20}}
                     error={bodyError.length === 0 ? false : true}
                     helperText={bodyError}
-                />
+                /> */}
+                <FormHelperText>Enter post body here... (Markdown supported)</FormHelperText>
+                <MEDitor id="body" height={250} value={postBody} onChange={setPostBody} preview={'live'} commands={[commands.codeEdit, commands.codeLive, commands.codePreview]} />
+                <FormHelperText error={bodyError.length === 0 ? false : true}>{bodyError}</FormHelperText>
             </DialogContent>
             <DialogActions>
                 <Button color="primary" onClick={submitPost}>
