@@ -99,13 +99,15 @@ export default function PositionsDialog(props) {
 
     const submitPosition = async() => {
 
-        console.log(props.searchValue)
-
         const err = validateInput()
 
         if(!err) {
 
-            const position_name_array = positionName.toLowerCase().replace(/[^a-zA-Z ]/g, "").split(" ")
+            let position_name_array = positionName.toLowerCase().replace(/[^a-zA-Z0-9 ]/g, "").split(" ")
+
+            const company_name_array = companyName.toLowerCase().replace(/[^a-zA-Z0-9 ]/g, "").split(" ")
+
+            position_name_array = position_name_array.concat(company_name_array)
 
             const db = firebase.firestore();
 
@@ -120,7 +122,7 @@ export default function PositionsDialog(props) {
             const response = await fetch('/auth/getUsername', requestOptions)
             const usernameObj = await response.json()
 
-            let searchKey = props.searchValue.toLowerCase().replace(/[^a-zA-Z ]/g, "").split(" ")
+            let searchKey = props.searchValue.toLowerCase().replace(/[^a-zA-Z0-9 ]/g, "").split(" ")
 
             positionRef.set({  
                 position_type: "Software Engineering",
@@ -134,7 +136,9 @@ export default function PositionsDialog(props) {
                 position_level: positionLevel,
                 position_duration: positionDuration
             }).then(() => {
-                if(searchKey.some(elem => position_name_array.includes(elem))) {    
+                // console.log(searchKey)
+
+                if(props.searchValue === "" || searchKey.some(elem => position_name_array.includes(elem))) {    
                     props.addPosition({
                         id: positionRef.id,
                         username: usernameObj.data.username,
@@ -200,7 +204,7 @@ export default function PositionsDialog(props) {
                     type="text"
                     fullWidth
                     multiline
-                    rows={3}
+                    rowsMax={15}
                     value = {jobDescription}
                     onChange = {e => setJobDescription(e.target.value)}
                     style={{marginBottom: 20}}

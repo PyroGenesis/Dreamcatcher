@@ -22,6 +22,9 @@ import CommentIcon from '@material-ui/icons/Comment';
 import firebase from 'firebase/app';
 import "firebase/firestore";
 
+import Link from '@material-ui/core/Link';
+import { Link as RouterLink } from 'react-router-dom';
+
 import CommentBox from './comment-box';
 
 import {render} from 'react-dom'
@@ -312,13 +315,17 @@ export default function Comment(props) {
                 <TimelineOppositeContent className={classes.oppositeContent}/>
                 <TimelineSeparator>
                     <TimelineDot>
-                        <Avatar className={classes.small_comment}>{props.comment.userName[0]}</Avatar> 
+                        <Avatar className={classes.small_comment}>
+                            {props.comment.userName[0]}
+                        </Avatar> 
                     </TimelineDot>
                     <TimelineConnector />
                 </TimelineSeparator>
                 <TimelineContent>        
                     <Typography variant="subtitle2" className={classes.comment_details}>
-                        {props.comment.userName} • Posted on {props.comment.date} at {props.comment.time}
+                        <Link component={RouterLink} to={{pathname:`/profile/${props.comment.userName}`}} target="_blank" rel="noopener">    
+                            {props.comment.userName} 
+                        </Link> • Posted on {props.comment.date} at {props.comment.time}
                     </Typography>
                     {/* {
                         quoteBody.length > 1 ? <div> 
