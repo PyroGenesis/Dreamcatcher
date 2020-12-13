@@ -1,0 +1,33 @@
+pitch deck
+    intro
+    product overview
+    problem
+    solution
+    
+demo
+    new user
+        signup
+        profile -> add some details
+        position
+        search -> add to my applications
+        forums -> pick relevant subforum -> new question
+        logout
+        
+    existing user
+        dashboard -> hover over today
+        positions -> add new -> add to applications
+        (note: initially (interviews) will be 0, just make a note to audience)
+        dashboard -> all applications
+        change status of 1/2 applications to (interview)
+        return to dashboard and show changed count
+        forums -> go to subforum -> open topic -> answer question
+        click on new user's username to see their profile
+        
+
+pitch deck
+    roadmap
+    tech stack
+    team
+    
+    
+// TODO: signup user should redirect to profile
