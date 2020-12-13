@@ -189,7 +189,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function EnhancedTable(props) {
-  const numRows = props.numRows;
+  const numRows = parseInt(props.numRows);
   const title = props.title;
   const data = props.data;
   const userDetails = useAuthState();
