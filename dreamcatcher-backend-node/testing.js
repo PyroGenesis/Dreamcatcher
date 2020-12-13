@@ -32,32 +32,32 @@ router.get('/addUser',  async (req, res) => {
     //     }] 
     // });
 
-    // profileRef.update({
-    //     experience: [{
-    //         position: 'Software Engineer Intern',
-    //         company: 'Personable Inc.',
-    //         type: 'Fulltime',
-    //         start: new Date(2020, 5, 22),
-    //         end: new Date(2020, 11, 18),
-    //         location: 'Irvine, California, United States',
-    //         description: 'Designed and developed 30-40% of all enhancements and improvements for Personable’s prime product, ScanWriter, which significantly improved user experience and expanded core functionality.\nAlso played an important role in transitioning the dev environment to a version-controlled CI / CD environment, which reduced merge errors by up to 50%'
-    //     }, {
-    //         position: 'Software Engineer',
-    //         company: 'Mastek Ltd.',
-    //         type: 'Fulltime',
-    //         start: new Date(2018, 5, 12),
-    //         end: new Date(2020, 7, 16),
-    //         location: 'Mumbai, Maharashtra, India',
-    //         description: 'Developed an NLP solution consisting of Text Summarization, Sentiment Analysis, and Document Clustering. Adapted the solution into a Review Analytics platform for Mastek’s customers, using Angular as the front-end, Python Flask as the back-end and hosted on Azure Cloud. Designed the Angular UI for a document profiler application, chatbot application, and a machine-learning project.'
-    //     }]
-    // });
-
     profileRef.update({
-        about: 'Software Engineer Intern undertaking .NET application development at Personable Inc. Graduate Student in Computer Science at UCI and previously employed as a Software Engineer in Mastek\'s Innovation Team. Won 1st place in Mastek\'s prestigious Project Deep Blue. Enthusiastic about learning and working with new technologies as well as applying them to provide solutions for business problems.',
-        headline: 'Software Engineer at Personable Inc. | Grad student in CS @ UCI',
-        location: 'Irvine, California, United States',
-        fullname: 'Burhanuddin Lakdawala'
-    })
+        experience: [{
+            position: 'Software Engineer Intern',
+            company: 'Personable Inc.',
+            type: 'Fulltime',
+            start: new Date(2020, 5, 22),
+            end: new Date(2020, 11, 18),
+            location: 'Irvine, California, United States',
+            description: 'Designed and developed 30-40% of all enhancements and improvements for Personable’s prime product, ScanWriter, which significantly improved user experience and expanded core functionality.\nAlso played an important role in transitioning the dev environment to a version-controlled CI / CD environment, which reduced merge errors by up to 50%'
+        }, {
+            position: 'Software Engineer',
+            company: 'Mastek Ltd.',
+            type: 'Fulltime',
+            start: new Date(2018, 5, 12),
+            end: new Date(2020, 7, 16),
+            location: 'Mumbai, Maharashtra, India',
+            description: 'Developed an NLP solution consisting of Text Summarization, Sentiment Analysis, and Document Clustering. Adapted the solution into a Review Analytics platform for Mastek’s customers, using Angular as the front-end, Python Flask as the back-end and hosted on Azure Cloud. Designed the Angular UI for a document profiler application, chatbot application, and a machine-learning project.'
+        }]
+    });
+
+    // profileRef.update({
+    //     about: 'Software Engineer Intern undertaking .NET application development at Personable Inc. Graduate Student in Computer Science at UCI and previously employed as a Software Engineer in Mastek\'s Innovation Team. Won 1st place in Mastek\'s prestigious Project Deep Blue. Enthusiastic about learning and working with new technologies as well as applying them to provide solutions for business problems.',
+    //     headline: 'Software Engineer at Personable Inc. | Grad student in CS @ UCI',
+    //     location: 'Irvine, California, United States',
+    //     fullname: 'Burhanuddin Lakdawala'
+    // })
 
     // userRef.update({
     //     createdAt: new Date(),
