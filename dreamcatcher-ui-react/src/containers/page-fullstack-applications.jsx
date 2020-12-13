@@ -1,26 +1,36 @@
 import React, {Component} from 'react';
 import Table from '../components/table';
 import { AuthStateContext } from '../context/context';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 class FullStackApplicationsPage extends Component {
   static contextType = AuthStateContext;
   state = {
     data: [],
+    isLoading: true,
   };
   componentDidMount() {
     this.callApi()
-      .then(data => this.setState({ data}))
+      .then(response => this.setState({ data:response}))
       .catch(err => console.log(err));
-      
   }
   
   callApi = async () => {
     const response = await fetch('/applications?token='+this.context.token+'&position=Full Stack');
     const body = await response.json();
+    this.setState({ isLoading:false});
     if (response.status !== 200) throw Error(body.message);
     return body;
   };
     render() {
+      if(this.state.isLoading) {
+        return (
+          <div className="body-content" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <CircularProgress size="10vw" />
+          </div>
+        );
+      }
+      else{
       return (
           <div className="applications" align ="center">
             <br></br>
@@ -29,6 +39,7 @@ class FullStackApplicationsPage extends Component {
           </div>
   
       )
+      }
     }
   }
   
