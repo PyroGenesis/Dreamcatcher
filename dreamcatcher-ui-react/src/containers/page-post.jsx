@@ -15,6 +15,8 @@ import { useAuthState } from '../context/context';
 import {firestore} from '../components/firebase'
 import firebase from 'firebase/app';
 import "firebase/firestore";
+import Link from '@material-ui/core/Link';
+import { Link as RouterLink } from 'react-router-dom';
 
 import ReactMarkdown from 'react-markdown'
 
@@ -454,7 +456,7 @@ function Post(props) {
                                             {posts[0].title}
                                         </Typography>
                                         <Typography variant="subtitle2" className = {classes.subtitle}>
-                                            {posts[0].userName} • Posted on {posts[0].date} at {posts[0].time}
+                                            <Link component={RouterLink} to={{pathname:`/profile/${posts[0].userName}`}} target="_blank" rel="noopener">{posts[0].userName}</Link> • Posted on {posts[0].date} at {posts[0].time}
                                         </Typography>
                                         {/* <Typography variant="body1" align="justify" paragraph={true}>
                                             {posts[0].body}

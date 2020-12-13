@@ -57,7 +57,9 @@ const myPromise = new Promise(function(resolve, reject) {
             desc: change.doc.data().description,
             link: change.doc.data().link,
             positionName: change.doc.data().position_name,
-            image: imgData.data[change.doc.data().company_name.toLowerCase()]
+            image: imgData.data[change.doc.data().company_name.toLowerCase()],
+            positionLevel: change.doc.data().position_level,
+            positionDuration: change.doc.data().position_duration
           }
           
           defaultPositions.push(position)
@@ -124,7 +126,9 @@ class PositionsPage extends Component {
         companyName: doc.data().company_name,
         desc: doc.data().description,
         link: doc.data().link,
-        image: imgData.data[doc.data().company_name.toLowerCase()]
+        image: imgData.data[doc.data().company_name.toLowerCase()],
+        positionLevel: doc.data().position_level,
+        positionDuration: doc.data().position_duration
       })
     });
 
@@ -141,7 +145,7 @@ class PositionsPage extends Component {
       return;
     }
 
-    let searchKey = e.searchValue.toLowerCase().replace(/[^a-zA-Z ]/g, "").split(" ")
+    let searchKey = e.searchValue.toLowerCase().replace(/[^a-zA-Z0-9 ]/g, "").split(" ")
 
     const positionsReference = firestore.collection('positions');
 
@@ -174,7 +178,9 @@ class PositionsPage extends Component {
         companyName: doc.data().company_name,
         desc: doc.data().description,
         link: doc.data().link,
-        image: imgData.data[doc.data().company_name.toLowerCase()]
+        image: imgData.data[doc.data().company_name.toLowerCase()],
+        positionLevel: doc.data().position_level,
+        positionDuration: doc.data().position_duration
       })
     });
 
@@ -361,18 +367,18 @@ class PositionsPage extends Component {
                             <h3> {this.state.position.positionName} </h3>
                             <p style={{color: "grey",display:"inline"}}> {this.state.position.companyName} </p>
                             <Button style={{float:"right"}} onClick = {()=>this.handleAddApplication(this.state)}>Add to My Applications</Button>
-                            <br></br>
+                            <br/><br/>
+                            <Typography variant="subtitle2" style={{color: "grey"}}>
+                                Position Level: {this.state.position.positionLevel} <br/>
+                                Position Duration: {this.state.position.positionDuration}
+                            </Typography>
                             <br></br>
                             <Typography variant="body1" align="justify" style={{whiteSpace: 'pre-line'}}>
                                 {this.state.position.desc}
                             </Typography>
                             <br/>
-                            <a href={this.state.position.link}> Link to application </a>
+                            <a href={this.state.position.link} target="_blank" rel="noopener"> Link to application </a>
                             <br/><br/>
-                            <Typography variant="body2">
-                                <b>Position Level:</b> {this.state.position.positionLevel} <br/><br/>
-                                <b>Position Duration:</b> {this.state.position.positionDuration}
-                            </Typography>
                           </div>
                       }
                     </CardContent>
