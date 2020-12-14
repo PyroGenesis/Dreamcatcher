@@ -177,7 +177,7 @@ function BioEdit({ data, open, closeFn, /*modifyFn,*/ saveFn }) {
   };
 
   const handleSave = () => {
-    if (!validate(data)) {
+    if (!validate(data, [])) {
       triggerReRender(dummy + 1);
       return;
     }
