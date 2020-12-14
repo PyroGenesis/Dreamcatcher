@@ -326,12 +326,14 @@ function ExperienceEdit({ data, open, closeFn, modifyFn, saveFn }) {
             <Grid item xs={3} style={{ paddingLeft: 8, paddingRight: 8 }}>
               <DatePicker required
                 error={!data || !data.start} helperText={!data || !data.start ? "This field is required" : ''}
+                views={['year', 'month', 'date']}
                 margin="dense" id="start" label="Start Date" disableFuture format="MMM DD, yyyy"
                 value={data ? data.start : null} onChange={dateFieldChanged('start')} fullWidth />
             </Grid>
             <Grid item xs={3} style={{ paddingLeft: 8, paddingRight: 8 }}>
               <DatePicker required
                 error={!data || !data.end} helperText={!data || !data.end ? "This field is required" : ''}
+                views={['year', 'month', 'date']}
                 margin="dense" id="end" label="End Date" format="MMM DD, yyyy"
                 value={data ? data.end : null} onChange={dateFieldChanged('end')} fullWidth />
             </Grid>
