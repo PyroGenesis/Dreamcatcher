@@ -101,7 +101,7 @@ function SignUp(props) {
                     return;
                 }
 
-                props.history.push("/dashboard");
+                props.history.push("/profile");
 
             } catch(error) {
                 // var errorCode = error.code;
