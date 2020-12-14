@@ -49,11 +49,11 @@ export default function LandingPageNew(props) {
     // }
 
     // if(tokenStatus === 'success') {
-    if(userDetails.token) {
+    /* if(userDetails.token) {
        props.history.push('/dashboard');
        return null;
-    }
-    else {
+    } 
+    else { */
       return (
         <header className="body-content App-header">
           <Grid container style={{margin: 0, width: '100%'}} justify="center" spacing={3} alignItems="center">
@@ -79,5 +79,5 @@ export default function LandingPageNew(props) {
           </Grid>    
         </header>
       );
-    }
+    // }
 }
