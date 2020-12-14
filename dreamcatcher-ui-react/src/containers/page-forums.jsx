@@ -212,7 +212,7 @@ function ForumsPage(props) {
             <AddIcon />
           </Fab>
           
-          <Grid container align="center">
+          <Grid container align="center" style={{ height: '100%' }}>
             <Grid item xs={3}>
               <Card  className={classes.forumCard} style={{backgroundColor: backgroundColor1, color: textColor1}} onClick={()=>handleCardClick(1)} >
                 <CardContent>
@@ -254,7 +254,7 @@ function ForumsPage(props) {
               dialog ? <PostDialog dialog={dialog} setDialog={showDialog} forumNum={forumNum} addPost={addPost}/> : null
             } 
             </Grid>
-            <Grid item xs={12} style={{ marginLeft: '20px', marginRight: '20px'}}>
+            <Grid item xs={12} style={{ marginLeft: '20px', marginRight: '20px', height: 'calc(100% - 165px)', overflow: 'auto'}}>
               <PostsTable forumNum={forumNum} posts={posts} username={username}/>
             </Grid>
           </Grid>
