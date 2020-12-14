@@ -156,7 +156,7 @@ export default function CommentBox(props) {
                         onChange = {e => updateBody(e.target.value)}
                     /> */}
                     <FormHelperText style={{ paddingBottom: 5 }}>Comment here... (Markdown supported)</FormHelperText>
-                    <MEDitor style={{ paddingBottom: 16 }} height={100} value={body} onChange={updateBody} preview={'live'} commands={[commands.codeEdit, commands.codeLive, commands.codePreview]} />
+                    <MEDitor style={{ paddingBottom: 16 }} height={300} value={body} onChange={updateBody} preview={'live'} commands={[commands.codeEdit, commands.codeLive, commands.codePreview]} />
                     <FormHelperText style={{ paddingBottom: 5 }} error={commentError.length === 0 ? false : true}>{commentError}</FormHelperText>
                     <Button size="small" style={{backgroundColor: "#3f51b5", color: "white", marginBottom: -20}} onClick={addComment}>
                         Reply
