@@ -43,9 +43,7 @@ export default function Calendar({countArray}) {
         }}
         tooltipDataAttrs={value => {
           return {
-            'data-tip': `${value.date.toISOString().slice(0, 10)} has count: ${
-              value.count
-            }`,
+            'data-tip': value.date? `${value.date.toISOString().slice(0, 10)} has count: ${value.count}`:'',
           };
         }}
         showWeekdayLabels={true}
