@@ -143,16 +143,18 @@ export default function CenteredGrid() {
           <h3 style={{fontFamily: "Roboto"}}> {count120} applications in the past 4 months</h3>
           <Paper >
             <br></br>
-            <Paper square style ={{display: 'inline-block', width: 20, height: 20,background: '#eeeeee', marginLeft: 5}}></Paper>
+            <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap'}}>
+              <Paper square style ={{display: 'inline-block', width: 20, height: 20,background: '#eeeeee', marginLeft: 5, marginRight: 5}}></Paper>
             <span>  0 applications</span>
-            <Paper square style ={{display: 'inline-block', width: 20, height: 20,background: '#d6e685', marginLeft: 5}}></Paper>
+              <Paper square style ={{display: 'inline-block', width: 20, height: 20,background: '#d6e685', marginLeft: 5, marginRight: 5}}></Paper>
             <span>  1-3 applications</span>
-            <Paper square style ={{display: 'inline-block', width: 20, height: 20,background: '#8cc665', marginLeft: 5}}></Paper>
+              <Paper square style ={{display: 'inline-block', width: 20, height: 20,background: '#8cc665', marginLeft: 5, marginRight: 5}}></Paper>
             <span>  4-7 applications</span>
-            <Paper square style ={{display: 'inline-block', width: 20, height: 20,background: '#44a340', marginLeft: 5}}></Paper>
+              <Paper square style ={{display: 'inline-block', width: 20, height: 20,background: '#44a340', marginLeft: 5, marginRight: 5}}></Paper>
             <span>  7-10 applications</span>
-            <Paper square style ={{display: 'inline-block', width: 20, height: 20,background: '#1e6823', marginLeft: 5}}></Paper>
+              <Paper square style ={{display: 'inline-block', width: 20, height: 20,background: '#1e6823', marginLeft: 5, marginRight: 5}}></Paper>
             <span>  {">"} 10 applications</span>
+            </div>
             <Calendar countArray = {dailyCounts}/> 
           </Paper>
           <br></br>
