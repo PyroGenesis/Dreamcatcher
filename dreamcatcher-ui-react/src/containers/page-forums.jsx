@@ -12,6 +12,7 @@ import {firebaseDateToJSDate} from "../misc/utilities"
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { useAuthState, useAuthDispatch } from '../context/context';
 import {firestore} from "../components/firebase"
+import queryString from 'query-string';
 
 const useStyles = makeStyles((theme) => ({
   small: {
@@ -41,19 +42,39 @@ const useStyles = makeStyles((theme) => ({
 function ForumsPage(props) {
     const classes = useStyles();
 
-    const [forumNum, setForumNum] = useState(1);
+    // const id = useParams();
+
+    const [forumNum, setForumNum] = useState(props.location.search ? queryString.parse(props.location.search).category : 1);
     const [dialog, setDialog] = useState(false);
     // const [backgroundColor, setBackgroundColor] = useState(['green', 'white', 'white', 'white'])
     // const [textColor, setTextColor] = useState(['black', 'black', 'black', 'black'])
-    const [backgroundColor1, setBackgroundColor1] = useState('#3f51b5')
-    const [backgroundColor2, setBackgroundColor2] = useState('white')
-    const [backgroundColor3, setBackgroundColor3] = useState('white')
-    const [backgroundColor4, setBackgroundColor4] = useState('white')
 
-    const [textColor1, setTextColor1] = useState('white')
-    const [textColor2, setTextColor2] = useState('black')
-    const [textColor3, setTextColor3] = useState('black')
-    const [textColor4, setTextColor4] = useState('black')
+    // const [backgroundColor1, setBackgroundColor1] = useState('#3f51b5')
+    // const [backgroundColor2, setBackgroundColor2] = useState('white')
+    // const [backgroundColor3, setBackgroundColor3] = useState('white')
+    // const [backgroundColor4, setBackgroundColor4] = useState('white')
+
+    // console.log(queryString.parse(props.location.search).category)
+
+    /* if(queryString.parse(props.location.search).category === '1') {
+      console.log("True")
+    } */
+
+    const [backgroundColor1, setBackgroundColor1] = useState(props.location.search ? (queryString.parse(props.location.search).category === '1' ? '#3f51b5' : 'white') : '#3f51b5' )
+    const [backgroundColor2, setBackgroundColor2] = useState(props.location.search ? (queryString.parse(props.location.search).category === '2' ? '#3f51b5' : 'white') : 'white' )
+    const [backgroundColor3, setBackgroundColor3] = useState(props.location.search ? (queryString.parse(props.location.search).category === '3' ? '#3f51b5' : 'white') : 'white' )
+    const [backgroundColor4, setBackgroundColor4] = useState(props.location.search ? (queryString.parse(props.location.search).category === '4' ? '#3f51b5' : 'white') : 'white' )
+
+    // const [textColor1, setTextColor1] = useState('white')
+    // const [textColor2, setTextColor2] = useState('black')
+    // const [textColor3, setTextColor3] = useState('black')
+    // const [textColor4, setTextColor4] = useState('black')
+
+    const [textColor1, setTextColor1] = useState(props.location.search ? (queryString.parse(props.location.search).category === '1' ? 'white' : 'black') : 'white' )
+    const [textColor2, setTextColor2] = useState(props.location.search ? (queryString.parse(props.location.search).category === '2' ? 'white' : 'black') : 'black' )
+    const [textColor3, setTextColor3] = useState(props.location.search ? (queryString.parse(props.location.search).category === '3' ? 'white' : 'black') : 'black' )
+    const [textColor4, setTextColor4] = useState(props.location.search ? (queryString.parse(props.location.search).category === '4' ? 'white' : 'black') : 'black' )
+
 
     const [isLoading, setIsLoading] = useState(true);
     const [posts, setPosts] = useState([])
@@ -129,6 +150,11 @@ function ForumsPage(props) {
       switch(id) {
         case 1: {
           console.log("here1")
+
+          props.history.push({
+            search: '?category=1'
+          })  
+
           setBackgroundColor1('#3f51b5')
           setTextColor1('white')
           
@@ -143,6 +169,11 @@ function ForumsPage(props) {
         }
         case 2: {
           console.log("here2")
+
+          props.history.push({
+            search: '?category=2'
+          })  
+
           setBackgroundColor2('#3f51b5')
           setTextColor2('white')
 
@@ -157,6 +188,11 @@ function ForumsPage(props) {
         }
         case 3: {
           console.log("here3")
+
+          props.history.push({
+            search: '?category=3'
+          })  
+
           setBackgroundColor3('#3f51b5')
           setTextColor3('white')
 
@@ -171,6 +207,11 @@ function ForumsPage(props) {
         }
         case 4: {
           console.log("here4")
+
+          props.history.push({
+            search: '?category=4'
+          })  
+
           setBackgroundColor4('#3f51b5')
           setTextColor4('white')
 
