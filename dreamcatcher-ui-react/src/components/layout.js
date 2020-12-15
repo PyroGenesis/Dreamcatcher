@@ -77,7 +77,7 @@ export default function CenteredGrid() {
   else {
   return (
     <div className={classes.root}>
-      <Grid container spacing={5}
+      <Grid container spacing={0}
       justify="center">
         <Grid item xs={4}> 
           <Paper className = {classes.paper}>
