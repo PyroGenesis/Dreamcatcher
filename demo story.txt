@@ -9,7 +9,7 @@ demo
         signup
         profile -> add some details
         position
-        search -> add to my applications
+        search (full stack) -> add to my applications
         forums -> pick relevant subforum -> new question
         logout
         
@@ -30,4 +30,10 @@ pitch deck
     team
     
     
+// TODO: tab URL query param for forum
 // TODO: signup user should redirect to profile
+// TODO: company name in position search
+// fix apple logo
+// bettwe date
+// fix the 100% navbar issue
+// resizing of markdown box
