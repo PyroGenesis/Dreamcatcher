@@ -7,6 +7,12 @@ import 'react-calendar-heatmap/dist/styles.css';
 
 const today = new Date();
 
+const TOOLTIP_DATE_FORMAT = {
+  month: 'short',
+  day: '2-digit',
+  year: 'numeric'
+}
+
 
 export default function Calendar({countArray}) {
   const countValues = getRange(120).map(index => {
@@ -43,7 +49,9 @@ export default function Calendar({countArray}) {
         }}
         tooltipDataAttrs={value => {
           return {
-            'data-tip': value.date? `${value.date.toISOString().slice(0, 10)} has count: ${value.count}`:'',
+            'data-tip': value.date?
+              `${value.count} application${value.count==1?'':'s'} on ${value.date.toLocaleDateString('default', TOOLTIP_DATE_FORMAT)}`:
+              '',
           };
         }}
         showWeekdayLabels={true}
