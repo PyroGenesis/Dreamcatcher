@@ -33,10 +33,8 @@ class PastApplicationsPage extends Component {
       }
       else{
       return (
-          <div className="applications" align ="center">
-            <br></br>
+          <div className="body-content applications" align ="center" style={{paddingTop: 20, paddingBottom: 20}}>
             <Table numRows = "10" title = "Past Applications" data = {this.state.data.data}/>
-            <br></br>
           </div>
   
       )
