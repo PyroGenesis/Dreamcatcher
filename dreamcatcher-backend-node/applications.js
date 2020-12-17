@@ -3,7 +3,19 @@ const router = express.Router();
 
 const firebase = require('./firestore-init');
 const db = firebase.firestore();
-const utilities = require('../dreamcatcher-ui-react/src/misc/utilities')
+
+// For the love of god please don't make an import like this
+// const utilities = require('../dreamcatcher-ui-react/src/misc/utilities')
+const firebaseDateToJSDate = (dateObj, options) => {
+    return firebaseDateToJSDateObj(dateObj).toLocaleDateString("default", options);
+};
+
+const firebaseDateToJSDateObj = (dateObj) => {
+    let milliseconds = 0;
+    milliseconds += dateObj._seconds * 1000;
+    milliseconds += Math.floor(dateObj._nanoseconds / 1000000);
+    return new Date(milliseconds);
+};
 
 const verifyToken = require('./common_resources').verifyToken;
 
@@ -149,7 +161,7 @@ router.get('/data', async (req, res, next) => {
             application.position = (await application.positionRef.get()).data();
             const dateObj = {_seconds: application.date._seconds, _nanoseconds:application.date._nanoseconds};
             const options = {year: "numeric", month: "numeric", day: "2-digit"};
-            const datetime = utilities.firebaseDateToJSDate(dateObj, options);
+            const datetime = firebaseDateToJSDate(dateObj, options);
             // const datetime ="11/23/2020";
             day = datetime.substring(3,5);
             month = datetime.substring(0,2)-1;
@@ -226,7 +238,7 @@ router.get('/data', async (req, res, next) => {
             application.position = (await application.positionRef.get()).data();
             const dateObj = {_seconds: application.date._seconds, _nanoseconds:application.date._nanoseconds};
             const options = {year: "numeric", month: "numeric", day: "2-digit"};
-            const datetime = utilities.firebaseDateToJSDate(dateObj, options);
+            const datetime = firebaseDateToJSDate(dateObj, options);
             // const datetime ="11/23/2020";
             day = datetime.substring(3,5);
             month = datetime.substring(0,2)-1;
