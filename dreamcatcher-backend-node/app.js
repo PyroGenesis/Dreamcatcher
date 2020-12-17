@@ -19,7 +19,9 @@ const basicAPI = async (req, res, next) => {
     res.json({
         status: 500,
         message: 'API was not setup / called correctly. Caught by fallback.',
-        data: null
+        data: {
+            port: port
+        }
     });
 }
 
