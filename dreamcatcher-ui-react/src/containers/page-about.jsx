@@ -5,6 +5,7 @@ import Grid from '@material-ui/core/Grid';
 import Avatar from '@material-ui/core/Avatar';
 import defaultuser from '../assets/images/user.png';
 import burhan from '../assets/images/burhan.jpg';
+import yash from '../assets/images/yash.jpg';
 
 const styles = theme => ({
     root: {
@@ -31,8 +32,8 @@ class AboutPage extends Component {
             image: burhan
         }, {
             name: 'Yash Kulkarni',
-            position: 'Full Stack Engineer',
-            image: defaultuser
+            position: 'Front End and Infrastructure Engineer',
+            image: yash
         }];
 
         const { theme, classes } = this.props;
