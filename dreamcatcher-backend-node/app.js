@@ -31,6 +31,7 @@ app.use('/applications', applications);
 app.use('/auth', auth);
 app.use('/profiles', profileRoutes);
 app.use('/images', imageRoutes);
+app.use('/health', (req, res) => { res.sendStatus(200) })
 app.use('/', basicAPI)
 
 
