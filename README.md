@@ -10,9 +10,9 @@
   <p align="center">
     Get help on your path to acquire your dream job
     <br />
-    <a href="https://youtu.be/4ABw-JlAAco">View Demo</a>
+    <a href="https://youtu.be/4_YIT2BbuLA">View Demo</a>
     ·
-    <a href="https://youtu.be/4_YIT2BbuLA">View a 30 second advertisement</a>
+    <a href="https://youtu.be/4ABw-JlAAco">View a 30 second advertisement</a>
     ·
     <a href="/dreamcatcher-ui-react/src/docs/Dreamcatcher - Executive Summary.pdf">View Executive Summary</a>
   </p>
