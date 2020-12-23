@@ -372,13 +372,13 @@ class PositionsPage extends Component {
                                 Position Level: {this.state.position.positionLevel} <br/>
                                 Position Duration: {this.state.position.positionDuration}
                             </Typography>
-                            <br></br>
+                            <br/>
+                            <a href={this.state.position.link} target="_blank" rel="noopener"> Link to application </a>
+                            <br/><br/>
                             <Typography variant="body1" align="justify" style={{whiteSpace: 'pre-line'}}>
                                 {this.state.position.desc}
                             </Typography>
                             <br/>
-                            <a href={this.state.position.link} target="_blank" rel="noopener"> Link to application </a>
-                            <br/><br/>
                           </div>
                       }
                     </CardContent>
