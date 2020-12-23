@@ -119,8 +119,8 @@ npm install
 <!-- CONTACT -->
 ## Contact
 
-Yash Kulkarni - [LinkedIn](https://www.linkedin.com/in/yashkulkarni97/)
-Burhanuddin Lakdawala - [LinkedIn](https://www.linkedin.com/in/burhanuddin-lakdawala/)
+Yash Kulkarni - [LinkedIn](https://www.linkedin.com/in/yashkulkarni97/)  \
+Burhanuddin Lakdawala - [LinkedIn](https://www.linkedin.com/in/burhanuddin-lakdawala/)  \
 Anand Deshpande - [LinkedIn](https://www.linkedin.com/in/anand-deshpande10)
 
 Project Link: [https://github.com/PyroGenesis/Dreamcatcher](https://github.com/PyroGenesis/Dreamcatcher)
